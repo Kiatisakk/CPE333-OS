@@ -73,6 +73,19 @@ def one_run(rel, label, run=1):
     raise SystemExit("make_latex.py: no block %r run %d in %s" % (label, run, rel))
 
 
+def all_runs(rel, label):
+    """(first, last) spanning every run of one build.
+
+    The sheet says to copy the output into the report, so each subsection
+    carries its build's runs in full. Between them the subsections account for
+    every block in results/, which is why there is no appendix repeating them.
+    """
+    hits = [(first, last) for lab, _, first, last, _ in parse(rel) if lab == label]
+    if not hits:
+        raise SystemExit("make_latex.py: no blocks labelled %r in %s" % (label, rel))
+    return hits[0][0], hits[-1][1]
+
+
 def addr_after(rel, label, run, marker, offset=1):
     """The address `offset` lines below `marker` inside one block."""
     for lab, n, _, _, body in parse(rel):
@@ -109,10 +122,58 @@ def csrc(rel):
     return listing(rel, "csrc", "Source: \\texttt{%s}" % rel.replace("_", "\\_"))
 
 
+QUOTED = set()   # (transcript, label) pairs the document actually shows
+
+
+def needspace(lines):
+    """Ask for enough room that a transcript is not split across a page break.
+
+    A transcript reads as one continuous session, so a break through the middle
+    of it is worse than a short page. Listings are \\scriptsize (about 0.62 of a
+    normal baselineskip) and the caption costs about two more lines. Anything
+    taller than a page cannot be kept together anyway, so above that the request
+    is dropped rather than forcing a page it still will not fit on.
+    """
+    need = int(lines * 0.62) + 3
+    if need > 40:
+        return r"\headroom"
+    return r"\Needspace*{%d\baselineskip}" % need
+
+
+def _term(rel, label, caption, first, last):
+    QUOTED.add((rel, label))
+    return "%s\n%s" % (needspace(last - first + 1),
+                       listing(rel, "term", caption,
+                               ",firstline=%d,lastline=%d" % (first, last)))
+
+
 def run_listing(rel, label, caption, run=1):
     first, last = one_run(rel, label, run)
-    return listing(rel, "term", caption,
-                   ",firstline=%d,lastline=%d" % (first, last))
+    return _term(rel, label, caption, first, last)
+
+
+def runs_listing(rel, label, caption):
+    """Every run of one build, quoted straight out of the transcript."""
+    first, last = all_runs(rel, label)
+    return _term(rel, label, caption, first, last)
+
+
+def check_coverage():
+    """Every captured run must appear somewhere in the report.
+
+    There is no appendix, so the subsections are the only place output is
+    shown. If a build were ever added to run_all.sh and not to the document,
+    its runs would silently never reach the report -- this turns that into an
+    error instead.
+    """
+    missing = []
+    for rel in (R1, R2, R3):
+        for label in dict.fromkeys(lab for lab, _, _, _, _ in parse(rel)):
+            if (rel, label) not in QUOTED:
+                missing.append("%s: %s" % (rel, label))
+    if missing:
+        raise SystemExit("make_latex.py: captured but never shown in the "
+                         "report:\n  " + "\n  ".join(missing))
 
 
 def addr_table(caption, rows, headers=None):
@@ -164,15 +225,18 @@ def build_body():
     sec("Static Storage Class")
     sub(r"The original program", "item1_1", [
         csrc("src/1_static.c"), "",
-        r"\headroom",
-        run_listing(R1, L1P, "One run of the original program"), "",
+        runs_listing(R1, L1P, "All three runs of the original program"), "",
     ])
     sub(r"With \texttt{static} removed", "item1_2", [
         csrc("src/1_static_no_static.c"), "",
-        r"\headroom",
-        run_listing(R1, L1PA, "One run after removing \\texttt{static}"), "",
+        runs_listing(R1, L1PA, "All three runs after removing \\texttt{static}"), "",
     ])
     sub(r"Compiled with \texttt{-no-pie}", "item1_3", [
+        runs_listing(R1, L1N,
+                     "The original program rebuilt with \\texttt{-no-pie}"), "",
+        runs_listing(R1, L1NA,
+                     "The \\texttt{static}-less program with \\texttt{-no-pie}"), "",
+        r"\headroom",
         addr_table(
             "Address of \\texttt{y} in each of the three runs",
             [(r"\texttt{static}, default PIE", [y(L1P, n) for n in (1, 2, 3)]),
@@ -186,15 +250,19 @@ def build_body():
     sec("Extern Storage Class")
     sub(r"The original program", "item2_1", [
         csrc("src/2_extern.c"), "",
-        r"\headroom",
-        run_listing(R2, L2P, "One run of the original program"), "",
+        runs_listing(R2, L2P, "All three runs of the original program"), "",
     ])
     sub(r"With \texttt{extern} removed from \texttt{main()}", "item2_2", [
         csrc("src/2_extern_no_extern.c"), "",
-        r"\headroom",
-        run_listing(R2, L2PA, "One run after removing \\texttt{extern}"), "",
+        runs_listing(R2, L2PA,
+                     "All three runs after removing \\texttt{extern}"), "",
     ])
     sub(r"Compiled with \texttt{-no-pie}", "item2_3", [
+        runs_listing(R2, L2N,
+                     "The original program rebuilt with \\texttt{-no-pie}"), "",
+        runs_listing(R2, L2NA,
+                     "The \\texttt{extern}-less program with \\texttt{-no-pie}"), "",
+        r"\headroom",
         addr_table(
             "Address of \\texttt{x} in each of the three runs",
             [(r"global \texttt{x}, default PIE", [x(L2P, n, "main") for n in (1, 2, 3)]),
@@ -210,12 +278,10 @@ def build_body():
     sec("Memory Allocation")
     sub(r"The original program", "item3_1", [
         csrc("src/3_memory.c"), "",
-        r"\headroom",
         run_listing(R3, L3, "The program as given"), "",
     ])
     sub(r"With the allocation of \texttt{b} enabled", "item3_2", [
         csrc("src/3_memory_with_b.c"), "",
-        r"\headroom",
         run_listing(R3, L3B, "The same program with \\texttt{b} allocated"), "",
         r"\headroom",
         addr_table(
@@ -230,19 +296,10 @@ def build_body():
         "",
     ])
 
-    # -------------------------------------------------------- appendix ---
-    out.extend([
-        r"\clearpage",
-        r"\appendix",
-        r"\section{Full experiment output}",
-        "",
-        "Every run captured by the experiment script. The extracts and tables "
-        "above are taken from these files at build time, not transcribed.",
-        "",
-        listing(R1, "term", "All twelve runs of item 1"), "",
-        listing(R2, "term", "All twelve runs of item 2"), "",
-        listing(R3, "term", "Both runs of item 3"), "",
-    ])
+    check_coverage()
+
+    # No appendix: between them the subsections above already quote every
+    # block in results/, so an appendix would only repeat them.
 
     with io.open(os.path.join(GEN, "body.tex"), "w",
                  encoding="utf-8", newline="\n") as fh:
