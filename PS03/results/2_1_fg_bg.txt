@@ -1,0 +1,18 @@
+--- 1. in the foreground ---
+$ date +%T ; ./ss1_1.sh ; date +%T
+03:12:21
+ss1_1.sh (pid 1434): tick 1 tick 2 tick 3 tick 4 tick 5 tick 6 tick 7 tick 8 tick 9 tick 10 finished
+03:12:31
+
+--- 2. in the background ---
+$ date +%T ; ./ss1_1.sh &
+03:12:31
+ss1_1.sh (pid 1448): tick 1 tick 2
+$ jobs
+[1]+  Running                    ./ss1_1.sh &
+$ ps -o pid,ppid,stat,etime,args -p 1448
+    PID    PPID STAT     ELAPSED COMMAND
+   1448    1431 S          00:02 bash ./ss1_1.sh
+$ wait ; date +%T          # only now block until it finishes
+ tick 3 tick 4 tick 5 tick 6 tick 7 tick 8 tick 9 tick 10 finished
+03:12:42

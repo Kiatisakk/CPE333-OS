@@ -1,0 +1,47 @@
+% ===================================================================
+%  CPE 333 Operating Systems -- Problem Session 2
+%  Process Creation & Pipes
+%
+%  BUILD:   cd latex && latexmk -pdf main.tex
+%           (or run ..\scripts\build_pdf.ps1 from anywhere)
+%
+%  WHAT IS SAFE TO EDIT
+%    main.tex           <- this file. Put your names below. Hand-edited.
+%    preamble.tex       <- packages and listing styles. Hand-edited.
+%    discussion/*.tex   <- YOUR PROSE. Never overwritten by the generator.
+%    generated/*        <- DO NOT EDIT. Rewritten by scripts/make_latex.py.
+%
+%  Code and transcripts are pulled straight out of ../src and ../results at
+%  compile time, so the report cannot drift from what was actually run.
+%
+%  NEED THAI CHARACTERS (e.g. Thai names in \author)?
+%  pdfLaTeX cannot render them. See the switch instructions in preamble.tex,
+%  then build with:  latexmk -xelatex main.tex
+% ===================================================================
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+
+\title{%
+  \large CPE 333 Operating Systems, 1/2026\\[0.4em]
+  \Large\bfseries Problem Session 2: Process Creation \& Pipes%
+}
+
+% A tabular, not \quad: names differ in length, so only a table lines the
+% student IDs up in a column.
+\author{%
+  \begin{tabular}{@{}l@{\hspace{2em}}l@{}}
+    Kiatisak Markmeeshap & 67070501005 \\
+    Tithinan Sobking     & 67070501018 \\
+    Worawut Sereethai    & 67070501040 \\
+    Chanya Poolketkij    & 67070501058
+  \end{tabular}%
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{generated/body}
+
+\end{document}

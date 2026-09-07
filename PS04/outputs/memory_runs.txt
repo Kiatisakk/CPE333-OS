@@ -1,0 +1,55 @@
+MEMORY original, no -no-pie
+
+Address of Pointer
+>>0x7ffdcae952b0
+>>0x7ffdcae952b8
+
+Effective Address
+>>(nil)
+>>(nil)
+
+After malloc Pointer a
+>>0x5b5db992c2b0
+>>0x5b5db992c2b0
+>>0x5b5db992c2d4
+
+Array c
+>>0x7ffdcae952c0
+>>0x7ffdcae952c0
+>>0x7ffdcae952e4
+
+After realloc Pointer a
+>>0x5b5db992c2b0
+>>0x5b5db992c2b0
+>>0x5b5db992c2d4
+>>0x5b5db992d24c
+MEMORY with b uncommented, no -no-pie
+
+Address of Pointer
+>>0x7ffc24be13d0
+>>0x7ffc24be13d8
+
+Effective Address
+>>(nil)
+>>(nil)
+
+After malloc Pointer a
+>>0x5a42ae8592b0
+>>0x5a42ae8592b0
+>>0x5a42ae8592d4
+
+Array c
+>>0x7ffc24be13e0
+>>0x7ffc24be13e0
+>>0x7ffc24be1404
+
+After malloc Pointer b
+>>0x5a42ae8592e0
+>>0x5a42ae8592e0
+>>0x5a42ae859304
+
+After realloc Pointer a
+>>0x5a42ae859310
+>>0x5a42ae859310
+>>0x5a42ae859334
+>>0x5a42ae85a2ac

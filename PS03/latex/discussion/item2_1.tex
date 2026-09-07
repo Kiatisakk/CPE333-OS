@@ -1,0 +1,11 @@
+% Discussion for item2_1 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+The script does the same work and takes the same ten seconds either way; what
+changes is what the \emph{shell} does meanwhile. In the foreground the shell
+hands the terminal over and waits --- the timestamps either side are ten seconds
+apart, and in between there was no prompt to type at. With \texttt{\&} the
+prompt comes back at once and the job goes into the shell's table, as
+\texttt{jobs} confirms, so \texttt{jobs} and \texttt{ps} both run while the
+script is still counting. Its ticks still land in the same terminal, which is
+why background output interleaves with whatever is typed next.

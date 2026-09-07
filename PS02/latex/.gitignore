@@ -1,0 +1,7 @@
+# pdflatex build products -- main.pdf is the deliverable, keep it
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk

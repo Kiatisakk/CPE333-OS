@@ -1,0 +1,4 @@
+$ ./bin/1_1_fork_hello
+hello world (pid:679)
+hello, I am parent of 680 (pid:679)
+hello, I am child (pid:680)

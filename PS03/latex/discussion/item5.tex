@@ -1,0 +1,31 @@
+% Discussion for item5 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+Two assumptions from the sheet shape the output. Because the scheduler's own
+work and a context switch cost nothing, the slots abut exactly: a process
+preempted at $t=2$ hands over at $t=2$ and the next slot begins at $t=2$, where
+a real machine would show a small gap. And a process arriving at $t$ competes
+for slot $t$ itself --- in the code the skip \texttt{procs[i].arrival > t} is
+evaluated \emph{before} the CPU is assigned for that unit.
+
+\paragraph{Case 1 --- preemption.}
+P1 starts alone; at $t=2$ P2 arrives needing 4 against P1's remaining 5 and
+takes the CPU, then at $t=4$ P3 arrives needing 1 and takes it from P2 in turn.
+P1 arrived first and finishes last, which is exactly what STCF trades away:
+short jobs are served quickly at the cost of delaying long ones. Note P2
+appears twice, as \texttt{[2-4]} and \texttt{[5-7]} --- being preempted does not
+discard the work already done.
+
+\paragraph{Case 2 --- idle time and simultaneous arrivals.}
+P1 finishes at $t=2$ and nothing arrives until $t=5$, so the schedule records
+\texttt{[2-5]: IDLE}: a gap in the arrivals is a gap in the schedule. P2 and P3
+then arrive together with identical bursts, and the tie is broken on
+\texttt{pid} so P2 runs.
+
+\paragraph{Case 3 --- ties on remaining time.}
+This tests the second tie-break, which neither of the others reaches: a
+scheduler that got it backwards would still pass case 1. At $t=3$ the running
+P2 has 2 left and the arriving P1 needs 2 --- equal, so the lower \texttt{pid}
+wins and P1 preempts. At $t=6$ it repeats the other way round: P2 has 1 left and
+P3 arrives needing 1, but this time the lower \texttt{pid} is the process
+already running, so P2 keeps the CPU.

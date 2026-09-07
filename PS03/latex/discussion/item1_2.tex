@@ -1,0 +1,11 @@
+% Discussion for item1_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\texttt{nice} sets a process's \emph{niceness}, a scheduling hint from $-20$ to
+$+19$ where higher means lower priority. It does not cap or reserve CPU time,
+only weights the scheduler's choice when several processes are ready at once.
+\texttt{nice -n 10 <command>} starts one at that niceness; \texttt{renice -n 5
+-p <pid>} changes one already running. Raising niceness is unprivileged,
+\emph{lowering} it is not --- hence the failure above: a user may make their own
+work less important, but not more important than everyone else's, which needs
+\texttt{CAP\_SYS\_NICE}.

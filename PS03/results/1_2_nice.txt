@@ -1,0 +1,10 @@
+$ sleep 120 &                    # started normally
+$ nice -n 10 sleep 120 &         # started with a raised niceness
+$ ps -o pid,ni,comm -p 1405 -p 1406
+    PID  NI COMMAND
+   1405   0 sleep
+   1406  10 sleep
+$ renice -n 5 -p 1405              # raise it on a running process
+1405 (process ID) old priority 0, new priority 5
+$ renice -n -5 -p 1405             # lowering it needs privilege
+renice: failed to set priority for 1405 (process ID): Permission denied

@@ -1,0 +1,120 @@
+% ===================================================================
+%  Preamble -- HAND-EDITED.  scripts/make_latex.py never touches this file.
+% ===================================================================
+
+% ---- encoding / fonts ---------------------------------------------
+% Default: pdfLaTeX, ASCII/Latin only.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+% ---- TO TYPESET THAI (e.g. Thai names in \author) ------------------
+% pdfLaTeX CANNOT render Thai.  To switch:
+%   1. comment out the three lines above
+%   2. uncomment the block below
+%   3. build with:  latexmk -xelatex main.tex
+%
+% \usepackage{fontspec}
+% \setmainfont{Leelawadee UI}
+% \setmonofont{Consolas}
+% --------------------------------------------------------------------
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+
+% ---- page breaking -------------------------------------------------
+% Never leave a single line of a paragraph stranded at the top or bottom
+% of a page.
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+
+% Let the last line of a page fall where it falls rather than stretching
+% the page to fill it. Without this, LaTeX pads the gaps between listings
+% to force a flush bottom, which looks worse than a short page.
+\raggedbottom
+
+% A heading needs this much room beneath it, or it moves to the next page
+% instead of being stranded at the foot of this one.
+\newcommand{\headroom}{\Needspace*{6\baselineskip}}
+
+\captionsetup[lstlisting]{font=small,labelfont=bf}
+
+% Long \texttt{} tokens (RLIMIT_NPROC, -Wno-unused-parameter) resist line
+% breaking; a little extra stretch avoids overfull boxes without \sloppy's
+% ragged look.
+\emergencystretch=2em
+
+% ---- colours -------------------------------------------------------
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{codecomment}{RGB}{0,120,0}
+\definecolor{codekeyword}{RGB}{0,0,180}
+\definecolor{codestring}{RGB}{170,0,0}
+
+% ---- C source listings ---------------------------------------------
+\lstdefinestyle{csrc}{
+  language=C,
+  basicstyle=\ttfamily\scriptsize,
+  commentstyle=\color{codecomment}\itshape,
+  keywordstyle=\color{codekeyword}\bfseries,
+  stringstyle=\color{codestring},
+  numbers=left,
+  numberstyle=\ttfamily\tiny\color{gray},
+  numbersep=8pt,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  tabsize=4,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+}
+
+% ---- shell script listings -----------------------------------------
+\lstdefinestyle{shsrc}{
+  style=csrc,
+  language=bash,
+}
+
+% ---- terminal transcripts ------------------------------------------
+% columns=fixed matters here: it preserves the column alignment of `ps` output.
+\lstdefinestyle{term}{
+  basicstyle=\ttfamily\scriptsize,
+  numbers=none,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  columns=fixed,
+  keepspaces=true,
+  basewidth=0.5em,
+  captionpos=b,
+}
+
+\lstset{style=term}
+
+% Tighter gaps around listings: the default leaves enough air that a listing
+% which would otherwise fit gets pushed to the next page.
+\lstset{aboveskip=0.7\baselineskip, belowskip=0.4\baselineskip}
+
+% ---- a visible marker for unwritten sections ------------------------
+\newcommand{\todoprose}[1]{%
+  \par\medskip
+  \noindent\fcolorbox{red}{yellow!15}{%
+    \parbox{0.97\linewidth}{\textbf{TODO --- write this section.} #1}%
+  }%
+  \par\medskip
+}

@@ -1,0 +1,4 @@
+$ ./bin/1_2_fork_wait
+hello world (pid:681)
+hello, I am child (pid:682)
+hello, I am parent of 682 (wc:682) (pid:681)

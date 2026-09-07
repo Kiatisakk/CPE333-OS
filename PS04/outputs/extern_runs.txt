@@ -1,0 +1,84 @@
+EXTERN original, default PIE - run 1
+Print value of x: 20
+Address of x (in main function): 0x58e748aa6010
+
+Display value of x: 20
+Address of x (in display function): 0x58e748aa6010
+
+EXTERN original, default PIE - run 2
+Print value of x: 20
+Address of x (in main function): 0x6216efdc6010
+
+Display value of x: 20
+Address of x (in display function): 0x6216efdc6010
+
+EXTERN original, default PIE - run 3
+Print value of x: 20
+Address of x (in main function): 0x6171c3ddc010
+
+Display value of x: 20
+Address of x (in display function): 0x6171c3ddc010
+
+EXTERN original, -no-pie - run 1
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+EXTERN original, -no-pie - run 2
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+EXTERN original, -no-pie - run 3
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+EXTERN removed in main, default PIE - run 1
+Print value of x: 32765
+Address of x (in main function): 0x7ffd7570a044
+
+Display value of x: 20
+Address of x (in display function): 0x6401920cd010
+
+EXTERN removed in main, default PIE - run 2
+Print value of x: 32765
+Address of x (in main function): 0x7ffd260ef104
+
+Display value of x: 20
+Address of x (in display function): 0x5802dce82010
+
+EXTERN removed in main, default PIE - run 3
+Print value of x: 32764
+Address of x (in main function): 0x7ffc81b49474
+
+Display value of x: 20
+Address of x (in display function): 0x57b023182010
+
+EXTERN removed in main, -no-pie - run 1
+Print value of x: 32764
+Address of x (in main function): 0x7ffc4a52d794
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+
+EXTERN removed in main, -no-pie - run 2
+Print value of x: 32766
+Address of x (in main function): 0x7ffe2204d474
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+
+EXTERN removed in main, -no-pie - run 3
+Print value of x: 32766
+Address of x (in main function): 0x7ffe612fae34
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+

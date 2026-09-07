@@ -1,0 +1,8 @@
+$ ./bin/5_1a_read_closed
+
+[child ] wrote 28 bytes into the pipe
+[child ] now trying to read() back from fd[0], which it closed...
+[child ] read() failed: Bad file descriptor (errno=9)
+[parent] received 28 bytes: Hello from child PID: 28171
+
+[exit status: 0]

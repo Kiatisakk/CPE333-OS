@@ -1,0 +1,53 @@
+% Discussion for item 5.
+% scripts/make_latex.py will NEVER overwrite this file -- edit it freely.
+
+\paragraph{5.1 --- the sender reads back its own message.}
+The outcome depends entirely on whether the sender still holds the read end, so
+both cases were tested.
+
+With the read end closed, as item 4 requires, the child's \texttt{read()} failed
+at once with \texttt{EBADF} --- ``bad file descriptor''. The error is about the
+\emph{handle}, not the pipe: \texttt{fd[0]} is no longer a valid descriptor in
+that process, so the call never reaches the pipe to discover whether anything is
+in it. Nothing was consumed, and the parent received the message normally.
+
+With the read end left open, the child read its own 28-byte message back
+successfully, and the parent then got \texttt{0} --- end of file --- with nothing
+to show for it. A pipe is not addressed to anybody. It is one shared buffer, and
+whichever process reads first takes the bytes. The convention that a pipe runs
+one way is maintained purely by both sides closing the end they do not use; the
+kernel does not enforce it. Note the parent's \texttt{read()} returned 0 rather
+than blocking: by then the child had exited, so no write end remained open
+anywhere, and the kernel reports end-of-file rather than making the reader wait
+for data that can never arrive.
+
+\paragraph{5.2 --- the receiver reads before the sender sends.}
+The parent called \texttt{read()} at $t=0$ on an empty pipe and the call returned
+at $t=3.004$~s, immediately after the child wrote. It did not fail and it did not
+return 0; it blocked, and the process was simply set aside until data arrived.
+
+This is the distinction the previous case turned on. An empty pipe that still has
+a writer means ``no data \emph{yet}'', and the reader waits. An empty pipe with no
+writers left means ``no data \emph{ever}'', and \texttt{read()} returns 0. The
+same empty buffer produces opposite behaviour depending on whether any write end
+is still open --- which is why closing the unused ends correctly matters so much.
+
+\paragraph{5.3 --- several messages before a single read.}
+The child made three separate \texttt{write()} calls of 32 bytes each. The parent
+made one \texttt{read()} and received 96 bytes: all three messages, concatenated,
+with nothing marking where one ended and the next began.
+
+A pipe is a byte stream, not a queue of messages. The three writes did not create
+three records; they appended bytes to one buffer. This is the essential difference
+between a pipe and a message queue, which preserves message boundaries. If the
+receiver needs its messages back as separate items, the two sides must agree on a
+framing convention of their own --- a delimiter such as a newline, or a fixed-size
+length prefix before each message. Here the messages happen to end in newlines, so
+the receiver could split on those, but that only works because both sides
+implicitly agreed on it.
+
+\paragraph{In summary.}
+A correct pipe user closes the end it does not need, so that end-of-file is
+reported when the writers are really gone; expects \texttt{read()} to block rather
+than to fail when data has not arrived yet; and does not assume that one
+\texttt{write()} corresponds to one \texttt{read()}.

@@ -1,0 +1,35 @@
+# LaTeX auxiliary files
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.fls
+report/*.fdb_latexmk
+
+# Compiled C executables
+/extern_default
+/extern_demo
+/extern_demo_no_extern_main
+/extern_lab
+/extern_lab_no_extern_main
+/extern_lab_no_extern_main_nopie
+/extern_lab_nopie
+/extern_no_extern_main
+/extern_no_extern_main_nopie
+/extern_nopie
+/memory_default
+/memory_lab
+/memory_lab_with_b
+/memory_with_b
+/static_default
+/static_demo
+/static_demo_no_static
+/static_lab
+/static_lab_no_static
+/static_lab_no_static_nopie
+/static_lab_nopie
+/static_no_static
+/static_no_static_nopie
+/static_nopie

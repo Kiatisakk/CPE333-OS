@@ -1,0 +1,18 @@
+--- by PID ---
+$ sleep 300 &                    # pid 1413
+$ kill 1413                       # SIGTERM (15): asks it to stop
+  (no such process)
+$ sleep 300 &                    # pid 1415
+$ kill -9 1415                    # SIGKILL (9): cannot be caught
+  (no such process)
+--- by job number ---
+$ jobs
+[1]+  Running                    sleep 300 &
+$ kill %1                      # %n names a job, not a process
+  (no jobs left)
+--- by name, several at once ---
+$ pgrep -x -P $$ sleep | wc -l
+3
+$ pkill -x -P $$ sleep          # only this shell's own children
+$ pgrep -x -P $$ sleep | wc -l
+0

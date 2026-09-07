@@ -1,0 +1,9 @@
+$ ./bin/5_2_read_first
+
+[parent] t=0.000s  calling read() -- pipe is still empty
+[child ] t=0.000s  sleeping 3s before writing
+[child ] t=3.004s  wrote 28 bytes
+[parent] t=3.004s  read() returned 28 bytes: Hello from child PID: 28179
+[parent] read() was blocked for about 3.004 seconds
+
+[exit status: 0]

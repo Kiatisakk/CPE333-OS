@@ -1,0 +1,22 @@
+% Discussion for item 1.
+% scripts/make_latex.py will NEVER overwrite this file -- edit it freely.
+
+The two outputs differ in the order of the last two lines: in 1.1 the parent
+printed first, in 1.2 the child did.
+
+In 1.1 the parent does not wait. Once \texttt{fork()} returns there are two
+runnable processes, and nothing in the program orders them --- which one reaches
+its \texttt{printf} first is decided by the operating system's scheduler. A
+single run cannot show that, since it only ever shows one of the possible
+orders, so we ran 1.1 repeatedly and counted. The child does come first
+sometimes, but rarely: once in 500 runs on an idle machine. Loading the machine
+with eight busy loops raised it to 44 in 500. The order really is undecided ---
+it is simply that on an idle multi-core machine the parent almost always wins
+the race, and making the processes compete for the CPU is what lets the child
+win often enough to see.
+
+In 1.2 the parent calls \texttt{wait(NULL)}, which blocks it until the child
+terminates. The parent therefore cannot reach its \texttt{printf} until the
+child has already run and exited, so the child's line always comes first ---
+under load or not. Adding \texttt{wait()} turns the ordering from an accident of
+scheduling into a property the program guarantees.

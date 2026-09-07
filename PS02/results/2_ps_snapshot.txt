@@ -1,0 +1,55 @@
+
+===================== system context =====================
+PID 1 on this system:
+    PID    PPID COMMAND
+      1       0 systemd
+
+shell running this script: pid=436
+
+===================== 2.1  child is DEAD while the parent is still RUNNING =====================
+[parent] pid=439 ppid=436
+[parent] forked child pid=441; sleeping 10s WITHOUT calling wait()
+[parent] run `ps -ef` now: child 441 should appear as <defunct>
+[child ] pid=441 ppid=439 -- exiting immediately
+
+--- ps -ef at t=3s (parent sleeping, child already exited) ---
+UID          PID    PPID  C STIME TTY          TIME CMD
+kiatisa+     439     436  0 20:44 pts/0    00:00:00 ./bin/2_1_zombie
+kiatisa+     441     439  0 20:44 pts/0    00:00:00 [2_1_zombie] <defunct>
+
+--- same rows, PPID made explicit ---
+    PID    PPID STAT COMMAND
+    439     436 S    2_1_zombie
+    441     439 Z    2_1_zombie
+[parent] waking up and exiting; the zombie is now reaped by init
+
+--- ps -ef after the parent exited ---
+(nothing left: init reaped the zombie when the parent died)
+
+===================== 2.2  parent is DEAD while the child is still RUNNING =====================
+[parent] pid=455 ppid=436
+[parent] forked child pid=457; exiting in 2s without calling wait()
+[child ] pid=457 ppid=455  (parent is still alive)
+
+--- ps -ef at t=1s (parent and child both alive) ---
+UID          PID    PPID  C STIME TTY          TIME CMD
+kiatisa+     455     436  0 20:44 pts/0    00:00:00 ./bin/2_2_orphan
+kiatisa+     457     455  0 20:44 pts/0    00:00:00 ./bin/2_2_orphan
+[child ] pid=457 ppid=301  (parent has died -- re-parented)
+
+--- who adopted the orphan? ---
+orphan pid=457  new ppid=301  comm=Relay(303)
+for comparison, PID 1 is: systemd
+=> the adopter is NOT PID 1: WSL's per-session Relay process is a child subreaper
+
+--- ps -ef at t=5s (parent gone, child re-parented) ---
+UID          PID    PPID  C STIME TTY          TIME CMD
+kiatisa+     457     301  0 20:44 pts/0    00:00:00 ./bin/2_2_orphan
+
+--- same rows, PPID made explicit ---
+    PID    PPID STAT COMMAND
+    457     301 S    2_2_orphan
+[child ] pid=457 exiting
+
+--- ps -ef after the child finally exited ---
+(nothing left: the new parent reaped it immediately)

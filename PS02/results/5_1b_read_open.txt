@@ -1,0 +1,8 @@
+$ ./bin/5_1b_read_open
+
+[child ] wrote 28 bytes into the pipe (read end left OPEN)
+[child ] read back its OWN message (28 bytes): Hello from child PID: 28175
+[parent] now calling read(), giving up after 5s
+[parent] read() returned 0 (EOF): all write ends closed, nothing to read
+
+[exit status: 0]

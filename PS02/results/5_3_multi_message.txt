@@ -1,0 +1,15 @@
+$ ./bin/5_3_multi_message
+
+[child ] write() #1 sent 32 bytes
+[child ] write() #2 sent 32 bytes
+[child ] write() #3 sent 32 bytes
+[child ] 3 separate write() calls, 96 bytes in total
+[parent] calling read() ONCE with a 1024-byte buffer
+[parent] a single read() returned 96 bytes:
+---- begin received data ----
+message 1 from child PID: 28183
+message 2 from child PID: 28183
+message 3 from child PID: 28183
+---- end received data ----
+
+[exit status: 0]

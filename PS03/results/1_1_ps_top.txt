@@ -1,0 +1,14 @@
+$ ps -ef | head -5          # one snapshot, then it exits
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  2 03:11 ?        00:00:01 /sbin/init
+root           2       1  0 03:11 ?        00:00:00 /init
+root           6       2  0 03:11 ?        00:00:00 plan9 --control-socket 7 --log-level 4 --server-fd 8 --pipe-fd 10 --log-truncate
+root          49       1  0 03:11 ?        00:00:00 /usr/lib/systemd/systemd-journald
+
+$ top -b -n 1 | head -6     # a live monitor, sampled once
+top - 03:12:18 up 18:07,  1 user,  load average: 0.12, 0.09, 0.14
+Tasks:  34 total,   1 running,  33 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  1.2 us,  1.2 sy,  0.0 ni, 96.4 id,  0.0 wa,  0.0 hi,  1.2 si,  0.0 st 
+MiB Mem :   8909.6 total,   6440.1 free,    986.0 used,   1678.8 buff/cache     
+MiB Swap:   3072.0 total,   3072.0 free,      0.0 used.   7923.6 avail Mem 
+

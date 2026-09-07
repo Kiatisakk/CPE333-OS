@@ -1,0 +1,300 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{codegray}{RGB}{246,246,246}
+\definecolor{commentgreen}{RGB}{30,110,45}
+\definecolor{keywordblue}{RGB}{0,55,135}
+
+\lstdefinestyle{cstyle}{
+    language=C,
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{keywordblue}\bfseries,
+    commentstyle=\color{commentgreen},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+    frame=single,
+    breaklines=true,
+    keepspaces=true,
+    showstringspaces=false,
+    captionpos=b
+}
+
+\lstdefinestyle{terminal}{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    breaklines=true,
+    keepspaces=true,
+    columns=fullflexible,
+    captionpos=b
+}
+
+\title{\textbf{Problem Session 4}\\
+Memory Class and API in C Programming}
+\author{%
+    \begin{tabular}{ll}
+        Kiatisak Markmeeshap & 67070501005\\
+        Tithinan Sobking & 67070501018\\
+        Worawut Sereethai & 67070501040\\
+        Chanya Poolketkij & 67070501058
+    \end{tabular}%
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Environment and Compilation}
+
+All experiments were performed in Ubuntu running under WSL. The source files,
+executables, and output logs were kept in the same working directory.
+
+\begin{lstlisting}[style=terminal,caption={Working directory and compilation examples}]
+cd ~/cpe333/ps4
+gcc -Wall -Wextra -std=c11 -O0 -g -o static_lab static_lab.c
+gcc -Wall -Wextra -std=c11 -O0 -g -o static_lab_nopie static_lab.c -no-pie
+./static_lab
+./static_lab_nopie
+\end{lstlisting}
+
+The programs use standard C entry points with \texttt{int main(void)}. Pointer
+values are cast to \texttt{void *} when printed with the \texttt{\%p} format
+specifier.
+
+\section{Static Storage Class}
+
+\subsection{Original program}
+
+The original program declares \texttt{y} as a static local variable. It is
+initialized once and keeps its value between loop iterations.
+
+\lstinputlisting[style=cstyle,caption={Static storage class program}]
+{../static_lab.c}
+
+\subsection{Results from three runs}
+
+The program was compiled and executed three times without \texttt{-no-pie}.
+The address of \texttt{y} stays constant within one execution, while its
+address can change between executions because of position-independent loading
+and address randomization.
+
+\begin{lstlisting}[style=terminal,caption={Selected output from the original static program}]
+The value of y is 6
+The address of y is 0x5eb92dd39010
+
+The value of y is 7
+The address of y is 0x5eb92dd39010
+
+The value of y is 8
+The address of y is 0x5eb92dd39010
+\end{lstlisting}
+
+The complete three-run output is included in Appendix~\ref{app:outputs}.
+
+\subsection{Program after removing \texttt{static}}
+
+After removing the keyword, \texttt{y} becomes an automatic local variable.
+It is initialized to 5 again on every loop iteration, so the printed value is
+6 on every iteration.
+
+\lstinputlisting[style=cstyle,caption={Static keyword removed}]
+{../static_lab_no_static.c}
+
+\begin{lstlisting}[style=terminal,caption={Output after removing static}]
+The value of y is 6
+The address of y is 0x7ffde7b84c40
+
+The value of y is 6
+The address of y is 0x7ffde7b84c40
+
+The value of y is 6
+The address of y is 0x7ffde7b84c40
+\end{lstlisting}
+
+The address remains the same during this execution because the same stack
+location is reused by the loop. It is not guaranteed to be the same across
+separate executions.
+
+\subsection{Comparison with \texttt{-no-pie}}
+
+With the static program compiled using \texttt{-no-pie}, the static variable
+was located at the same address in all three runs in this environment:
+\texttt{0x404018}. The values still followed the same sequence 6, 7, and 8.
+For the non-static program, the stack address still changed between runs,
+because disabling PIE does not disable stack address randomization.
+
+\section{Extern Storage Class}
+
+\subsection{Original program}
+
+The global variable \texttt{x} is defined once and referenced from both
+\texttt{main()} and \texttt{display()} using \texttt{extern}. Both functions
+therefore access the same object.
+
+\lstinputlisting[style=cstyle,caption={Extern storage class program}]
+{../extern_demo.c}
+
+\begin{lstlisting}[style=terminal,caption={Original extern output}]
+Print value of x: 20
+Address of x (in main function): 0x5bb79ed55010
+
+Display value of x: 20
+Address of x (in display function): 0x5bb79ed55010
+\end{lstlisting}
+
+The value and address are identical in both functions. With the default PIE
+build, the global address may change between executions. With \texttt{-no-pie},
+the global address was stable at \texttt{0x404018} in this environment.
+
+\subsection{Removing \texttt{extern} in \texttt{main()}}
+
+The modified line becomes \texttt{int x;}. This declares a new local variable
+that hides the global variable. It is not initialized, so reading it produces
+an indeterminate value and the compiler warns about using an uninitialized
+variable. The \texttt{display()} function still accesses the global value 20.
+
+\lstinputlisting[style=cstyle,caption={Extern removed from main}]
+{../extern_demo_no_extern_main.c}
+
+\begin{lstlisting}[style=terminal,caption={Output after removing extern in main}]
+Print value of x: 32767
+Address of x (in main function): 0x7fff7d990da4
+
+Display value of x: 20
+Address of x (in display function): 0x5ca88dea4010
+\end{lstlisting}
+
+The exact value printed by \texttt{main()} is not predictable and may differ
+between runs. The important observation is that the two functions now refer to
+different objects.
+
+\section{Memory Allocation}
+
+\subsection{Original program}
+
+The program creates an integer pointer \texttt{a}, a floating-point pointer
+\texttt{b}, and a fixed-size array \texttt{c}. It then allocates memory for
+\texttt{a} using \texttt{malloc()} and expands it using \texttt{realloc()}.
+
+\lstinputlisting[style=cstyle,caption={Memory allocation program}]
+{../memory_demo.c}
+
+\subsection{Meaning of the addresses}
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{\&a} and \texttt{\&b} are the addresses of the pointer variables themselves.
+    \item \texttt{a} and \texttt{b} are the addresses stored inside the pointers.
+    \item After \texttt{malloc()}, \texttt{a} points to a block on the heap.
+    \item \texttt{c} and \texttt{\&c[0]} have the same base address because an array name decays to a pointer to its first element.
+    \item \texttt{\&a[9]} and \texttt{\&c[9]} are offset by nine integer elements from the first element.
+    \item \texttt{realloc()} may keep the original block or move it to a new location if a larger contiguous block is required.
+\end{itemize}
+
+\begin{lstlisting}[style=terminal,caption={Memory allocation output before enabling b}]
+Address of Pointer
+>>0x7ffd5e8f0be0
+>>0x7ffd5e8f0be8
+
+Effective Address
+>>(nil)
+>>(nil)
+
+After malloc Pointer a
+>>0x6467b2cec2b0
+>>0x6467b2cec2b0
+>>0x6467b2cec2d4
+
+Array c
+>>0x7ffd5e8f0bf0
+>>0x7ffd5e8f0bf0
+>>0x7ffd5e8f0c14
+
+After realloc Pointer a
+>>0x6467b2cec2b0
+>>0x6467b2cec2b0
+>>0x6467b2cec2d4
+>>0x6467b2ced24c
+\end{lstlisting}
+
+The initial effective addresses are not valid allocated objects because the
+pointers have not been initialized. Their printed values are therefore not
+portable or predictable. The observed \texttt{(nil)} output is only one result
+from this execution.
+
+\subsection{After uncommenting the allocation of b}
+
+The second version allocates ten floating-point elements for \texttt{b} before
+calling \texttt{realloc()} on \texttt{a}.
+
+\lstinputlisting[style=cstyle,caption={Memory allocation with b enabled}]
+{../memory_demo_with_b.c}
+
+\begin{lstlisting}[style=terminal,caption={Memory allocation output after enabling b}]
+After malloc Pointer b
+>>0x57232be552e0
+>>0x57232be552e0
+>>0x57232be55304
+
+After realloc Pointer a
+>>0x57232be55310
+>>0x57232be55310
+>>0x57232be55334
+>>0x57232be562ac
+\end{lstlisting}
+
+In this run, allocating \texttt{b} occupied space immediately after the first
+allocation for \texttt{a}. When \texttt{a} was expanded, the allocator moved it
+to another address. This behavior is implementation-dependent, so another run
+or another machine may produce different addresses.
+
+\section{Discussion}
+
+The experiments show that storage class affects lifetime, linkage, and the
+location used by a variable. A static local variable retains its value after a
+function block is left, while an automatic variable is initialized again on
+each entry to the block. The \texttt{extern} declaration allows code in
+different functions or source files to refer to one global object.
+
+The address experiments also show the effect of process memory layout. PIE
+allows the executable's data to be relocated between runs, while \texttt{-no-pie}
+makes the executable's fixed data address stable in this environment. Heap
+addresses remain controlled by the memory allocator and can change when
+\texttt{malloc()} or \texttt{realloc()} changes the allocation layout.
+
+\section{Conclusion}
+
+Static storage preserves a variable's value for the lifetime of the program.
+Extern storage provides access to a global object from another scope. Finally,
+\texttt{malloc()} and \texttt{realloc()} demonstrate dynamic heap allocation,
+while the address of an array declared inside a function belongs to the stack.
+
+\appendix
+\section{Complete Experiment Outputs}\label{app:outputs}
+
+\lstinputlisting[style=terminal,caption={Complete static experiment output}]
+{../outputs/static_runs.txt}
+
+\lstinputlisting[style=terminal,caption={Complete extern experiment output}]
+{../outputs/extern_runs.txt}
+
+\lstinputlisting[style=terminal,caption={Complete memory experiment output}]
+{../outputs/memory_runs.txt}
+
+\end{document}

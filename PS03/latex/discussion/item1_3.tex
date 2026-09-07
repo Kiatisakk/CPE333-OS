@@ -1,0 +1,12 @@
+% Discussion for item1_3 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\texttt{kill} sends a signal rather than necessarily killing: the default
+\texttt{SIGTERM} (15) asks the process to stop and can be caught so it can clean
+up, while \texttt{kill -9} sends \texttt{SIGKILL}, which cannot be caught and so
+saves nothing --- a last resort, not a default. The target is named four ways
+above: by PID, by PID with an explicit signal, by \emph{job} number
+(\texttt{\%1} is the shell's own numbering, not a PID), and by name with
+\texttt{pkill}, which kills every match at once. \texttt{pkill} matches the
+process name as a substring, so \texttt{-x} demands the whole name; matching the
+full command line instead is \texttt{-f}.

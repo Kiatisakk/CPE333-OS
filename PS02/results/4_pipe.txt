@@ -1,0 +1,7 @@
+$ ./bin/4_pipe
+
+Child: Child PID: 28136
+Parent: Parent PID: 28135
+Parent: Hello from child PID: 28136
+
+[exit status: 0]

@@ -1,0 +1,46 @@
+% ===================================================================
+%  CPE 333 Operating Systems -- Problem Session 3
+%  Process Manipulation and Monitoring
+%
+%  BUILD:   powershell -ExecutionPolicy Bypass -File ..\scripts\build_pdf.ps1
+%
+%  WHAT IS SAFE TO EDIT
+%    main.tex           <- this file. Hand-edited.
+%    preamble.tex       <- packages and listing styles. Hand-edited.
+%    discussion/*.tex   <- the prose. Never overwritten by the generator.
+%    generated/*        <- DO NOT EDIT. Rewritten by scripts/make_latex.py.
+%
+%  Code and transcripts are pulled straight out of ../ and ../results at
+%  compile time, so the report cannot drift from what was actually run.
+%  Screenshots go in ../figures/ ; until they exist the document shows a
+%  placeholder naming the file it expects.
+% ===================================================================
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+
+% The title block is deliberately compact: it shares page 1 with section 1, and
+% the default \maketitle spacing pushes the section over onto a second page.
+\title{%
+  \vspace{-1.5cm}%
+  \large CPE 333 Operating Systems, 1/2026\\[0.4em]
+  \Large\bfseries Problem Session 3: Process Manipulation and Monitoring%
+}
+
+\author{%
+  \begin{tabular}{@{}l@{\hspace{2em}}l@{}}
+    Kiatisak Markmeeshap & 67070501005 \\
+    Tithinan Sobking     & 67070501018 \\
+    Worawut Sereethai    & 67070501040 \\
+    Chanya Poolketkij    & 67070501058
+  \end{tabular}%
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+\input{generated/body}
+
+\end{document}

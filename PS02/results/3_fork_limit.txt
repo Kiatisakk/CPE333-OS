@@ -1,0 +1,31 @@
+per-user process limit (ulimit -u): 35595   -- not reached on this machine
+no artificial limit: the program forks until it cannot fork any more
+memory guard: run is stopped below 800 MB free
+
+===== measurement 1: the program on its own =====
+processes already owned by this user: 9   free memory: 8269 MB
+successful fork() calls: 4295
+stopped by: the memory guard, with free memory down to 796 MB
+            (so this count is a floor, not the true ceiling)
+run took 314s
+settled after 4s: 9 processes, 8150 MB free
+
+===== spawning 200 background 'sleep' processes =====
+processes now owned by this user: 209   free memory: 8013 MB
+
+===== measurement 2: with 200 other processes running =====
+successful fork() calls: 4226
+stopped by: the memory guard, with free memory down to 761 MB
+            (so this count is a floor, not the true ceiling)
+run took 306s
+settled after 360s: 209 processes, 8002 MB free
+
+===== killing the 200 background processes =====
+processes now owned by this user: 9   free memory: 8276 MB
+
+===== measurement 3: after killing them again =====
+successful fork() calls: 4296
+stopped by: the memory guard, with free memory down to 787 MB
+            (so this count is a floor, not the true ceiling)
+run took 315s
+settled after 4s: 9 processes, 8277 MB free

@@ -1,0 +1,31 @@
+% Discussion for item 3.
+% scripts/make_latex.py will NEVER overwrite this file -- edit it freely.
+
+Other programs running on the system really do reduce how many times we can
+fork. On its own the program managed \textbf{4295} successful \texttt{fork()}
+calls; with 200 extra \texttt{sleep} processes running it managed \textbf{4226};
+after those were killed it was back to \textbf{4296}. Measurements 1 and 3 differ
+by only 1, so the drop of 69 is well outside the run-to-run variation.
+
+The reason is that whatever runs out is not owned by our program. It is shared
+across everything the user is running, so processes that have nothing to do with
+us --- shells, editors, those 200 \texttt{sleep} processes --- consume part of the
+same budget and leave less for us. Killing them gives it straight back, which is
+why the third measurement returns to the first.
+
+How much less depends on which resource is the scarce one. Here the drop was 69
+rather than 200, because the limit being hit was memory and not a limit on the
+\emph{number} of processes: the 200 \texttt{sleep} processes consumed about
+256~MB between them (free memory before each run: 8269~MB, then 8013~MB), and at
+this depth each of our own processes costs several megabytes, so 256~MB is worth
+roughly 69 of them. Had the per-user process quota been the binding limit
+instead, 200 processes would have cost exactly 200 forks, one seat each.
+
+It is worth being clear about what stopped the run, because it was not the
+process limit --- this machine allows 35\,595 processes per user and
+\texttt{fork()} never returned an error --- nor a shortage of PIDs, of which there
+are 4\,194\,304. Memory ran out first, since each process costs the kernel a
+process table entry, a kernel stack and page tables. The counts above are
+therefore a floor rather than a true ceiling: each run was stopped once free
+memory fell below 800~MB, so that the OOM killer was never left to pick a victim
+of its own.

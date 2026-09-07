@@ -1,0 +1,6 @@
+Which process printed the second line, over 500 runs of 1.1 in each condition
+
+idle machine             parent first:  499   child first:    1
+(starting 8 busy loops to contend for the CPU)
+machine under load       parent first:  456   child first:   44
+pinned to one CPU        parent first:  500   child first:    0

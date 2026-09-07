@@ -1,0 +1,27 @@
+% Discussion for item 4.
+% scripts/make_latex.py will NEVER overwrite this file -- edit it freely.
+
+The output matches the form the problem sheet asks for: the child announced
+itself, the parent announced itself, and the parent then printed the message the
+child had sent through the pipe.
+
+\texttt{pipe(fd)} produces one buffer inside the kernel with two handles onto it,
+\texttt{fd[0]} to read and \texttt{fd[1]} to write, and \texttt{fork()} copies the
+whole descriptor table --- so immediately afterwards \emph{four} descriptors refer
+to that one pipe. The child closes \texttt{fd[0]} and the parent closes
+\texttt{fd[1]}, leaving exactly one writer and one reader. That closing is not
+housekeeping: the kernel signals end-of-file to a reader only when \emph{every}
+write end has been closed, so a parent still holding its own copy of
+\texttt{fd[1]} would wait forever for an EOF that its own descriptor prevents,
+and the program would simply hang.
+
+The pipe does guarantee that the third line comes after the first, since the
+parent's \texttt{read()} cannot return until the child has written. It guarantees
+nothing about the second line: the child's announcement and the parent's are
+printed by two runnable processes that are not synchronised with each other, so
+their order is left to the scheduler, exactly as in item 1.1. Our program inserts
+a brief \texttt{usleep()} in the parent purely so the output matches the expected
+listing, which hides the race rather than resolving it --- a fixed delay is a
+guess about timing, and a wrong one under load. The pipe already provides real
+synchronisation, and using it, for instance by having the parent print only after
+its \texttt{read()} returns, would order the output without any sleep at all.

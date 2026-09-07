@@ -1,0 +1,21 @@
+% Discussion for item2_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\textsc{ctrl+z} sends \texttt{SIGTSTP} to the foreground job and the shell
+reports \texttt{[1]+ Stopped}. The process has \emph{not} been killed: \texttt{ps}
+shows state \texttt{T}, stopped by a job-control signal. It is still in the
+process table, still holds its memory and open files, and still has its place in
+the job list --- it simply will not be scheduled again until told to continue,
+which is why \textsc{ctrl+z} is not a way to abandon a program.
+
+\texttt{fg} and \texttt{bg} both resume it by sending \texttt{SIGCONT}, and
+differ only in who gets the terminal afterwards. \texttt{bg} resumes it in the
+background: the state goes from \texttt{T} back to \texttt{S}, \texttt{jobs}
+reports \texttt{Running}, and the prompt stays ours --- as though it had been
+started with \texttt{\&} in the first place. (\texttt{S} is \emph{sleeping}, not
+running on a CPU: the script is blocked in \texttt{sleep(1000)}. What changed is
+that it is back under the scheduler rather than held off it.) \texttt{fg}
+instead hands the terminal back and blocks until the job ends, exactly like the
+first run of situation one --- so the pair is what makes \textsc{ctrl+z} useful
+rather than merely disruptive: suspend, move to the background, reclaim the
+terminal, without restarting the work.

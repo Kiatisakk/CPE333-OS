@@ -1,0 +1,27 @@
+--- 1. run it, then press CTRL+Z ---
+$ ./ss1_2.sh
+ss1_2.sh (pid 1468): started, now sleeping 1000 seconds
+^Z
+
+--- 2. what CTRL+Z did ---
+$ jobs
+[1]+  Stopped                    ./ss1_2.sh
+$ ps -o pid,stat,args -p 1468
+    PID STAT COMMAND
+   1468 T    bash ./ss1_2.sh
+
+--- 3. bg: resume it, in the background ---
+$ bg %1
+[1]+ ./ss1_2.sh &
+$ jobs
+[1]+  Running                    ./ss1_2.sh &
+$ ps -o pid,stat,args -p 1468
+    PID STAT COMMAND
+   1468 S    bash ./ss1_2.sh
+
+--- 4. fg: bring it back to the foreground ---
+$ fg %1
+./ss1_2.sh
+Terminated                 ./ss1_2.sh
+
+$ jobs
