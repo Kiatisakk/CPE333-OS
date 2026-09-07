@@ -1,0 +1,96 @@
+--- 2_extern.c, default PIE, run 1 ---
+Print value of x: 20
+Address of x (in main function): 0x5e847872a010
+
+Display value of x: 20
+Address of x (in display function): 0x5e847872a010
+
+
+--- 2_extern.c, default PIE, run 2 ---
+Print value of x: 20
+Address of x (in main function): 0x55bd30571010
+
+Display value of x: 20
+Address of x (in display function): 0x55bd30571010
+
+
+--- 2_extern.c, default PIE, run 3 ---
+Print value of x: 20
+Address of x (in main function): 0x60475102d010
+
+Display value of x: 20
+Address of x (in display function): 0x60475102d010
+
+
+--- 2_extern.c, -no-pie, run 1 ---
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+
+--- 2_extern.c, -no-pie, run 2 ---
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+
+--- 2_extern.c, -no-pie, run 3 ---
+Print value of x: 20
+Address of x (in main function): 0x404018
+
+Display value of x: 20
+Address of x (in display function): 0x404018
+
+
+--- 2_extern_no_extern.c, default PIE, run 1 ---
+Print value of x: 0
+Address of x (in main function): 0x7ffcd6c9e714
+
+Display value of x: 20
+Address of x (in display function): 0x56f9dc7b3010
+
+
+--- 2_extern_no_extern.c, default PIE, run 2 ---
+Print value of x: 0
+Address of x (in main function): 0x7ffdc5b931d4
+
+Display value of x: 20
+Address of x (in display function): 0x586cd516f010
+
+
+--- 2_extern_no_extern.c, default PIE, run 3 ---
+Print value of x: 0
+Address of x (in main function): 0x7ffc34bb6704
+
+Display value of x: 20
+Address of x (in display function): 0x5bd01b79b010
+
+
+--- 2_extern_no_extern.c, -no-pie, run 1 ---
+Print value of x: 0
+Address of x (in main function): 0x7fff9a126b64
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+
+
+--- 2_extern_no_extern.c, -no-pie, run 2 ---
+Print value of x: 0
+Address of x (in main function): 0x7ffe59e39194
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+
+
+--- 2_extern_no_extern.c, -no-pie, run 3 ---
+Print value of x: 0
+Address of x (in main function): 0x7ffebaabcea4
+
+Display value of x: 20
+Address of x (in display function): 0x404020
+
+

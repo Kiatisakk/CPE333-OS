@@ -1,0 +1,14 @@
+% Discussion for item2_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+Deleting one keyword changes the meaning completely. \texttt{int x;} inside
+\texttt{main()} is no longer a declaration referring to the global --- it is a
+\emph{definition} of a new automatic variable that shadows it for the rest of
+the function. It is never assigned, so reading it is undefined behaviour; the
+compiler says so as well, warning \texttt{`x' is used uninitialized}.
+
+So \texttt{main()} prints whatever happened to be in that stack slot, and a
+stack address to go with it, while \texttt{display()} is untouched and still
+reports the global's 20 at the global's address. The two addresses printed in a
+single run are in completely different regions of memory, which is the clearest
+evidence that they are two different variables.

@@ -1,0 +1,12 @@
+% Discussion for item2_3 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+The behaviour is the same as in item 1, for the same reason. The global
+\texttt{x} is part of the loaded image, so under default PIE its address follows
+the randomised load base and changes every run, while \texttt{-no-pie} pins it
+at \texttt{0x404018} in all three.
+
+The local \texttt{x} in the bottom two rows keeps moving under both, because it
+lives on the stack and the stack is randomised regardless of PIE. The values
+printed are equally unrepeatable --- each run finds different leftover bytes in
+that slot --- which is what undefined behaviour looks like in practice.

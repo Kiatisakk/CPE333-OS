@@ -1,0 +1,54 @@
+% ===================================================================
+%  CPE 333 Operating Systems -- Problem Session 4
+%  Memory Class and API in C Programming
+%
+%  BUILD:   powershell -ExecutionPolicy Bypass -File ..\scripts\build_pdf.ps1
+%
+%  WHAT IS SAFE TO EDIT
+%    main.tex           <- this file. Hand-edited.
+%    preamble.tex       <- packages and listing styles. Hand-edited.
+%    discussion/*.tex   <- the prose. Never overwritten by the generator.
+%    generated/*        <- DO NOT EDIT. Rewritten by scripts/make_latex.py.
+%
+%  Source files and transcripts are pulled straight out of ../src and
+%  ../results at compile time, and the address tables are derived from the
+%  transcripts by the generator, so no figure in this report can drift from
+%  what was actually compiled and run.
+% ===================================================================
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+
+% The title block is deliberately compact: it shares page 1 with section 1, and
+% the default \maketitle spacing pushes the section over onto a second page.
+\title{%
+  \vspace{-1.5cm}%
+  \large CPE 333 Operating Systems, 1/2026\\[0.4em]
+  \Large\bfseries Problem Session 4: Memory Class and API in C Programming%
+}
+
+\author{%
+  \begin{tabular}{@{}l@{\hspace{2em}}l@{}}
+    Kiatisak Markmeeshap & 67070501005 \\
+    Tithinan Sobking     & 67070501018 \\
+    Worawut Sereethai    & 67070501040 \\
+    Chanya Poolketkij    & 67070501058
+  \end{tabular}%
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+Everything below was run on one machine, as the sheet requires: Ubuntu under
+WSL2 on Windows~11. The programs were compiled with exactly the two commands the
+sheet gives, \texttt{gcc -o \textit{exe} \textit{src}.c} and
+\texttt{gcc -no-pie -o \textit{exe} \textit{src}.c}, with no additional flags, so
+that nothing about the compilation can be blamed for the addresses that follow.
+Items 1 and 2 were built both ways and run three times per build; item 3 is run
+without \texttt{-no-pie}, as the sheet specifies.
+
+\input{generated/body}
+
+\end{document}

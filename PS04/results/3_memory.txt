@@ -1,0 +1,57 @@
+--- 3_memory.c, default PIE, run 1 ---
+
+Address of Pointer
+>>0x7ffed482f730
+>>0x7ffed482f738
+
+Effective Address
+>>0x1800000017
+>>(nil)
+
+After malloc Pointer a
+>>0x558fb7513020
+>>0x558fb7513020
+>>0x558fb7513044
+
+Array c
+>>0x7ffed482f740
+>>0x7ffed482f740
+>>0x7ffed482f764
+
+After realloc Pointer a
+>>0x558fb7513020
+>>0x558fb7513020
+>>0x558fb7513044
+>>0x558fb7513fbc
+
+--- 3_memory_with_b.c, default PIE, run 1 ---
+
+Address of Pointer
+>>0x7fffe767fea0
+>>0x7fffe767fea8
+
+Effective Address
+>>0x1800000017
+>>(nil)
+
+After malloc Pointer a
+>>0x5bf54a021020
+>>0x5bf54a021020
+>>0x5bf54a021044
+
+Array c
+>>0x7fffe767feb0
+>>0x7fffe767feb0
+>>0x7fffe767fed4
+
+After malloc Pointer b
+>>0x5bf54a021050
+>>0x5bf54a021050
+>>0x5bf54a021074
+
+After realloc Pointer a
+>>0x5bf54a021080
+>>0x5bf54a021080
+>>0x5bf54a0210a4
+>>0x5bf54a02201c
+

@@ -1,0 +1,132 @@
+--- 1_static.c, default PIE, run 1 ---
+The value of y is 6
+The address of y is 0x58cb201ad010
+
+The value of y is 7
+The address of y is 0x58cb201ad010
+
+The value of y is 8
+The address of y is 0x58cb201ad010
+
+
+--- 1_static.c, default PIE, run 2 ---
+The value of y is 6
+The address of y is 0x5a3ca3532010
+
+The value of y is 7
+The address of y is 0x5a3ca3532010
+
+The value of y is 8
+The address of y is 0x5a3ca3532010
+
+
+--- 1_static.c, default PIE, run 3 ---
+The value of y is 6
+The address of y is 0x5fc5b0b79010
+
+The value of y is 7
+The address of y is 0x5fc5b0b79010
+
+The value of y is 8
+The address of y is 0x5fc5b0b79010
+
+
+--- 1_static.c, -no-pie, run 1 ---
+The value of y is 6
+The address of y is 0x404018
+
+The value of y is 7
+The address of y is 0x404018
+
+The value of y is 8
+The address of y is 0x404018
+
+
+--- 1_static.c, -no-pie, run 2 ---
+The value of y is 6
+The address of y is 0x404018
+
+The value of y is 7
+The address of y is 0x404018
+
+The value of y is 8
+The address of y is 0x404018
+
+
+--- 1_static.c, -no-pie, run 3 ---
+The value of y is 6
+The address of y is 0x404018
+
+The value of y is 7
+The address of y is 0x404018
+
+The value of y is 8
+The address of y is 0x404018
+
+
+--- 1_static_no_static.c, default PIE, run 1 ---
+The value of y is 6
+The address of y is 0x7fff9688e0f0
+
+The value of y is 6
+The address of y is 0x7fff9688e0f0
+
+The value of y is 6
+The address of y is 0x7fff9688e0f0
+
+
+--- 1_static_no_static.c, default PIE, run 2 ---
+The value of y is 6
+The address of y is 0x7ffee90a8000
+
+The value of y is 6
+The address of y is 0x7ffee90a8000
+
+The value of y is 6
+The address of y is 0x7ffee90a8000
+
+
+--- 1_static_no_static.c, default PIE, run 3 ---
+The value of y is 6
+The address of y is 0x7ffc8f16a3e0
+
+The value of y is 6
+The address of y is 0x7ffc8f16a3e0
+
+The value of y is 6
+The address of y is 0x7ffc8f16a3e0
+
+
+--- 1_static_no_static.c, -no-pie, run 1 ---
+The value of y is 6
+The address of y is 0x7fffd2a525e0
+
+The value of y is 6
+The address of y is 0x7fffd2a525e0
+
+The value of y is 6
+The address of y is 0x7fffd2a525e0
+
+
+--- 1_static_no_static.c, -no-pie, run 2 ---
+The value of y is 6
+The address of y is 0x7ffe40c85ce0
+
+The value of y is 6
+The address of y is 0x7ffe40c85ce0
+
+The value of y is 6
+The address of y is 0x7ffe40c85ce0
+
+
+--- 1_static_no_static.c, -no-pie, run 3 ---
+The value of y is 6
+The address of y is 0x7ffcca719fb0
+
+The value of y is 6
+The address of y is 0x7ffcca719fb0
+
+The value of y is 6
+The address of y is 0x7ffcca719fb0
+
+

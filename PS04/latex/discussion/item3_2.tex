@@ -1,0 +1,17 @@
+% Discussion for item3_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+Yes --- with \texttt{b} allocated, \texttt{a} moves.
+
+The first \texttt{malloc} still hands back the same kind of address, and
+\texttt{b}'s block is placed immediately after \texttt{a}'s. That is what
+changes the outcome: \texttt{a} is no longer the last thing in the heap, so
+growing it from 40 bytes to 4000 in place would run straight into \texttt{b}.
+The allocator has to find room elsewhere, copy the contents across, release the
+old block, and return a different pointer.
+
+This is why \texttt{realloc} must be used as \texttt{a = realloc(a, \ldots)} and
+why any other pointer into the old block is invalid afterwards. Whether a block
+moves is not a property of the program but of what else has been allocated
+around it --- the same call moved nothing in the previous run and moves the
+block here, with no change to the \texttt{realloc} line itself.

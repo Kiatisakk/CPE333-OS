@@ -1,0 +1,28 @@
+% Discussion for item3_1 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+Each section of the output means something different.
+
+\textbf{Address of Pointer} is \texttt{\&a} and \texttt{\&b} --- where the two
+pointer \emph{variables} themselves sit. They are locals, so these are stack
+addresses, eight bytes apart because a pointer is eight bytes on this machine.
+
+\textbf{Effective Address} is \texttt{a} and \texttt{b} --- the values stored in
+those pointers, read before anything has been assigned to them. That is
+undefined behaviour: the values are whatever the stack happened to hold. In this
+run one printed \texttt{(nil)} and the other a nonsense value, which is exactly
+the point --- \texttt{(nil)} is not a guarantee, and an uninitialised pointer is
+not a null pointer.
+
+\textbf{After malloc} shows \texttt{a} pointing into the heap, a region far from
+the stack. \texttt{a} and \texttt{\&a[0]} print the same thing, because that is
+what indexing means, and \texttt{\&a[9]} is 36 bytes further along: nine
+\texttt{int}s of four bytes each.
+
+\textbf{Array c} is a stack array, so it sits next to the other locals rather
+than in the heap. It needs no allocation and cannot be freed; its lifetime ends
+with the function.
+
+\texttt{realloc} here returned the same address it was given. The block was the
+most recent allocation and nothing lay above it, so the allocator could simply
+extend it in place; \texttt{\&a[999]} is then 3996 bytes past the start.
