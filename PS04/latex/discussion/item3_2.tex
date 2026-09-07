@@ -1,17 +1,16 @@
 % Discussion for item3_2 -- prose goes here.
 % scripts/make_latex.py will NEVER overwrite this file.
 
-Yes --- with \texttt{b} allocated, \texttt{a} moves.
+The result does differ from the previous run: with \texttt{b} allocated,
+\texttt{a} moves.
 
-The first \texttt{malloc} still hands back the same kind of address, and
-\texttt{b}'s block is placed immediately after \texttt{a}'s. That is what
-changes the outcome: \texttt{a} is no longer the last thing in the heap, so
-growing it from 40 bytes to 4000 in place would run straight into \texttt{b}.
-The allocator has to find room elsewhere, copy the contents across, release the
-old block, and return a different pointer.
+Allocating \texttt{b} immediately after \texttt{a} prevents in-place expansion
+during \texttt{realloc(a, 1000 * sizeof(int))}. Because \texttt{b}'s chunk
+obstructs contiguous growth, the allocator relocates \texttt{a} to a
+sufficiently large free block, copies the existing contents, releases the old
+block and returns a new address.
 
-This is why \texttt{realloc} must be used as \texttt{a = realloc(a, \ldots)} and
-why any other pointer into the old block is invalid afterwards. Whether a block
-moves is not a property of the program but of what else has been allocated
-around it --- the same call moved nothing in the previous run and moves the
-block here, with no change to the \texttt{realloc} line itself.
+Whether a block moves is therefore not a property of the program but of what
+else has been allocated around it: the \texttt{realloc} call is identical in
+both versions. This is why its return value must always be reassigned to the
+pointer, and why any other pointer into the old block is invalid afterwards.

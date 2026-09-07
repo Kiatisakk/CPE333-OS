@@ -1,13 +1,8 @@
 % Discussion for item1_2 -- prose goes here.
 % scripts/make_latex.py will NEVER overwrite this file.
 
-Without \texttt{static}, \texttt{y} is an ordinary automatic variable. It is
-created when the loop body is entered and destroyed when the body ends, so
-\texttt{= 5} really does run every iteration and the increment always starts
-over: the value is 6 three times instead of 6, 7, 8.
-
-The address is now a stack address --- far higher than before, in the
-\texttt{0x7ff\ldots} range --- and it repeats across the three iterations only
-because the same stack slot is handed back each time the body is re-entered.
-That is reuse, not persistence: the old value is gone even though the storage
-happens to be the same.
+Without \texttt{static}, \texttt{y} becomes an automatic variable allocated on
+the stack. It is reinitialised to 5 upon entering each loop iteration and
+deallocated upon exiting, yielding the value 6 on every pass. The address falls
+within the high stack range (\texttt{0x7ff\ldots}); it remains identical across
+iterations due to stack slot reuse rather than state persistence.

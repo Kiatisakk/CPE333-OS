@@ -41,13 +41,12 @@
 \maketitle
 \vspace{-2em}
 
-Everything below was run on one machine, as the sheet requires: Ubuntu under
-WSL2 on Windows~11. The programs were compiled with exactly the two commands the
-sheet gives, \texttt{gcc -o \textit{exe} \textit{src}.c} and
-\texttt{gcc -no-pie -o \textit{exe} \textit{src}.c}, with no additional flags, so
-that nothing about the compilation can be blamed for the addresses that follow.
-Items 1 and 2 were built both ways and run three times per build; item 3 is run
-without \texttt{-no-pie}, as the sheet specifies.
+All tests were executed on a single Ubuntu environment (WSL2 on Windows~11),
+using exactly the two commands specified --- \texttt{gcc -o \textit{exe}
+\textit{src}.c} and \texttt{gcc -no-pie -o \textit{exe} \textit{src}.c} --- with
+no additional flags, so that no compiler option can account for the addresses
+reported below. Items 1 and 2 were evaluated under both configurations across
+three runs each; item 3 was executed without \texttt{-no-pie}.
 
 \input{generated/body}
 

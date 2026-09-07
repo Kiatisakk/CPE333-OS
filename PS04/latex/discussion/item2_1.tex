@@ -1,13 +1,9 @@
 % Discussion for item2_1 -- prose goes here.
 % scripts/make_latex.py will NEVER overwrite this file.
 
-\texttt{extern int x;} \emph{declares} \texttt{x} without defining it: it tells
-the compiler that a variable of that name and type exists somewhere and that
-this function should use it, rather than creating a new one. The definition is
-the file-scope \texttt{int x = 20;}, which is what actually reserves storage.
-
-Both functions therefore name the same object, so both print 20 and both print
-the same address. Here the \texttt{extern} declarations are redundant --- the
-file-scope definition is already visible to both functions --- but they make the
-intent explicit, and in a real program they are how one translation unit reaches
-a variable defined in another.
+\texttt{extern int x;} declares \texttt{x} without defining it, instructing the
+compiler to reference the existing file-scope definition (\texttt{int x = 20;}).
+Both functions therefore reference the same object in the data segment, printing
+identical values (20) and addresses. While redundant here within a single file,
+\texttt{extern} makes shared linkage explicit and is how one translation unit
+reaches a variable defined in another.

@@ -1,13 +1,9 @@
 % Discussion for item1_1 -- prose goes here.
 % scripts/make_latex.py will NEVER overwrite this file.
 
-\texttt{static} gives \texttt{y} \emph{static storage duration}: it is created
-once, before the program starts running, and lives in the initialised-data
-segment rather than on the stack. The initialiser \texttt{= 5} is therefore not
-an instruction executed each time control passes it --- it is the value the
-variable is born with. Each iteration only runs \texttt{y++}, so the value goes
-6, 7, 8, and the address is the same on all three lines because there is only
-ever one \texttt{y}.
-
-(The \texttt{auto} on \texttt{x} is what every local already is, so it changes
-nothing; the keyword is a leftover from early C.)
+Declaring \texttt{y} as \texttt{static} allocates it in the initialised data
+segment rather than the stack, giving it static storage duration. The
+initialisation (\texttt{= 5}) occurs only once, at program startup. Subsequent
+iterations execute only \texttt{y++}, producing the values 6, 7 and 8 at an
+invariant address. (\texttt{auto} on \texttt{x} is the default for local
+variables and has no effect.)

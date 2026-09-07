@@ -1,19 +1,15 @@
 % Discussion for item1_3 -- prose goes here.
 % scripts/make_latex.py will NEVER overwrite this file.
 
-Yes, the results differ, and the table shows exactly where.
+The two builds do produce different results, as the table shows.
 
-By default \texttt{gcc} produces a \emph{position-independent executable}, which
-the loader is free to place at a randomly chosen base address; every address
-inside it shifts with that base, so the static \texttt{y} lands somewhere new on
-every run. \texttt{-no-pie} produces a fixed-position executable instead, linked
-to load at one address, so \texttt{y} is at \texttt{0x404018} in all three runs.
-The \emph{values} 6, 7, 8 never change --- storage duration is a language rule
-and has nothing to do with how the image is loaded.
+By default \texttt{gcc} generates a position-independent executable (PIE) whose
+base address is randomised by ASLR on each execution, causing the address of
+static \texttt{y} to change across runs. Compiling with \texttt{-no-pie} fixes
+the program's load address, pinning \texttt{y} to \texttt{0x404018}. The values
+(6, 7, 8) remain unaffected, as storage duration is governed by language
+semantics, not by binary loading.
 
-The last row is the useful one: without \texttt{static}, the address still moves
-between runs even under \texttt{-no-pie}. That variable is on the stack, and the
-stack is randomised by address-space layout randomisation, which the kernel
-applies independently of whether the executable is position-independent.
-Turning off PIE fixes where the \emph{program} is loaded; it does not turn ASLR
-off.
+Notably, the non-static \texttt{y} moves across runs even under
+\texttt{-no-pie}. Because stack layout is randomised independently by the
+kernel, disabling PIE fixes only the text and data segments, not the stack.
