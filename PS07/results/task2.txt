@@ -1,0 +1,70 @@
+--- task 2, run 1 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 970877 tickets
+  thread 2 sold 756499 tickets
+  thread 3 sold 942701 tickets
+  thread 4 sold 670539 tickets
+tickets sold: 3340616 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2340616 tickets
+
+--- task 2, run 2 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 853406 tickets
+  thread 2 sold 786425 tickets
+  thread 3 sold 669075 tickets
+  thread 4 sold 654655 tickets
+tickets sold: 2963561 for 1000000 seats, seats left: -2
+result: OVERSOLD by 1963561 tickets
+
+--- task 2, run 3 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 485998 tickets
+  thread 2 sold 553269 tickets
+  thread 3 sold 506288 tickets
+  thread 4 sold 915276 tickets
+tickets sold: 2460831 for 1000000 seats, seats left: -1
+result: OVERSOLD by 1460831 tickets
+
+--- task 2, run 4 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1214589 tickets
+  thread 2 sold 781397 tickets
+  thread 3 sold 582172 tickets
+  thread 4 sold 778077 tickets
+tickets sold: 3356235 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2356235 tickets
+
+--- task 2, run 5 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 639517 tickets
+  thread 2 sold 614481 tickets
+  thread 3 sold 894386 tickets
+  thread 4 sold 785616 tickets
+tickets sold: 2934000 for 1000000 seats, seats left: 0
+result: OVERSOLD by 1934000 tickets
+
+--- task 2, run 6 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 843675 tickets
+  thread 2 sold 908994 tickets
+  thread 3 sold 580894 tickets
+  thread 4 sold 605849 tickets
+tickets sold: 2939412 for 1000000 seats, seats left: 0
+result: OVERSOLD by 1939412 tickets
+
+--- task 2, run 7 ---
+$ ./ps7 4
+4 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 984965 tickets
+  thread 2 sold 618196 tickets
+  thread 3 sold 671487 tickets
+  thread 4 sold 611313 tickets
+tickets sold: 2885961 for 1000000 seats, seats left: 0
+result: OVERSOLD by 1885961 tickets
+

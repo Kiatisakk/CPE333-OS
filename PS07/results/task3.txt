@@ -1,0 +1,70 @@
+--- task 3, run 1 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 974612 tickets
+  thread 2 sold 985241 tickets
+  thread 3 sold 956641 tickets
+  thread 4 sold 990127 tickets
+tickets sold: 3906621 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2906621 tickets
+
+--- task 3, run 2 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 994781 tickets
+  thread 2 sold 993585 tickets
+  thread 3 sold 997120 tickets
+  thread 4 sold 991734 tickets
+tickets sold: 3977220 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2977220 tickets
+
+--- task 3, run 3 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 978872 tickets
+  thread 2 sold 985593 tickets
+  thread 3 sold 1011897 tickets
+  thread 4 sold 986278 tickets
+tickets sold: 3962640 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2962640 tickets
+
+--- task 3, run 4 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 954999 tickets
+  thread 2 sold 966836 tickets
+  thread 3 sold 983761 tickets
+  thread 4 sold 948853 tickets
+tickets sold: 3854449 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2854449 tickets
+
+--- task 3, run 5 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 952878 tickets
+  thread 2 sold 1012297 tickets
+  thread 3 sold 981335 tickets
+  thread 4 sold 984938 tickets
+tickets sold: 3931448 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2931448 tickets
+
+--- task 3, run 6 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 957783 tickets
+  thread 2 sold 988187 tickets
+  thread 3 sold 955115 tickets
+  thread 4 sold 972485 tickets
+tickets sold: 3873570 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2873570 tickets
+
+--- task 3, run 7 ---
+$ ./ps7 4 yield
+4 booking thread(s), 1000000 seats, forced context switch: yes
+  thread 1 sold 985269 tickets
+  thread 2 sold 972796 tickets
+  thread 3 sold 966003 tickets
+  thread 4 sold 967716 tickets
+tickets sold: 3891784 for 1000000 seats, seats left: 0
+result: OVERSOLD by 2891784 tickets
+

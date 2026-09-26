@@ -1,0 +1,7 @@
+% Discussion for task3 -- never overwritten by make_latex.py.
+
+Forcing a context switch makes the overselling larger on average, and the
+totals still differ from run to run. A thread now holds its private copy of the
+counter across the \texttt{sched\_yield()} while the other threads keep
+selling. When it resumes it stores its stale value, putting back every seat
+they sold in the meantime, so those seats are sold again.

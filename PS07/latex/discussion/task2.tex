@@ -1,0 +1,12 @@
+% Discussion for task2 -- never overwritten by make_latex.py.
+
+With four threads the result is wrong in every run, and different in every
+run: far more tickets are sold than the hall holds. No yield is needed. The four threads
+run in parallel on separate cores, and \texttt{seats\_left = seats\_left - 1}
+compiles to a separate load, subtract and store, so two threads regularly read
+the same value, both sell a ticket, and both store the same result: one
+decrement is lost and a seat is sold twice.
+
+Because the check and the decrement are also separate, two threads can both see
+the last seat free and both take it, which is how the counter can end below
+zero.

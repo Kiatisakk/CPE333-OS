@@ -1,0 +1,49 @@
+--- task 1, run 1 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 2 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 3 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 4 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 5 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 6 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+
+--- task 1, run 7 ---
+$ ./ps7 1
+1 booking thread(s), 1000000 seats, forced context switch: no
+  thread 1 sold 1000000 tickets
+tickets sold: 1000000 for 1000000 seats, seats left: 0
+result: correct
+

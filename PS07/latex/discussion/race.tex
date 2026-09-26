@@ -1,0 +1,16 @@
+% Discussion for race -- never overwritten by make_latex.py.
+
+The cause is that selling a seat is a \emph{read-modify-write} of shared state
+that is not atomic. \texttt{seats\_left = seats\_left - 1} is one line of C but
+three machine steps --- load into a register, subtract, store --- and each thread
+has its own registers. Whenever another thread's store lands between one
+thread's load and its store, that thread writes back a value computed from
+stale data and the other thread's update is lost. The check
+\texttt{seats\_left <= 0} adds a second race of the same kind: the decision is
+made on a value that may already be out of date when the decrement happens.
+
+Which interleavings occur depends on how the scheduler and the cores happen to
+run the threads, which is why the outcome differs from run to run while the
+single-threaded run is always correct. Removing the race requires making the
+check and the decrement one indivisible step, for example by holding a
+\texttt{pthread\_mutex\_t} around them.

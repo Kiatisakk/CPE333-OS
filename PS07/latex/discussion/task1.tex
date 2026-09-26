@@ -1,0 +1,6 @@
+% Discussion for task1 -- never overwritten by make_latex.py.
+
+With a single thread the program is correct in every run: exactly one million
+tickets are sold and no seats are left. Only one thread ever reads or writes
+\texttt{seats\_left}, so no update can interleave with another and the result is
+deterministic.

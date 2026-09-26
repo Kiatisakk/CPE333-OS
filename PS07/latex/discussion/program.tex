@@ -1,0 +1,14 @@
+% Discussion for program -- never overwritten by make_latex.py.
+
+The example is a concert box office rather than the lecture's shared counter.
+A hall of one million seats is sold by several booking threads that share one
+variable, \texttt{seats\_left}. To sell a ticket a thread checks that a seat is
+free and then writes back one fewer; nothing makes that pair of steps
+indivisible. Each thread counts its own sales in a private variable, so the
+total sold is exact and any excess over one million is tickets sold for seats
+that do not exist.
+
+The number of threads comes from the first argument. With a second argument,
+\texttt{yield}, the decrement is split into the explicit load, decrement,
+\texttt{sched\_yield()} and store of the sheet's example, forcing a context
+switch between reading the counter and writing it back.
