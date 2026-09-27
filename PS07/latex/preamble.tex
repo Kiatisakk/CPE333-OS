@@ -103,6 +103,14 @@
   captionpos=b,
 }
 
+% Seven runs of a task are 69 lines; at \scriptsize (9.5pt lines) they spill
+% one page by a few lines. 7.5pt on 8.6pt lines fits them, heading and caption
+% included, on a single page. The generator's needspace() uses the same 8.6pt.
+\lstdefinestyle{termsmall}{
+  style=term,
+  basicstyle=\ttfamily\fontsize{7.5}{8.6}\selectfont,
+}
+
 \lstset{style=term}
 
 % Tighter gaps around listings: the default leaves enough air that a listing

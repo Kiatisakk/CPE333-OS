@@ -7,6 +7,7 @@ compiles to a separate load, subtract and store, so two threads regularly read
 the same value, both sell a ticket, and both store the same result: one
 decrement is lost and a seat is sold twice.
 
-Because the check and the decrement are also separate, two threads can both see
-the last seat free and both take it, which is how the counter can end below
-zero.
+The check and the decrement are also separate, which makes this a
+\emph{check-then-act} race, also called time-of-check to time-of-use (TOCTOU):
+two threads can both see the last seat free and both take it, which is how the
+counter can end below zero.

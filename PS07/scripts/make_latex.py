@@ -70,11 +70,27 @@ def listing(rel, style, caption, extra=""):
             % (style, extra, caption, rel))
 
 
-def needspace(lines):
-    """Keep a transcript on one page: ask for its height, or give up if it
-    could never fit (scriptsize is ~0.62 baselineskip; a page is ~50)."""
-    need = int(lines * 0.62) + 3
-    return r"\headroom" if need > 48 else r"\Needspace*{%d\baselineskip}" % need
+def needspace(lines, line_pt=9.5):
+    """Keep a listing on one page: ask for its height, or give up if it could
+    never fit. Heights are in body baselineskips (13.6pt); a page holds ~51.
+    line_pt is the listing's own line height: 9.5 for \\scriptsize, 8.6 for
+    the termsmall style. Getting it wrong under-reserves -- the first version
+    assumed 0.62 of a line for \\scriptsize and pushed captions off the page."""
+    need = int(lines * line_pt / 13.6 + 0.999) + 3
+    return r"\headroom" if need > 51 else r"\Needspace*{%d\baselineskip}" % need
+
+
+def source(rel, caption):
+    """A C source listing that never breaks inside a function header: it is
+    split before main(), and the second half asks for room for main() whole."""
+    with io.open(os.path.join(ROOT, rel), encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    cut = next(i for i, l in enumerate(lines, 1) if l.startswith("int main("))
+    return "\n".join([
+        "\\lstinputlisting[style=csrc,lastline=%d]{../%s}" % (cut - 1, rel),
+        needspace(len(lines) - cut + 1),
+        "\\lstinputlisting[style=csrc,firstline=%d,firstnumber=%d,caption={%s}]{../%s}"
+        % (cut, cut, caption, rel)])
 
 
 def all_runs(rel, caption):
@@ -83,7 +99,7 @@ def all_runs(rel, caption):
     blocks = parse(rel)
     first, last = blocks[0][2], blocks[-1][3]
     QUOTED.add(rel)
-    return listing(rel, "term", caption, ",firstline=%d,lastline=%d" % (first, last))
+    return listing(rel, "termsmall", caption, ",firstline=%d,lastline=%d" % (first, last))
 
 
 def run_lines(rel):
@@ -125,13 +141,13 @@ def build_body():
         # transcript together, so the heading is never stranded at a page foot.
         # 4 lines covers the heading and its spacing.
         if transcript:
-            out.append(needspace(run_lines(transcript) + 4))
+            out.append(needspace(run_lines(transcript) + 6, line_pt=8.6))
         out.extend([r"\headroom", r"\section{%s}" % title, ""])
         out.extend(blocks)
         out.extend([r"\input{discussion/%s}" % key, ""])
 
     sec("The Program", "program", [
-        listing("src/ps7.c", "csrc", r"Source: \texttt{ps7.c}"), ""])
+        source("src/ps7.c", r"Source: \texttt{ps7.c}"), ""])
     sec("Task 1: One Thread", "task1", [
         all_runs(T1, r"Seven runs of \texttt{./ps7 1}"), ""], transcript=T1)
     sec("Task 2: Several Threads, No Forced Context Switch", "task2", [

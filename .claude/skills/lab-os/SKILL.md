@@ -51,7 +51,7 @@ Done when: `run_all.sh` exits 0 with every assertion passing.
 
 ### 5. Generate and write
 
-`make_latex.py` pulls sources and transcripts in with `\lstinputlisting` (line ranges for a single run) and derives any comparison table by parsing `results/`. It rewrites `latex/generated/` every run and writes `latex/discussion/*.tex` only when absent. Keep PS04's `check_coverage()` (every captured block shown) and `needspace()` (a transcript moves to the next page whole).
+`make_latex.py` pulls sources and transcripts in with `\lstinputlisting` (line ranges for a single run) and derives any comparison table by parsing `results/`. It rewrites `latex/generated/` every run and writes `latex/discussion/*.tex` only when absent. Keep `check_coverage()` (every captured block shown). Take `needspace()` and `source()` from `PS07/scripts/make_latex.py`, not PS04: PS04's `needspace()` assumes a `\scriptsize` line is 0.62 of a body line when it is 0.70, under-reserves, and lets a caption fall onto the next page. `source()` splits a C listing before `main()` so a page break never lands inside a function header. A transcript too tall for one page gets the `termsmall` style (7.5pt, in PS07's preamble) rather than a split.
 
 Write the prose into `latex/discussion/`: formal report register, a few lines per subsection, opening with a direct answer when the sheet asks a yes/no question. Name undefined behaviour as undefined behaviour. Quote only stable values (a `-no-pie` address, a byte offset); leave run-varying numbers to the listings.
 
@@ -61,6 +61,8 @@ Write the prose into `latex/discussion/`: formal report register, a few lines pe
 powershell -ExecutionPolicy Bypass -File PSxx\scripts\build_pdf.ps1
 python3 .claude/skills/lab-os/drift_check.py PSxx
 ```
+
+`drift_check.py` covers hex addresses only; when the lab's figures are decimal counts (PS07's ticket totals), check them against `results/` the same way before calling it clean — "0 captured, 0 shown" proves nothing.
 
 Done when: 0 overfull boxes, `drift_check.py` exits 0, and each sheet question from step 1 is answered somewhere in the PDF. Look at the rendered pages (`Read` the PDF) for stranded headings and split transcripts.
 
