@@ -1,13 +1,7 @@
 % Discussion for task2 -- never overwritten by make_latex.py.
 
-With four threads the result is wrong in every run, and different in every
-run: far more tickets are sold than the hall holds. No yield is needed. The four threads
-run in parallel on separate cores, and \texttt{seats\_left = seats\_left - 1}
-compiles to a separate load, subtract and store, so two threads regularly read
-the same value, both sell a ticket, and both store the same result: one
-decrement is lost and a seat is sold twice.
-
-The check and the decrement are also separate, which makes this a
-\emph{check-then-act} race, also called time-of-check to time-of-use (TOCTOU):
-two threads can both see the last seat free and both take it, which is how the
-counter can end below zero.
+With four threads the outcome is both incorrect and non-deterministic across
+all runs: far more tickets are sold than the hall holds, and the counter can
+even end below zero. No yield is needed for this --- the four threads run in
+parallel on separate cores and interleave on their own. The Discussion below
+explains both effects.

@@ -5,9 +5,13 @@ that is not atomic. \texttt{seats\_left = seats\_left - 1} is one line of C but
 three machine steps --- load into a register, subtract, store --- and each thread
 has its own registers. Whenever another thread's store lands between one
 thread's load and its store, that thread writes back a value computed from
-stale data and the other thread's update is lost. The check
-\texttt{seats\_left <= 0} adds a second race of the same kind: the decision is
-made on a value that may already be out of date when the decrement happens.
+stale data and the other thread's update is lost, so a seat is sold twice.
+
+The check \texttt{seats\_left <= 0} adds a second race, a \emph{check-then-act}
+or time-of-check to time-of-use (TOCTOU) race: the decision is made on a value
+that may already be out of date when the decrement happens. Two threads can
+both see the last seat free and both take it, which is how the counter ends
+below zero.
 
 Which interleavings occur depends on how the scheduler and the cores happen to
 run the threads, which is why the outcome differs from run to run while the
