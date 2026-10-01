@@ -26,12 +26,14 @@ SRC = ROOT / "src"
 TEMPLATE = ROOT / "UTF-8_PS8_2025.pptx"
 OUT = ROOT / "slides" / "PS08.pptx"
 
-MEMBERS = [  # (id, name, part)
-    ("67070501005", "Kiatisak Markmeeshap", "Peterson's Algorithm"),
-    ("67070501018", "Tithinan Sobking", "Load-Linked / Store-Conditional"),
-    ("67070501040", "Worawut Sereethai", "Lamport's Bakery Algorithm"),
-    ("67070501058", "Chanya Poolketkij", "Comparison and Conclusion"),
-]
+MEMBERS = {  # part -> (id, name), in presentation order
+    "How We Evaluate": ("67070501021", "Thanaboon Tikaew"),
+    "Peterson's Algorithm": ("67070501005", "Kiatisak Markmeeshap"),
+    "Load-Linked / Store-Conditional": ("67070501018", "Tithinan Sobking"),
+    "Lamport's Bakery Algorithm": ("67070501040", "Worawut Sereethai"),
+    "Comparison": ("67070501059", "Chanon Lhumsa-ard"),
+    "Conclusion": ("67070501075", "Siriwan Yindeephot"),
+}
 LABEL = {"peterson": "Peterson", "llsc": "LL/SC", "bakery": "Bakery",
          "tas": "TAS (lecture)", "mutex": "pthread_mutex (lecture)"}
 ACCENT = RGBColor(0xC0, 0x39, 0x2B)    # the red the template uses for remarks
@@ -223,9 +225,10 @@ def mps(lock, t, mode):
     return tp(lock, t, mode) / 1e6 if (lock, t, mode) in B else None
 
 
-def section(title, who, notes):
-    s = new_slide(title, notes, L_SECTION)
-    s.placeholders[1].text = "\n".join(who)
+def section(part, notes):
+    """Section header naming the member who presents `part`."""
+    s = new_slide(part, notes, L_SECTION)
+    s.placeholders[1].text = "\n".join(MEMBERS[part])
 
 
 # ============================================================== slides ===
@@ -240,15 +243,18 @@ s.placeholders[1].text = ("Peterson's Algorithm · LL/SC · Lamport's Bakery\n"
 
 # ---- 2 group
 s = new_slide("Group: OS InW",
-              "Each member presents one lock; the last part compares all three.", L_TITLE_ONLY)
-for k, (sid, name, part) in enumerate(MEMBERS):
-    tf = text(s, 1.2 + 5.7 * (k % 2), 2.0 + 2.3 * (k // 2), 5.2, 2.0,
-              [sid, name, ("", 0), (part, 0, ACCENT)], size=22, bullet=False)
+              "There are six of us. One member explains how we measured, three members each "
+              "present one lock, one compares them, and one concludes.", L_TITLE_ONLY)
+for k, (part, (sid, name)) in enumerate(MEMBERS.items()):
+    tf = text(s, 0.5 + 4.15 * (k % 3), 1.9 + 2.5 * (k // 3), 4.0, 2.2,
+              [sid, name, ("", 0), (part, 0, ACCENT)], size=20, bullet=False)
     for p in tf.paragraphs:
         p.alignment = PP_ALIGN.CENTER
         p.space_after = Pt(0)
 
 # ---- 3 method
+section("How We Evaluate",
+        "Before the locks themselves: the metrics we use and how we measured them.")
 s = new_slide("How We Evaluate Each Lock",
               f"We use the four metrics from Lecture 8. Every lock runs the same loop for "
               f"{SECS} second per run: lock, add one to a shared counter, unlock. If the "
@@ -275,7 +281,7 @@ barrier = next(l.split("\t", 1)[1].strip() for l in
                (RESULTS / "1_peterson_disasm.txt").read_text().splitlines()
                if re.search(r"mfence|lock or", l))
 
-section("Peterson's Algorithm", MEMBERS[0][:2],
+section("Peterson's Algorithm",
         "Part one: Peterson's algorithm, a lock built from ordinary loads and stores.")
 
 s = new_slide("Peterson's Algorithm: Idea",
@@ -355,7 +361,7 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
 
 # =================================================================== LL/SC
 arm = runs("2_llsc.txt", r".")
-section("Load-Linked / Store-Conditional", MEMBERS[1][:2],
+section("Load-Linked / Store-Conditional",
         "Part two: Load-Linked and Store-Conditional, a pair of hardware instructions.")
 
 s = new_slide("LL/SC: Idea",
@@ -433,7 +439,7 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
 
 # ================================================================== Bakery
 bak = [r for (l, _, _), rs in B.items() if l == "bakery" for r in rs]
-section("Lamport's Bakery Algorithm", MEMBERS[2][:2],
+section("Lamport's Bakery Algorithm",
         "Part three, the lock not covered in the lecture: Lamport's bakery algorithm.")
 
 s = new_slide("Bakery Algorithm: Idea",
@@ -496,8 +502,8 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
 ], size=20)
 
 # ============================================================== comparison
-section("Comparison", MEMBERS[3][:2],
-        "Last part: the three locks side by side, with two locks from the lecture as references.")
+section("Comparison",
+        "Now the three locks side by side, with two locks from the lecture as references.")
 
 s = new_slide("Throughput: All CPUs vs One CPU",
               f"On all {NCPU} CPUs, pthread_mutex was fastest at eight threads and Bakery "
@@ -535,6 +541,8 @@ text(s, 0.5, 5.1, 12.3, 2.0, [
     ("Peterson and Bakery give mutual exclusion on x86 only with the fence", 0, ACCENT),
 ], size=16)
 
+section("Conclusion",
+        "Last part: what the measurements tell us, and where the material comes from.")
 s = new_slide("Conclusion",
               "All three locks provide mutual exclusion and avoid deadlock, but the two software "
               "locks only do so on today's CPUs with memory fences. Software locks are fair but "
