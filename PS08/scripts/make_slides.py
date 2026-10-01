@@ -19,7 +19,7 @@ from pptx.oxml.ns import qn
 from pptx.oxml.xmlchemy import OxmlElement
 from pptx.util import Inches, Pt
 
-from results import LOCKS, THREADS, bench, env, median, runs, RESULTS
+from results import LOCKS, THREADS, RESULTS, bench, blocks, env, median, parse, runs
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
@@ -185,8 +185,10 @@ def log_axis(chart, values):
     va.crosses = XL_AXIS_CROSSES.MINIMUM
 
 
-def chart(slide, x, y, w, h, kind, categories, series, cat_title, size=12, labels=False):
-    """series: [(name, [values in M acq/s or None])]; log value axis."""
+def chart(slide, x, y, w, h, kind, categories, series, cat_title, size=12, labels=False,
+          value_title="million acquisitions / s (log)", log=True):
+    """series: [(name, [values or None])]; a log value axis unless log=False,
+    which gives a 0-1 axis (for fairness)."""
     data = CategoryChartData()
     data.categories = categories
     for name, vals in series:
@@ -197,10 +199,13 @@ def chart(slide, x, y, w, h, kind, categories, series, cat_title, size=12, label
     c.has_legend = True
     c.legend.position = XL_LEGEND_POSITION.BOTTOM
     c.legend.include_in_layout = False
-    log_axis(c, [v for _, vs in series for v in vs if v is not None])
     va = c.value_axis
+    if log:
+        log_axis(c, [v for _, vs in series for v in vs if v is not None])
+    else:
+        va.minimum_scale, va.maximum_scale = 0, 1
     va.has_title = True
-    va.axis_title.text_frame.text = "million acquisitions / s (log)"
+    va.axis_title.text_frame.text = value_title
     va.axis_title.text_frame.paragraphs[0].runs[0].font.size = Pt(size)
     va.tick_labels.number_format = "General"
     va.tick_labels.number_format_is_linked = False
@@ -214,7 +219,7 @@ def chart(slide, x, y, w, h, kind, categories, series, cat_title, size=12, label
         pl = c.plots[0]
         pl.has_data_labels = True
         dl = pl.data_labels
-        dl.number_format = "[<1]0.00;0.0"
+        dl.number_format = labels if isinstance(labels, str) else "[<1]0.00;0.0"
         dl.number_format_is_linked = False
         dl.position = XL_LABEL_POSITION.OUTSIDE_END
         dl.font.size = Pt(size)
@@ -257,22 +262,72 @@ for k, (sid, name, parts) in enumerate(MEMBERS):
 # ---- 3 method
 section("How We Evaluate",
         "Before the locks themselves: the metrics we use and how we measured them.")
-s = new_slide("How We Evaluate Each Lock",
-              f"We use the four metrics from Lecture 8. Every lock runs the same loop for "
-              f"{SECS} second per run: lock, add one to a shared counter, unlock. If the "
-              f"counter ends lower than the number of acquisitions, two threads were inside "
-              f"together. Each setting runs {REPS} times and we report the median.")
-text(s, 0.9, 1.7, 6.6, 5.4, [
-    "Metrics from Lecture 8:",
-    ("Mutual exclusion: counter must equal total acquisitions (lost = total − counter)", 1),
-    ("Absence of deadlock: every run must finish", 1),
-    ("Fairness: fewest ÷ most acquisitions per thread (1.0 = equal)", 1),
-    ("Performance: acquisitions per second", 1),
-    f"{SECS} s per run, median of {REPS} runs, 1/2/4/8 threads, on all {NCPU} CPUs and on one CPU (taskset -c 0)",
-    f"WSL2 Ubuntu, {NCPU} CPUs, gcc {E['gcc']} -O2",
-    "Reference locks from the lecture: TAS spin lock, pthread_mutex",
-], size=20)
-code(s, 7.8, 2.0, 5.1, 2.2, cut(SRC / "bench.c", r"while \(!stop\)", r"^    \}"))
+
+s = new_slide("Metrics from Lecture 8",
+              "Lecture 8 judges a lock on four things: mutual exclusion, absence of deadlock, "
+              "fairness, and performance. We turn each one into something a program can "
+              "measure, so every lock is judged the same way.")
+table(s, 0.6, 1.7, 12.1, [
+    ["Metric (Lecture 8)", "Question", "What we measure"],
+    ["Mutual exclusion", "Is only one thread inside at a time?",
+     "Shared counter must equal total acquisitions: lost = total − counter = 0"],
+    ["Absence of deadlock", "Does some waiting thread always get in?",
+     "Every run must finish when the time is up"],
+    ["Fairness", "Does every thread get a fair chance?",
+     "Fewest ÷ most acquisitions per thread (1.0 = equal, 0 = starved)"],
+    ["Performance", "How much time does the lock cost?",
+     "Acquisitions per second, with 1 to 8 threads"],
+], [2.6, 4.0, 5.5], size=16, row_h=0.9)
+
+s = new_slide("The Benchmark Loop",
+              f"Every lock runs this same loop. All threads start together at a barrier and "
+              f"loop until the main thread raises stop after {SECS} second. The counter is a "
+              f"plain variable, not an atomic one, so if two threads are ever inside together, "
+              f"one of their updates is lost and the counter ends short.")
+text(s, 0.6, 1.7, 5.4, 5.4, [
+    "All threads start together at a barrier",
+    f"Loop until main raises stop after {SECS} s",
+    "counter is a plain variable: two threads inside together lose an update",
+    "Each thread counts its own acquisitions (n)",
+    "Same loop for every lock: only lock_acquire / lock_release change",
+], size=19)
+code(s, 6.3, 1.7, 6.6, 5.0, cut(SRC / "bench.c", r"^static void \*worker"))
+
+ex_h, ex_b = next((h, b) for h, b in blocks("bench.txt") if h == "tas threads=4 all-cpus run 1")
+ex = parse(ex_b)
+s = new_slide("Reading One Run",
+              f"This is one real run: the test-and-set lock from the lecture with four threads. "
+              f"Each thread reports how many times it got the lock. The total matches the "
+              f"counter, so nothing was lost. Fairness is the smallest count divided by the "
+              f"largest, and performance is the total divided by the time.")
+code(s, 0.6, 1.7, 6.6, 3.2, f"--- {ex_h} ---\n" + ex_b.strip())
+text(s, 7.5, 1.7, 5.4, 5.4, [
+    f"Mutual exclusion: total {ex['total']:,} = counter {ex['counter']:,} → lost = {ex['lost']}",
+    "Absence of deadlock: the run finished",
+    f"Fairness: {min(ex['counts']):,} ÷ {max(ex['counts']):,} = {ex['fairness']:.3f}",
+    f"Performance: {rate(ex['throughput'])} acquisitions per second",
+], size=18)
+
+s = new_slide("Experiment Setup",
+              f"Each lock runs with 1, 2, 4 and 8 threads, first on all {NCPU} CPUs and then "
+              f"pinned to one CPU with taskset, to see what spinning costs when the lock holder "
+              f"cannot run. Every setting runs {REPS} times and the slides show the median. Two "
+              f"locks from the lecture, test-and-set and pthread_mutex, run as references.")
+table(s, 0.6, 1.7, 7.2, [
+    ["Setting", "Values"],
+    ["Locks", "Peterson, LL/SC, MCS"],
+    ["References (Lecture 8)", "TAS spin lock, pthread_mutex"],
+    ["Threads", "1, 2, 4, 8 (Peterson: 1, 2)"],
+    ["CPUs", f"all {NCPU}, and one (taskset -c 0)"],
+    ["Runs", f"{REPS} × {SECS} s per setting, median shown"],
+], [3.0, 4.2], size=16, row_h=0.6)
+text(s, 8.2, 1.7, 4.7, 5.4, [
+    f"WSL2 Ubuntu, kernel {E['kernel']}",
+    f"{NCPU} CPUs",
+    f"gcc {E['gcc']} -O2",
+    f"LL/SC on AArch64: qemu-aarch64 {E['qemu']}",
+    ("One CPU shows what spinning costs when the lock holder cannot run", 0, ACCENT),
+], size=17)
 
 # ================================================================ Peterson
 pet = runs("1_peterson.txt", r".")
@@ -511,28 +566,103 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
 ], size=20)
 
 # ============================================================== comparison
-section("Comparison: Throughput",
-        "Now the three locks side by side, with two locks from the lecture as references.")
-
-s = new_slide("Throughput: All CPUs vs One CPU",
-              f"On all {NCPU} CPUs, pthread_mutex was the fastest lock at eight threads. On one "
-              f"CPU the spinning locks waste time slices, while the mutex puts waiting threads "
-              f"to sleep.")
-cats = [str(t) for t in THREADS]
-for k, (mode, name) in enumerate((("all-cpus", f"All {NCPU} CPUs"), ("one-cpu", "One CPU"))):
-    c = chart(s, 0.4 + 6.4 * k, 1.5, 6.3, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
-              [(LABEL[l], [mps(l, t, mode) for t in THREADS]) for l in LOCKS], "threads", size=11)
-    c.has_title = True
-    c.chart_title.text_frame.text = name
-    c.chart_title.text_frame.paragraphs[0].runs[0].font.size = Pt(14)
-
-
 def most(lock):
+    """The most threads a lock was run with: Peterson stops at 2."""
     return 2 if lock == "peterson" else 8
 
 
+def short(lock):
+    return re.sub(r" [(].*", "", LABEL[lock])
+
+
+cats = [str(t) for t in THREADS]
+
+section("Comparison: Throughput",
+        "Now the three locks side by side, with two locks from the lecture as references.")
+
+s = new_slide(f"Throughput on All {NCPU} CPUs",
+              f"With one thread nobody waits, so the simplest locks, test-and-set and LL/SC, "
+              f"are fastest. As threads are added every spin lock slows down, because the "
+              f"threads fight over shared cache lines. pthread_mutex was the fastest lock at "
+              f"eight threads.")
+chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
+      [(LABEL[l], [mps(l, t, "all-cpus") for t in THREADS]) for l in LOCKS], "threads")
+lead1 = sorted(LOCKS, key=lambda l: -tp(l, 1))[:2]
+text(s, 8.4, 1.7, 4.5, 5.3, [
+    f"1 thread, no contention: {short(lead1[0])} {rate(tp(lead1[0], 1))} and "
+    f"{short(lead1[1])} {rate(tp(lead1[1], 1))} acq/s are fastest",
+    "More threads: every spin lock slows down as threads fight over cache lines",
+    f"8 threads: MCS {rate(tp('mcs', 8))}, LL/SC {rate(tp('llsc', 8))}, "
+    f"TAS {rate(tp('tas', 8))} acq/s",
+    (f"Fastest at 8 threads: pthread_mutex, {rate(tp('mutex', 8))} acq/s", 0, ACCENT),
+], size=17)
+
+s = new_slide("Throughput on One CPU",
+              "Pinned to one CPU, the picture changes. Test-and-set and LL/SC stay fast only "
+              "because one thread keeps the lock for its whole time slice while the others "
+              "starve. Peterson and MCS hand the lock to a thread that is not running, so they "
+              "collapse. The mutex puts waiters to sleep and keeps its speed.")
+chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
+      [(LABEL[l], [mps(l, t, "one-cpu") for t in THREADS]) for l in LOCKS], "threads")
+text(s, 8.4, 1.7, 4.5, 5.3, [
+    f"TAS / LL/SC stay fast ({rate(tp('tas', 8, 'one-cpu'))} / {rate(tp('llsc', 8, 'one-cpu'))} "
+    f"at 8 threads), but one thread holds on while the others starve",
+    f"Peterson and MCS hand the lock to a thread that is not running: "
+    f"{rate(tp('peterson', 2, 'one-cpu'))} (Peterson, 2 thr), "
+    f"{rate(tp('mcs', 8, 'one-cpu'))} (MCS, 8 thr)",
+    (f"pthread_mutex sleeps instead of spinning: {rate(tp('mutex', 1, 'one-cpu'))} → "
+     f"{rate(tp('mutex', 8, 'one-cpu'))} acq/s from 1 to 8 threads", 0, ACCENT),
+], size=17)
+
 section("Comparison: Summary",
-        "Next, the same results as one table.")
+        "Next, correctness and fairness for every lock, and then everything in one table.")
+
+pet_bench = [r for (l, _, _), rs in B.items() if l == "peterson" for r in rs]
+s = new_slide("Correctness: Mutual Exclusion and Deadlock",
+              "Every lock passed both correctness metrics in every run: no update was lost, and "
+              "every run finished. The one exception is the deliberate one, Peterson without "
+              "its memory fence, which lost updates on every multi-CPU run.")
+rows = [["Lock", "Runs", "Lost updates", "Runs finished", "Also tested"]]
+extra = {
+    "peterson": f"no fence: lost updates in {sum(r['lost'] > 0 for r in nofence)} / "
+                f"{len(nofence)} runs",
+    "llsc": f"real ldaxr/stxr under qemu: lost = 0 in "
+            f"{sum(r['lost'] == 0 for r in arm)} / {len(arm)} runs",
+    "mcs": "", "tas": "", "mutex": "",
+}
+for l in LOCKS:
+    rs = [r for (k, _, _), v in B.items() if k == l for r in v]
+    if l == "peterson":
+        rs += fenced
+    rows.append([short(l), str(len(rs)), f"{sum(r['lost'] for r in rs):,}",
+                 f"{len(rs)} / {len(rs)}", extra[l]])
+table(s, 0.5, 1.7, 12.3, rows, [2.2, 1.0, 1.7, 1.8, 5.6], size=15, row_h=0.55)
+text(s, 0.5, 1.7 + 0.55 * len(rows) + 0.4, 12.3, 1.5, [
+    "Mutual exclusion: lost = total acquisitions − counter, summed over all runs",
+    ("Peterson is correct on x86 only with the fence", 0, ACCENT),
+], size=16)
+
+s = new_slide("Fairness",
+              f"Fairness is the fewest acquisitions of any thread divided by the most. On all "
+              f"CPUs the MCS queue was the fairest lock at eight threads. On one CPU every spin "
+              f"lock let some thread starve, even the fair ones, because who gets in follows "
+              f"the scheduler. Only the mutex stayed fair.")
+chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.COLUMN_CLUSTERED,
+      [f"{short(l)} ({most(l)} thr)" for l in LOCKS],
+      # rounded here so the bar labels match the text, which uses the same rounding
+      [(f"all {NCPU} CPUs", [float(f"{fair(l, most(l)):.2f}") for l in LOCKS]),
+       ("one CPU", [float(f"{fair(l, most(l), 'one-cpu'):.2f}") for l in LOCKS])],
+      "lock (most threads it ran)", value_title="fairness (fewest ÷ most)", log=False,
+      labels="0.00")
+text(s, 8.4, 1.7, 4.5, 5.3, [
+    f"All CPUs: MCS {fair('mcs', 8):.2f} is the fairest at 8 threads — its queue is "
+    f"first-come, first-served",
+    f"TAS {fair('tas', 8):.2f}, LL/SC {fair('llsc', 8):.2f}: whoever wins the race gets in",
+    ("One CPU: every spin lock lets a thread starve (the bars near 0) — the scheduler "
+     "decides who gets in", 0, ACCENT),
+    f"Only pthread_mutex stays fair on one CPU: {fair('mutex', 8, 'one-cpu'):.2f}",
+], size=17)
+
 s = new_slide("Summary",
               "This table puts the three locks and the two references on one page, each at the "
               "most threads it supports. Peterson is fair but limited to two threads, the simple "
@@ -544,7 +674,7 @@ needs = {"peterson": "loads/stores + fence", "llsc": "LL/SC instructions",
          "mcs": "atomic exchange + CAS", "tas": "test-and-set", "mutex": "atomics + futex"}
 for l in LOCKS:
     t = most(l)
-    rows.append([f"{re.sub(r' [(].*', '', LABEL[l])} ({t} thr)", needs[l], "yes", "yes",
+    rows.append([f"{short(l)} ({t} thr)", needs[l], "yes", "yes",
                  f"{fair(l, t):.2f}", rate(tp(l, t)), rate(tp(l, t, "one-cpu"))])
 table(s, 0.5, 1.6, 12.3, rows, [2.6, 2.6, 1.4, 1.5, 1.2, 1.6, 1.4], size=14, row_h=0.45)
 text(s, 0.5, 1.6 + 0.45 * len(rows) + 0.4, 12.3, 1.5, [

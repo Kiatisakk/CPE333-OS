@@ -50,6 +50,7 @@ def env():
     text = (RESULTS / "env.txt").read_text()
     return {
         "nproc": re.search(r"^\$ nproc\n(\d+)", text, re.M).group(1),
+        "kernel": re.search(r"^\$ uname -r\n(\S+)", text, re.M).group(1),
         "gcc": re.search(r"^gcc \(.*?\) (\S+)", text, re.M).group(1),
         "qemu": re.search(r"qemu-aarch64 version (\S+)", text).group(1),
     }

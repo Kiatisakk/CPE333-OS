@@ -4,7 +4,7 @@ Called by run_all.sh; exits 1 if any claim no longer holds.  Each claim
 compares medians of the REPS runs, never a single run.
 """
 import sys
-from results import bench, median
+from results import LOCKS, bench, median
 
 B = bench()
 fail = 0
@@ -32,6 +32,15 @@ check("at 8 threads on all CPUs, MCS is the fairest lock",
       all(fair(l, 8) < fair("mcs", 8) for l in MULTI if l != "mcs"))
 check("on all CPUs at 8 threads, mutex is the fastest lock",
       max(MULTI, key=lambda l: tp(l, 8)) == "mutex")
+check("at 1 thread (no contention), TAS and LL/SC are the two fastest locks",
+      sorted(LOCKS, key=lambda l: -tp(l, 1))[:2] in (["tas", "llsc"], ["llsc", "tas"]))
+check("on all CPUs, every spin lock (LL/SC, MCS, TAS) is slower at 8 threads than at 1",
+      all(tp(l, 8) < tp(l, 1) for l in ("llsc", "mcs", "tas")))
+check("on one CPU, every spin lock at its most threads lets a thread starve (median min/max <= 0.1)",
+      all(fair(l, 2 if l == "peterson" else 8, "one-cpu") <= 0.1
+          for l in ("peterson", "llsc", "mcs", "tas")))
+check("on one CPU, mutex at 8 threads keeps at least half its 1-thread throughput",
+      tp("mutex", 8, "one-cpu") >= tp("mutex", 1, "one-cpu") / 2)
 check("on one CPU, Peterson and MCS with 2+ threads run over 10x slower than mutex",
       all(tp(l, t, "one-cpu") < tp("mutex", t, "one-cpu") / 10
           for l, ts in (("peterson", (2,)), ("mcs", (2, 4, 8))) for t in ts))
