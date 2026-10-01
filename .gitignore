@@ -18,3 +18,6 @@ PS04/bin/
 PS07/bin/
 PS08/bin/
 __pycache__/
+# Office lock files and Windows shortcuts
+~$*
+*.lnk
