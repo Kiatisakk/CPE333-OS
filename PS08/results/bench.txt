@@ -1,0 +1,1026 @@
+--- peterson threads=1 all-cpus run 1 ---
+$ bin/peterson 1 1
+lock=peterson threads=1 cpus=8
+  thread 0: 66646846 acquisitions
+total=66646846 counter=66646846 lost=0
+elapsed=1.000 s  throughput=66629723 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=1 all-cpus run 2 ---
+$ bin/peterson 1 1
+lock=peterson threads=1 cpus=8
+  thread 0: 69360978 acquisitions
+total=69360978 counter=69360978 lost=0
+elapsed=1.000 s  throughput=69335129 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=1 all-cpus run 3 ---
+$ bin/peterson 1 1
+lock=peterson threads=1 cpus=8
+  thread 0: 67941785 acquisitions
+total=67941785 counter=67941785 lost=0
+elapsed=1.000 s  throughput=67920163 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=2 all-cpus run 1 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 9138463 acquisitions
+  thread 1: 9092501 acquisitions
+total=18230964 counter=18230964 lost=0
+elapsed=1.000 s  throughput=18226069 acq/s  fairness(min/max)=0.995
+
+--- peterson threads=2 all-cpus run 2 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 9059044 acquisitions
+  thread 1: 9001330 acquisitions
+total=18060374 counter=18060374 lost=0
+elapsed=1.000 s  throughput=18055780 acq/s  fairness(min/max)=0.994
+
+--- peterson threads=2 all-cpus run 3 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 7232397 acquisitions
+  thread 1: 7395109 acquisitions
+total=14627506 counter=14627506 lost=0
+elapsed=1.000 s  throughput=14623013 acq/s  fairness(min/max)=0.978
+
+--- llsc threads=1 all-cpus run 1 ---
+$ bin/llsc 1 1
+lock=llsc threads=1 cpus=8
+  thread 0: 115747104 acquisitions
+total=115747104 counter=115747104 lost=0
+elapsed=1.000 s  throughput=115718807 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=1 all-cpus run 2 ---
+$ bin/llsc 1 1
+lock=llsc threads=1 cpus=8
+  thread 0: 115032988 acquisitions
+total=115032988 counter=115032988 lost=0
+elapsed=1.000 s  throughput=115001974 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=1 all-cpus run 3 ---
+$ bin/llsc 1 1
+lock=llsc threads=1 cpus=8
+  thread 0: 113056686 acquisitions
+total=113056686 counter=113056686 lost=0
+elapsed=1.000 s  throughput=113022337 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=2 all-cpus run 1 ---
+$ bin/llsc 2 1
+lock=llsc threads=2 cpus=8
+  thread 0: 7694619 acquisitions
+  thread 1: 10537549 acquisitions
+total=18232168 counter=18232168 lost=0
+elapsed=1.000 s  throughput=18227358 acq/s  fairness(min/max)=0.730
+
+--- llsc threads=2 all-cpus run 2 ---
+$ bin/llsc 2 1
+lock=llsc threads=2 cpus=8
+  thread 0: 10268594 acquisitions
+  thread 1: 9990831 acquisitions
+total=20259425 counter=20259425 lost=0
+elapsed=1.000 s  throughput=20253834 acq/s  fairness(min/max)=0.973
+
+--- llsc threads=2 all-cpus run 3 ---
+$ bin/llsc 2 1
+lock=llsc threads=2 cpus=8
+  thread 0: 7425665 acquisitions
+  thread 1: 8996365 acquisitions
+total=16422030 counter=16422030 lost=0
+elapsed=1.000 s  throughput=16417295 acq/s  fairness(min/max)=0.825
+
+--- llsc threads=4 all-cpus run 1 ---
+$ bin/llsc 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1523715 acquisitions
+  thread 1: 2106820 acquisitions
+  thread 2: 2994505 acquisitions
+  thread 3: 2222078 acquisitions
+total=8847118 counter=8847118 lost=0
+elapsed=1.000 s  throughput=8845274 acq/s  fairness(min/max)=0.509
+
+--- llsc threads=4 all-cpus run 2 ---
+$ bin/llsc 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1293321 acquisitions
+  thread 1: 1899204 acquisitions
+  thread 2: 3431021 acquisitions
+  thread 3: 2159703 acquisitions
+total=8783249 counter=8783249 lost=0
+elapsed=1.000 s  throughput=8781207 acq/s  fairness(min/max)=0.377
+
+--- llsc threads=4 all-cpus run 3 ---
+$ bin/llsc 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1977726 acquisitions
+  thread 1: 2153055 acquisitions
+  thread 2: 2496577 acquisitions
+  thread 3: 2085339 acquisitions
+total=8712697 counter=8712697 lost=0
+elapsed=1.000 s  throughput=8709957 acq/s  fairness(min/max)=0.792
+
+--- llsc threads=8 all-cpus run 1 ---
+$ bin/llsc 8 1
+lock=llsc threads=8 cpus=8
+  thread 0: 739866 acquisitions
+  thread 1: 817483 acquisitions
+  thread 2: 486015 acquisitions
+  thread 3: 1029214 acquisitions
+  thread 4: 947417 acquisitions
+  thread 5: 670896 acquisitions
+  thread 6: 668275 acquisitions
+  thread 7: 1026289 acquisitions
+total=6385455 counter=6385455 lost=0
+elapsed=1.000 s  throughput=6382294 acq/s  fairness(min/max)=0.472
+
+--- llsc threads=8 all-cpus run 2 ---
+$ bin/llsc 8 1
+lock=llsc threads=8 cpus=8
+  thread 0: 512926 acquisitions
+  thread 1: 538520 acquisitions
+  thread 2: 936706 acquisitions
+  thread 3: 484314 acquisitions
+  thread 4: 767422 acquisitions
+  thread 5: 948194 acquisitions
+  thread 6: 1067974 acquisitions
+  thread 7: 1010606 acquisitions
+total=6266662 counter=6266662 lost=0
+elapsed=1.000 s  throughput=6264040 acq/s  fairness(min/max)=0.453
+
+--- llsc threads=8 all-cpus run 3 ---
+$ bin/llsc 8 1
+lock=llsc threads=8 cpus=8
+  thread 0: 483687 acquisitions
+  thread 1: 1025048 acquisitions
+  thread 2: 516049 acquisitions
+  thread 3: 1093844 acquisitions
+  thread 4: 972047 acquisitions
+  thread 5: 513057 acquisitions
+  thread 6: 1029302 acquisitions
+  thread 7: 787759 acquisitions
+total=6420793 counter=6420793 lost=0
+elapsed=1.001 s  throughput=6417035 acq/s  fairness(min/max)=0.442
+
+--- bakery threads=1 all-cpus run 1 ---
+$ bin/bakery 1 1
+lock=bakery threads=1 cpus=8
+  thread 0: 34081682 acquisitions
+total=34081682 counter=34081682 lost=0
+elapsed=1.000 s  throughput=34072153 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=1 all-cpus run 2 ---
+$ bin/bakery 1 1
+lock=bakery threads=1 cpus=8
+  thread 0: 34892629 acquisitions
+total=34892629 counter=34892629 lost=0
+elapsed=1.000 s  throughput=34884392 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=1 all-cpus run 3 ---
+$ bin/bakery 1 1
+lock=bakery threads=1 cpus=8
+  thread 0: 34116923 acquisitions
+total=34116923 counter=34116923 lost=0
+elapsed=1.000 s  throughput=34104665 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=2 all-cpus run 1 ---
+$ bin/bakery 2 1
+lock=bakery threads=2 cpus=8
+  thread 0: 4198478 acquisitions
+  thread 1: 4205694 acquisitions
+total=8404172 counter=8404172 lost=0
+elapsed=1.000 s  throughput=8401917 acq/s  fairness(min/max)=0.998
+
+--- bakery threads=2 all-cpus run 2 ---
+$ bin/bakery 2 1
+lock=bakery threads=2 cpus=8
+  thread 0: 4584501 acquisitions
+  thread 1: 4620140 acquisitions
+total=9204641 counter=9204641 lost=0
+elapsed=1.000 s  throughput=9202197 acq/s  fairness(min/max)=0.992
+
+--- bakery threads=2 all-cpus run 3 ---
+$ bin/bakery 2 1
+lock=bakery threads=2 cpus=8
+  thread 0: 3709809 acquisitions
+  thread 1: 3715989 acquisitions
+total=7425798 counter=7425798 lost=0
+elapsed=1.000 s  throughput=7423662 acq/s  fairness(min/max)=0.998
+
+--- bakery threads=4 all-cpus run 1 ---
+$ bin/bakery 4 1
+lock=bakery threads=4 cpus=8
+  thread 0: 1221980 acquisitions
+  thread 1: 1181987 acquisitions
+  thread 2: 1154145 acquisitions
+  thread 3: 1133071 acquisitions
+total=4691183 counter=4691183 lost=0
+elapsed=1.000 s  throughput=4689352 acq/s  fairness(min/max)=0.927
+
+--- bakery threads=4 all-cpus run 2 ---
+$ bin/bakery 4 1
+lock=bakery threads=4 cpus=8
+  thread 0: 1278640 acquisitions
+  thread 1: 1233327 acquisitions
+  thread 2: 1197234 acquisitions
+  thread 3: 1178118 acquisitions
+total=4887319 counter=4887319 lost=0
+elapsed=1.001 s  throughput=4884272 acq/s  fairness(min/max)=0.921
+
+--- bakery threads=4 all-cpus run 3 ---
+$ bin/bakery 4 1
+lock=bakery threads=4 cpus=8
+  thread 0: 1250168 acquisitions
+  thread 1: 1207390 acquisitions
+  thread 2: 1186313 acquisitions
+  thread 3: 1167173 acquisitions
+total=4811044 counter=4811044 lost=0
+elapsed=1.000 s  throughput=4809303 acq/s  fairness(min/max)=0.934
+
+--- bakery threads=8 all-cpus run 1 ---
+$ bin/bakery 8 1
+lock=bakery threads=8 cpus=8
+  thread 0: 387689 acquisitions
+  thread 1: 386091 acquisitions
+  thread 2: 383798 acquisitions
+  thread 3: 383081 acquisitions
+  thread 4: 382118 acquisitions
+  thread 5: 380945 acquisitions
+  thread 6: 379081 acquisitions
+  thread 7: 375296 acquisitions
+total=3058099 counter=3058099 lost=0
+elapsed=1.000 s  throughput=3056673 acq/s  fairness(min/max)=0.968
+
+--- bakery threads=8 all-cpus run 2 ---
+$ bin/bakery 8 1
+lock=bakery threads=8 cpus=8
+  thread 0: 303800 acquisitions
+  thread 1: 301068 acquisitions
+  thread 2: 300632 acquisitions
+  thread 3: 300157 acquisitions
+  thread 4: 299630 acquisitions
+  thread 5: 298658 acquisitions
+  thread 6: 297314 acquisitions
+  thread 7: 294007 acquisitions
+total=2395266 counter=2395266 lost=0
+elapsed=1.006 s  throughput=2381165 acq/s  fairness(min/max)=0.968
+
+--- bakery threads=8 all-cpus run 3 ---
+$ bin/bakery 8 1
+lock=bakery threads=8 cpus=8
+  thread 0: 380604 acquisitions
+  thread 1: 377359 acquisitions
+  thread 2: 376858 acquisitions
+  thread 3: 376162 acquisitions
+  thread 4: 375000 acquisitions
+  thread 5: 373622 acquisitions
+  thread 6: 372725 acquisitions
+  thread 7: 368664 acquisitions
+total=3000994 counter=3000994 lost=0
+elapsed=1.001 s  throughput=2999472 acq/s  fairness(min/max)=0.969
+
+--- tas threads=1 all-cpus run 1 ---
+$ bin/tas 1 1
+lock=tas threads=1 cpus=8
+  thread 0: 109315954 acquisitions
+total=109315954 counter=109315954 lost=0
+elapsed=1.000 s  throughput=109285038 acq/s  fairness(min/max)=1.000
+
+--- tas threads=1 all-cpus run 2 ---
+$ bin/tas 1 1
+lock=tas threads=1 cpus=8
+  thread 0: 109767039 acquisitions
+total=109767039 counter=109767039 lost=0
+elapsed=1.000 s  throughput=109738311 acq/s  fairness(min/max)=1.000
+
+--- tas threads=1 all-cpus run 3 ---
+$ bin/tas 1 1
+lock=tas threads=1 cpus=8
+  thread 0: 109876581 acquisitions
+total=109876581 counter=109876581 lost=0
+elapsed=1.000 s  throughput=109847281 acq/s  fairness(min/max)=1.000
+
+--- tas threads=2 all-cpus run 1 ---
+$ bin/tas 2 1
+lock=tas threads=2 cpus=8
+  thread 0: 13448822 acquisitions
+  thread 1: 9969119 acquisitions
+total=23417941 counter=23417941 lost=0
+elapsed=1.000 s  throughput=23410838 acq/s  fairness(min/max)=0.741
+
+--- tas threads=2 all-cpus run 2 ---
+$ bin/tas 2 1
+lock=tas threads=2 cpus=8
+  thread 0: 10524024 acquisitions
+  thread 1: 11943232 acquisitions
+total=22467256 counter=22467256 lost=0
+elapsed=1.000 s  throughput=22460893 acq/s  fairness(min/max)=0.881
+
+--- tas threads=2 all-cpus run 3 ---
+$ bin/tas 2 1
+lock=tas threads=2 cpus=8
+  thread 0: 12965929 acquisitions
+  thread 1: 13269687 acquisitions
+total=26235616 counter=26235616 lost=0
+elapsed=1.000 s  throughput=26228432 acq/s  fairness(min/max)=0.977
+
+--- tas threads=4 all-cpus run 1 ---
+$ bin/tas 4 1
+lock=tas threads=4 cpus=8
+  thread 0: 3296455 acquisitions
+  thread 1: 2064948 acquisitions
+  thread 2: 2318481 acquisitions
+  thread 3: 1896824 acquisitions
+total=9576708 counter=9576708 lost=0
+elapsed=1.000 s  throughput=9574425 acq/s  fairness(min/max)=0.575
+
+--- tas threads=4 all-cpus run 2 ---
+$ bin/tas 4 1
+lock=tas threads=4 cpus=8
+  thread 0: 1630483 acquisitions
+  thread 1: 2917265 acquisitions
+  thread 2: 2191208 acquisitions
+  thread 3: 2822563 acquisitions
+total=9561519 counter=9561519 lost=0
+elapsed=1.000 s  throughput=9558400 acq/s  fairness(min/max)=0.559
+
+--- tas threads=4 all-cpus run 3 ---
+$ bin/tas 4 1
+lock=tas threads=4 cpus=8
+  thread 0: 1842209 acquisitions
+  thread 1: 1494006 acquisitions
+  thread 2: 2242539 acquisitions
+  thread 3: 4100999 acquisitions
+total=9679753 counter=9679753 lost=0
+elapsed=1.000 s  throughput=9676761 acq/s  fairness(min/max)=0.364
+
+--- tas threads=8 all-cpus run 1 ---
+$ bin/tas 8 1
+lock=tas threads=8 cpus=8
+  thread 0: 678861 acquisitions
+  thread 1: 619828 acquisitions
+  thread 2: 837812 acquisitions
+  thread 3: 676912 acquisitions
+  thread 4: 674595 acquisitions
+  thread 5: 801922 acquisitions
+  thread 6: 803044 acquisitions
+  thread 7: 789645 acquisitions
+total=5882619 counter=5882619 lost=0
+elapsed=1.001 s  throughput=5879488 acq/s  fairness(min/max)=0.740
+
+--- tas threads=8 all-cpus run 2 ---
+$ bin/tas 8 1
+lock=tas threads=8 cpus=8
+  thread 0: 698809 acquisitions
+  thread 1: 760469 acquisitions
+  thread 2: 694322 acquisitions
+  thread 3: 666214 acquisitions
+  thread 4: 717995 acquisitions
+  thread 5: 779476 acquisitions
+  thread 6: 696250 acquisitions
+  thread 7: 724959 acquisitions
+total=5738494 counter=5738494 lost=0
+elapsed=1.000 s  throughput=5735861 acq/s  fairness(min/max)=0.855
+
+--- tas threads=8 all-cpus run 3 ---
+$ bin/tas 8 1
+lock=tas threads=8 cpus=8
+  thread 0: 692656 acquisitions
+  thread 1: 662820 acquisitions
+  thread 2: 802619 acquisitions
+  thread 3: 688004 acquisitions
+  thread 4: 681302 acquisitions
+  thread 5: 792164 acquisitions
+  thread 6: 711505 acquisitions
+  thread 7: 766665 acquisitions
+total=5797735 counter=5797735 lost=0
+elapsed=1.001 s  throughput=5794615 acq/s  fairness(min/max)=0.826
+
+--- mutex threads=1 all-cpus run 1 ---
+$ bin/mutex 1 1
+lock=mutex threads=1 cpus=8
+  thread 0: 54950612 acquisitions
+total=54950612 counter=54950612 lost=0
+elapsed=1.000 s  throughput=54932697 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=1 all-cpus run 2 ---
+$ bin/mutex 1 1
+lock=mutex threads=1 cpus=8
+  thread 0: 59193400 acquisitions
+total=59193400 counter=59193400 lost=0
+elapsed=1.000 s  throughput=59176795 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=1 all-cpus run 3 ---
+$ bin/mutex 1 1
+lock=mutex threads=1 cpus=8
+  thread 0: 54598490 acquisitions
+total=54598490 counter=54598490 lost=0
+elapsed=1.000 s  throughput=54582852 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=2 all-cpus run 1 ---
+$ bin/mutex 2 1
+lock=mutex threads=2 cpus=8
+  thread 0: 7685865 acquisitions
+  thread 1: 7327281 acquisitions
+total=15013146 counter=15013146 lost=0
+elapsed=1.000 s  throughput=15007673 acq/s  fairness(min/max)=0.953
+
+--- mutex threads=2 all-cpus run 2 ---
+$ bin/mutex 2 1
+lock=mutex threads=2 cpus=8
+  thread 0: 8094764 acquisitions
+  thread 1: 7753141 acquisitions
+total=15847905 counter=15847905 lost=0
+elapsed=1.000 s  throughput=15843982 acq/s  fairness(min/max)=0.958
+
+--- mutex threads=2 all-cpus run 3 ---
+$ bin/mutex 2 1
+lock=mutex threads=2 cpus=8
+  thread 0: 8083621 acquisitions
+  thread 1: 7643236 acquisitions
+total=15726857 counter=15726857 lost=0
+elapsed=1.000 s  throughput=15722737 acq/s  fairness(min/max)=0.946
+
+--- mutex threads=4 all-cpus run 1 ---
+$ bin/mutex 4 1
+lock=mutex threads=4 cpus=8
+  thread 0: 4861766 acquisitions
+  thread 1: 4887866 acquisitions
+  thread 2: 4731298 acquisitions
+  thread 3: 5012676 acquisitions
+total=19493606 counter=19493606 lost=0
+elapsed=1.000 s  throughput=19489421 acq/s  fairness(min/max)=0.944
+
+--- mutex threads=4 all-cpus run 2 ---
+$ bin/mutex 4 1
+lock=mutex threads=4 cpus=8
+  thread 0: 4909311 acquisitions
+  thread 1: 4749955 acquisitions
+  thread 2: 4599044 acquisitions
+  thread 3: 4640876 acquisitions
+total=18899186 counter=18899186 lost=0
+elapsed=1.000 s  throughput=18894434 acq/s  fairness(min/max)=0.937
+
+--- mutex threads=4 all-cpus run 3 ---
+$ bin/mutex 4 1
+lock=mutex threads=4 cpus=8
+  thread 0: 4562456 acquisitions
+  thread 1: 4868715 acquisitions
+  thread 2: 4887307 acquisitions
+  thread 3: 4758525 acquisitions
+total=19077003 counter=19077003 lost=0
+elapsed=1.000 s  throughput=19072451 acq/s  fairness(min/max)=0.934
+
+--- mutex threads=8 all-cpus run 1 ---
+$ bin/mutex 8 1
+lock=mutex threads=8 cpus=8
+  thread 0: 2583142 acquisitions
+  thread 1: 2390755 acquisitions
+  thread 2: 2556713 acquisitions
+  thread 3: 2541556 acquisitions
+  thread 4: 2386479 acquisitions
+  thread 5: 2536869 acquisitions
+  thread 6: 2441567 acquisitions
+  thread 7: 2497997 acquisitions
+total=19935078 counter=19935078 lost=0
+elapsed=1.001 s  throughput=19924577 acq/s  fairness(min/max)=0.924
+
+--- mutex threads=8 all-cpus run 2 ---
+$ bin/mutex 8 1
+lock=mutex threads=8 cpus=8
+  thread 0: 2358710 acquisitions
+  thread 1: 2363985 acquisitions
+  thread 2: 2596923 acquisitions
+  thread 3: 2537350 acquisitions
+  thread 4: 2365348 acquisitions
+  thread 5: 2507816 acquisitions
+  thread 6: 2307200 acquisitions
+  thread 7: 2571216 acquisitions
+total=19608548 counter=19608548 lost=0
+elapsed=1.000 s  throughput=19599804 acq/s  fairness(min/max)=0.888
+
+--- mutex threads=8 all-cpus run 3 ---
+$ bin/mutex 8 1
+lock=mutex threads=8 cpus=8
+  thread 0: 2342708 acquisitions
+  thread 1: 2550806 acquisitions
+  thread 2: 2325852 acquisitions
+  thread 3: 2368821 acquisitions
+  thread 4: 2569157 acquisitions
+  thread 5: 2528362 acquisitions
+  thread 6: 2285685 acquisitions
+  thread 7: 2629159 acquisitions
+total=19600550 counter=19600550 lost=0
+elapsed=1.000 s  throughput=19592683 acq/s  fairness(min/max)=0.869
+
+--- peterson threads=1 one-cpu run 1 ---
+$ taskset -c 0 bin/peterson 1 1
+lock=peterson threads=1 cpus=1
+  thread 0: 66740836 acquisitions
+total=66740836 counter=66740836 lost=0
+elapsed=1.002 s  throughput=66603905 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=1 one-cpu run 2 ---
+$ taskset -c 0 bin/peterson 1 1
+lock=peterson threads=1 cpus=1
+  thread 0: 69554343 acquisitions
+total=69554343 counter=69554343 lost=0
+elapsed=1.000 s  throughput=69541664 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=1 one-cpu run 3 ---
+$ taskset -c 0 bin/peterson 1 1
+lock=peterson threads=1 cpus=1
+  thread 0: 68413833 acquisitions
+total=68413833 counter=68413833 lost=0
+elapsed=1.003 s  throughput=68207781 acq/s  fairness(min/max)=1.000
+
+--- peterson threads=2 one-cpu run 1 ---
+$ taskset -c 0 bin/peterson 2 1
+lock=peterson threads=2 cpus=1
+  thread 0: 126 acquisitions
+  thread 1: 192299 acquisitions
+total=192425 counter=192425 lost=0
+elapsed=1.004 s  throughput=191643 acq/s  fairness(min/max)=0.001
+
+--- peterson threads=2 one-cpu run 2 ---
+$ taskset -c 0 bin/peterson 2 1
+lock=peterson threads=2 cpus=1
+  thread 0: 126 acquisitions
+  thread 1: 119077 acquisitions
+total=119203 counter=119203 lost=0
+elapsed=1.004 s  throughput=118712 acq/s  fairness(min/max)=0.001
+
+--- peterson threads=2 one-cpu run 3 ---
+$ taskset -c 0 bin/peterson 2 1
+lock=peterson threads=2 cpus=1
+  thread 0: 121 acquisitions
+  thread 1: 214628 acquisitions
+total=214749 counter=214749 lost=0
+elapsed=1.004 s  throughput=213886 acq/s  fairness(min/max)=0.001
+
+--- llsc threads=1 one-cpu run 1 ---
+$ taskset -c 0 bin/llsc 1 1
+lock=llsc threads=1 cpus=1
+  thread 0: 114040609 acquisitions
+total=114040609 counter=114040609 lost=0
+elapsed=1.004 s  throughput=113613129 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=1 one-cpu run 2 ---
+$ taskset -c 0 bin/llsc 1 1
+lock=llsc threads=1 cpus=1
+  thread 0: 115839205 acquisitions
+total=115839205 counter=115839205 lost=0
+elapsed=1.004 s  throughput=115434466 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=1 one-cpu run 3 ---
+$ taskset -c 0 bin/llsc 1 1
+lock=llsc threads=1 cpus=1
+  thread 0: 114847299 acquisitions
+total=114847299 counter=114847299 lost=0
+elapsed=1.000 s  throughput=114820807 acq/s  fairness(min/max)=1.000
+
+--- llsc threads=2 one-cpu run 1 ---
+$ taskset -c 0 bin/llsc 2 1
+lock=llsc threads=2 cpus=1
+  thread 0: 20841589 acquisitions
+  thread 1: 39484877 acquisitions
+total=60326466 counter=60326466 lost=0
+elapsed=1.004 s  throughput=60079975 acq/s  fairness(min/max)=0.528
+
+--- llsc threads=2 one-cpu run 2 ---
+$ taskset -c 0 bin/llsc 2 1
+lock=llsc threads=2 cpus=1
+  thread 0: 38024141 acquisitions
+  thread 1: 22307206 acquisitions
+total=60331347 counter=60331347 lost=0
+elapsed=1.004 s  throughput=60085124 acq/s  fairness(min/max)=0.587
+
+--- llsc threads=2 one-cpu run 3 ---
+$ taskset -c 0 bin/llsc 2 1
+lock=llsc threads=2 cpus=1
+  thread 0: 26012156 acquisitions
+  thread 1: 31727320 acquisitions
+total=57739476 counter=57739476 lost=0
+elapsed=1.004 s  throughput=57505252 acq/s  fairness(min/max)=0.820
+
+--- llsc threads=4 one-cpu run 1 ---
+$ taskset -c 0 bin/llsc 4 1
+lock=llsc threads=4 cpus=1
+  thread 0: 22044800 acquisitions
+  thread 1: 4844273 acquisitions
+  thread 2: 2148816 acquisitions
+  thread 3: 1 acquisitions
+total=29037890 counter=29037890 lost=0
+elapsed=1.004 s  throughput=28918768 acq/s  fairness(min/max)=0.000
+
+--- llsc threads=4 one-cpu run 2 ---
+$ taskset -c 0 bin/llsc 4 1
+lock=llsc threads=4 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 7313133 acquisitions
+  thread 3: 21358973 acquisitions
+total=28672108 counter=28672108 lost=0
+elapsed=1.004 s  throughput=28553021 acq/s  fairness(min/max)=0.000
+
+--- llsc threads=4 one-cpu run 3 ---
+$ taskset -c 0 bin/llsc 4 1
+lock=llsc threads=4 cpus=1
+  thread 0: 8554390 acquisitions
+  thread 1: 12990514 acquisitions
+  thread 2: 4557997 acquisitions
+  thread 3: 4115684 acquisitions
+total=30218585 counter=30218585 lost=0
+elapsed=1.016 s  throughput=29739113 acq/s  fairness(min/max)=0.317
+
+--- llsc threads=8 one-cpu run 1 ---
+$ taskset -c 0 bin/llsc 8 1
+lock=llsc threads=8 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 1 acquisitions
+  thread 3: 1 acquisitions
+  thread 4: 1 acquisitions
+  thread 5: 1 acquisitions
+  thread 6: 1 acquisitions
+  thread 7: 14215103 acquisitions
+total=14215110 counter=14215110 lost=0
+elapsed=1.021 s  throughput=13928122 acq/s  fairness(min/max)=0.000
+
+--- llsc threads=8 one-cpu run 2 ---
+$ taskset -c 0 bin/llsc 8 1
+lock=llsc threads=8 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 1 acquisitions
+  thread 3: 1 acquisitions
+  thread 4: 1 acquisitions
+  thread 5: 1 acquisitions
+  thread 6: 11453838 acquisitions
+  thread 7: 2936227 acquisitions
+total=14390071 counter=14390071 lost=0
+elapsed=1.020 s  throughput=14103501 acq/s  fairness(min/max)=0.000
+
+--- llsc threads=8 one-cpu run 3 ---
+$ taskset -c 0 bin/llsc 8 1
+lock=llsc threads=8 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 1 acquisitions
+  thread 3: 8324735 acquisitions
+  thread 4: 1 acquisitions
+  thread 5: 2580807 acquisitions
+  thread 6: 801238 acquisitions
+  thread 7: 3447073 acquisitions
+total=15153857 counter=15153857 lost=0
+elapsed=1.025 s  throughput=14789855 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=1 one-cpu run 1 ---
+$ taskset -c 0 bin/bakery 1 1
+lock=bakery threads=1 cpus=1
+  thread 0: 34517048 acquisitions
+total=34517048 counter=34517048 lost=0
+elapsed=1.002 s  throughput=34453691 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=1 one-cpu run 2 ---
+$ taskset -c 0 bin/bakery 1 1
+lock=bakery threads=1 cpus=1
+  thread 0: 35246600 acquisitions
+total=35246600 counter=35246600 lost=0
+elapsed=1.003 s  throughput=35151591 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=1 one-cpu run 3 ---
+$ taskset -c 0 bin/bakery 1 1
+lock=bakery threads=1 cpus=1
+  thread 0: 34463779 acquisitions
+total=34463779 counter=34463779 lost=0
+elapsed=1.002 s  throughput=34400237 acq/s  fairness(min/max)=1.000
+
+--- bakery threads=2 one-cpu run 1 ---
+$ taskset -c 0 bin/bakery 2 1
+lock=bakery threads=2 cpus=1
+  thread 0: 126 acquisitions
+  thread 1: 44733 acquisitions
+total=44859 counter=44859 lost=0
+elapsed=1.004 s  throughput=44677 acq/s  fairness(min/max)=0.003
+
+--- bakery threads=2 one-cpu run 2 ---
+$ taskset -c 0 bin/bakery 2 1
+lock=bakery threads=2 cpus=1
+  thread 0: 125 acquisitions
+  thread 1: 102986 acquisitions
+total=103111 counter=103111 lost=0
+elapsed=1.000 s  throughput=103079 acq/s  fairness(min/max)=0.001
+
+--- bakery threads=2 one-cpu run 3 ---
+$ taskset -c 0 bin/bakery 2 1
+lock=bakery threads=2 cpus=1
+  thread 0: 125 acquisitions
+  thread 1: 55924 acquisitions
+total=56049 counter=56049 lost=0
+elapsed=1.004 s  throughput=55820 acq/s  fairness(min/max)=0.002
+
+--- bakery threads=4 one-cpu run 1 ---
+$ taskset -c 0 bin/bakery 4 1
+lock=bakery threads=4 cpus=1
+  thread 0: 31 acquisitions
+  thread 1: 32 acquisitions
+  thread 2: 184789 acquisitions
+  thread 3: 32 acquisitions
+total=184884 counter=184884 lost=0
+elapsed=1.012 s  throughput=182691 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=4 one-cpu run 2 ---
+$ taskset -c 0 bin/bakery 4 1
+lock=bakery threads=4 cpus=1
+  thread 0: 35 acquisitions
+  thread 1: 35 acquisitions
+  thread 2: 35 acquisitions
+  thread 3: 171193 acquisitions
+total=171298 counter=171298 lost=0
+elapsed=1.012 s  throughput=169242 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=4 one-cpu run 3 ---
+$ taskset -c 0 bin/bakery 4 1
+lock=bakery threads=4 cpus=1
+  thread 0: 30 acquisitions
+  thread 1: 30 acquisitions
+  thread 2: 121562 acquisitions
+  thread 3: 30 acquisitions
+total=121652 counter=121652 lost=0
+elapsed=1.012 s  throughput=120200 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=8 one-cpu run 1 ---
+$ taskset -c 0 bin/bakery 8 1
+lock=bakery threads=8 cpus=1
+  thread 0: 17 acquisitions
+  thread 1: 17 acquisitions
+  thread 2: 17 acquisitions
+  thread 3: 17 acquisitions
+  thread 4: 17 acquisitions
+  thread 5: 18 acquisitions
+  thread 6: 18 acquisitions
+  thread 7: 92790 acquisitions
+total=92911 counter=92911 lost=0
+elapsed=1.032 s  throughput=90003 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=8 one-cpu run 2 ---
+$ taskset -c 0 bin/bakery 8 1
+lock=bakery threads=8 cpus=1
+  thread 0: 8 acquisitions
+  thread 1: 8 acquisitions
+  thread 2: 8 acquisitions
+  thread 3: 8 acquisitions
+  thread 4: 8 acquisitions
+  thread 5: 8 acquisitions
+  thread 6: 9 acquisitions
+  thread 7: 72561 acquisitions
+total=72618 counter=72618 lost=0
+elapsed=1.077 s  throughput=67451 acq/s  fairness(min/max)=0.000
+
+--- bakery threads=8 one-cpu run 3 ---
+$ taskset -c 0 bin/bakery 8 1
+lock=bakery threads=8 cpus=1
+  thread 0: 14 acquisitions
+  thread 1: 14 acquisitions
+  thread 2: 14 acquisitions
+  thread 3: 15 acquisitions
+  thread 4: 15 acquisitions
+  thread 5: 15 acquisitions
+  thread 6: 15 acquisitions
+  thread 7: 134502 acquisitions
+total=134604 counter=134604 lost=0
+elapsed=1.072 s  throughput=125549 acq/s  fairness(min/max)=0.000
+
+--- tas threads=1 one-cpu run 1 ---
+$ taskset -c 0 bin/tas 1 1
+lock=tas threads=1 cpus=1
+  thread 0: 109791626 acquisitions
+total=109791626 counter=109791626 lost=0
+elapsed=1.000 s  throughput=109767550 acq/s  fairness(min/max)=1.000
+
+--- tas threads=1 one-cpu run 2 ---
+$ taskset -c 0 bin/tas 1 1
+lock=tas threads=1 cpus=1
+  thread 0: 110254662 acquisitions
+total=110254662 counter=110254662 lost=0
+elapsed=1.004 s  throughput=109840924 acq/s  fairness(min/max)=1.000
+
+--- tas threads=1 one-cpu run 3 ---
+$ taskset -c 0 bin/tas 1 1
+lock=tas threads=1 cpus=1
+  thread 0: 112797804 acquisitions
+total=112797804 counter=112797804 lost=0
+elapsed=1.003 s  throughput=112507783 acq/s  fairness(min/max)=1.000
+
+--- tas threads=2 one-cpu run 1 ---
+$ taskset -c 0 bin/tas 2 1
+lock=tas threads=2 cpus=1
+  thread 0: 2056721 acquisitions
+  thread 1: 52530861 acquisitions
+total=54587582 counter=54587582 lost=0
+elapsed=1.004 s  throughput=54366067 acq/s  fairness(min/max)=0.039
+
+--- tas threads=2 one-cpu run 2 ---
+$ taskset -c 0 bin/tas 2 1
+lock=tas threads=2 cpus=1
+  thread 0: 31643907 acquisitions
+  thread 1: 25614487 acquisitions
+total=57258394 counter=57258394 lost=0
+elapsed=1.004 s  throughput=57022819 acq/s  fairness(min/max)=0.809
+
+--- tas threads=2 one-cpu run 3 ---
+$ taskset -c 0 bin/tas 2 1
+lock=tas threads=2 cpus=1
+  thread 0: 2291092 acquisitions
+  thread 1: 53978369 acquisitions
+total=56269461 counter=56269461 lost=0
+elapsed=1.004 s  throughput=56040178 acq/s  fairness(min/max)=0.042
+
+--- tas threads=4 one-cpu run 1 ---
+$ taskset -c 0 bin/tas 4 1
+lock=tas threads=4 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 29231113 acquisitions
+  thread 3: 1 acquisitions
+total=29231116 counter=29231116 lost=0
+elapsed=1.016 s  throughput=28766980 acq/s  fairness(min/max)=0.000
+
+--- tas threads=4 one-cpu run 2 ---
+$ taskset -c 0 bin/tas 4 1
+lock=tas threads=4 cpus=1
+  thread 0: 2497270 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 8731750 acquisitions
+  thread 3: 18379895 acquisitions
+total=29608916 counter=29608916 lost=0
+elapsed=1.004 s  throughput=29487229 acq/s  fairness(min/max)=0.000
+
+--- tas threads=4 one-cpu run 3 ---
+$ taskset -c 0 bin/tas 4 1
+lock=tas threads=4 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 5388789 acquisitions
+  thread 2: 13198818 acquisitions
+  thread 3: 9152303 acquisitions
+total=27739911 counter=27739911 lost=0
+elapsed=1.008 s  throughput=27516650 acq/s  fairness(min/max)=0.000
+
+--- tas threads=8 one-cpu run 1 ---
+$ taskset -c 0 bin/tas 8 1
+lock=tas threads=8 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 5895514 acquisitions
+  thread 3: 1 acquisitions
+  thread 4: 1 acquisitions
+  thread 5: 1 acquisitions
+  thread 6: 7177212 acquisitions
+  thread 7: 1926262 acquisitions
+total=14998993 counter=14998993 lost=0
+elapsed=1.020 s  throughput=14700542 acq/s  fairness(min/max)=0.000
+
+--- tas threads=8 one-cpu run 2 ---
+$ taskset -c 0 bin/tas 8 1
+lock=tas threads=8 cpus=1
+  thread 0: 1 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 1 acquisitions
+  thread 3: 1 acquisitions
+  thread 4: 1 acquisitions
+  thread 5: 8462743 acquisitions
+  thread 6: 1 acquisitions
+  thread 7: 5730370 acquisitions
+total=14193119 counter=14193119 lost=0
+elapsed=1.017 s  throughput=13962459 acq/s  fairness(min/max)=0.000
+
+--- tas threads=8 one-cpu run 3 ---
+$ taskset -c 0 bin/tas 8 1
+lock=tas threads=8 cpus=1
+  thread 0: 1562108 acquisitions
+  thread 1: 1 acquisitions
+  thread 2: 1874738 acquisitions
+  thread 3: 1 acquisitions
+  thread 4: 6717196 acquisitions
+  thread 5: 638270 acquisitions
+  thread 6: 1780750 acquisitions
+  thread 7: 1053413 acquisitions
+total=13626477 counter=13626477 lost=0
+elapsed=1.040 s  throughput=13098300 acq/s  fairness(min/max)=0.000
+
+--- mutex threads=1 one-cpu run 1 ---
+$ taskset -c 0 bin/mutex 1 1
+lock=mutex threads=1 cpus=1
+  thread 0: 46076782 acquisitions
+total=46076782 counter=46076782 lost=0
+elapsed=1.000 s  throughput=46058880 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=1 one-cpu run 2 ---
+$ taskset -c 0 bin/mutex 1 1
+lock=mutex threads=1 cpus=1
+  thread 0: 57351341 acquisitions
+total=57351341 counter=57351341 lost=0
+elapsed=1.000 s  throughput=57340123 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=1 one-cpu run 3 ---
+$ taskset -c 0 bin/mutex 1 1
+lock=mutex threads=1 cpus=1
+  thread 0: 53816387 acquisitions
+total=53816387 counter=53816387 lost=0
+elapsed=1.002 s  throughput=53707997 acq/s  fairness(min/max)=1.000
+
+--- mutex threads=2 one-cpu run 1 ---
+$ taskset -c 0 bin/mutex 2 1
+lock=mutex threads=2 cpus=1
+  thread 0: 26853611 acquisitions
+  thread 1: 26590701 acquisitions
+total=53444312 counter=53444312 lost=0
+elapsed=1.004 s  throughput=53223159 acq/s  fairness(min/max)=0.990
+
+--- mutex threads=2 one-cpu run 2 ---
+$ taskset -c 0 bin/mutex 2 1
+lock=mutex threads=2 cpus=1
+  thread 0: 27719925 acquisitions
+  thread 1: 27454236 acquisitions
+total=55174161 counter=55174161 lost=0
+elapsed=1.004 s  throughput=54947375 acq/s  fairness(min/max)=0.990
+
+--- mutex threads=2 one-cpu run 3 ---
+$ taskset -c 0 bin/mutex 2 1
+lock=mutex threads=2 cpus=1
+  thread 0: 28104104 acquisitions
+  thread 1: 28439431 acquisitions
+total=56543535 counter=56543535 lost=0
+elapsed=1.004 s  throughput=56310467 acq/s  fairness(min/max)=0.988
+
+--- mutex threads=4 one-cpu run 1 ---
+$ taskset -c 0 bin/mutex 4 1
+lock=mutex threads=4 cpus=1
+  thread 0: 14118856 acquisitions
+  thread 1: 13420047 acquisitions
+  thread 2: 14033226 acquisitions
+  thread 3: 14192735 acquisitions
+total=55764864 counter=55764864 lost=0
+elapsed=1.004 s  throughput=55530698 acq/s  fairness(min/max)=0.946
+
+--- mutex threads=4 one-cpu run 2 ---
+$ taskset -c 0 bin/mutex 4 1
+lock=mutex threads=4 cpus=1
+  thread 0: 14785261 acquisitions
+  thread 1: 13758547 acquisitions
+  thread 2: 12924742 acquisitions
+  thread 3: 13952927 acquisitions
+total=55421477 counter=55421477 lost=0
+elapsed=1.004 s  throughput=55194344 acq/s  fairness(min/max)=0.874
+
+--- mutex threads=4 one-cpu run 3 ---
+$ taskset -c 0 bin/mutex 4 1
+lock=mutex threads=4 cpus=1
+  thread 0: 13924668 acquisitions
+  thread 1: 14590898 acquisitions
+  thread 2: 14078482 acquisitions
+  thread 3: 14567612 acquisitions
+total=57161660 counter=57161660 lost=0
+elapsed=1.000 s  throughput=57141822 acq/s  fairness(min/max)=0.954
+
+--- mutex threads=8 one-cpu run 1 ---
+$ taskset -c 0 bin/mutex 8 1
+lock=mutex threads=8 cpus=1
+  thread 0: 7434526 acquisitions
+  thread 1: 7418779 acquisitions
+  thread 2: 6886867 acquisitions
+  thread 3: 7158823 acquisitions
+  thread 4: 6535217 acquisitions
+  thread 5: 6879349 acquisitions
+  thread 6: 6834937 acquisitions
+  thread 7: 7177773 acquisitions
+total=56326271 counter=56326271 lost=0
+elapsed=1.004 s  throughput=56086632 acq/s  fairness(min/max)=0.879
+
+--- mutex threads=8 one-cpu run 2 ---
+$ taskset -c 0 bin/mutex 8 1
+lock=mutex threads=8 cpus=1
+  thread 0: 7286951 acquisitions
+  thread 1: 7021392 acquisitions
+  thread 2: 7423787 acquisitions
+  thread 3: 7177618 acquisitions
+  thread 4: 6934272 acquisitions
+  thread 5: 6988219 acquisitions
+  thread 6: 7460518 acquisitions
+  thread 7: 8051752 acquisitions
+total=58344509 counter=58344509 lost=0
+elapsed=1.009 s  throughput=57845938 acq/s  fairness(min/max)=0.861
+
+--- mutex threads=8 one-cpu run 3 ---
+$ taskset -c 0 bin/mutex 8 1
+lock=mutex threads=8 cpus=1
+  thread 0: 6501132 acquisitions
+  thread 1: 6577089 acquisitions
+  thread 2: 7232473 acquisitions
+  thread 3: 6096681 acquisitions
+  thread 4: 7731530 acquisitions
+  thread 5: 6844057 acquisitions
+  thread 6: 7362077 acquisitions
+  thread 7: 7081621 acquisitions
+total=55426660 counter=55426660 lost=0
+elapsed=1.012 s  throughput=54744611 acq/s  fairness(min/max)=0.789
+

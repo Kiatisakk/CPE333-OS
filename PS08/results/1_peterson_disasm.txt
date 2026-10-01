@@ -1,0 +1,20 @@
+$ objdump -d --disassemble=lock_acquire bin/peterson
+0000000000001670 <lock_acquire>:
+1670:	endbr64
+1674:	mov    $0x1,%edx
+1679:	lea    0x2bf8(%rip),%rcx        # 4278 <flag>
+1680:	sub    %edi,%edx
+1682:	movslq %edi,%rdi
+1685:	movl   $0x1,(%rcx,%rdi,4)
+168c:	movslq %edx,%rsi
+168f:	mov    %edx,0x2bdb(%rip)        # 4270 <turn>
+1695:	lock orq $0x0,(%rsp)
+169b:	jmp    16aa <lock_acquire+0x3a>
+169d:	nopl   (%rax)
+16a0:	mov    0x2bca(%rip),%eax        # 4270 <turn>
+16a6:	cmp    %edx,%eax
+16a8:	jne    16b2 <lock_acquire+0x42>
+16aa:	mov    (%rcx,%rsi,4),%eax
+16ad:	cmp    $0x1,%eax
+16b0:	je     16a0 <lock_acquire+0x30>
+16b2:	ret

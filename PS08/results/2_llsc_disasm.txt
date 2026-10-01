@@ -1,0 +1,12 @@
+$ aarch64-linux-gnu-objdump -d --disassemble=lock_acquire bin/llsc_arm64
+0000000000400b8c <lock_acquire>:
+400b8c:	adrp	x1, 4b1000 <_nl_global_locale+0x50>
+400b90:	add	x1, x1, #0xb40
+400b94:	mov	w2, #0x1                   	// #1
+400b98:	nop
+400b9c:	nop
+400ba0:	ldaxr	w0, [x1]
+400ba4:	cbnz	w0, 400ba0 <lock_acquire+0x14>
+400ba8:	stxr	w0, w2, [x1]
+400bac:	cbnz	w0, 400ba0 <lock_acquire+0x14>
+400bb0:	ret
