@@ -6,7 +6,7 @@ from pathlib import Path
 
 RESULTS = Path(__file__).resolve().parent.parent / "results"
 
-LOCKS = ["peterson", "llsc", "bakery", "tas", "mutex"]
+LOCKS = ["peterson", "llsc", "mcs", "tas", "mutex"]
 THREADS = [1, 2, 4, 8]
 MODES = ["all-cpus", "one-cpu"]
 

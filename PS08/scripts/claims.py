@@ -24,18 +24,17 @@ def check(desc, ok):
     fail |= not ok
 
 
-check("Peterson (2 threads) and Bakery (2-8 threads) stay fair on all CPUs: median min/max >= 0.9",
-      fair("peterson", 2) >= 0.9 and all(fair("bakery", t) >= 0.9 for t in (2, 4, 8)))
-check("Bakery is the fairest lock at 8 threads on all CPUs",
-      all(fair(l, 8) < fair("bakery", 8) for l in ("tas", "llsc", "mutex")))
-check("on all CPUs at 8 threads, mutex is fastest and Bakery slowest",
-      max(("mutex", "tas", "llsc", "bakery"), key=lambda l: tp(l, 8)) == "mutex"
-      and min(("mutex", "tas", "llsc", "bakery"), key=lambda l: tp(l, 8)) == "bakery")
-check("Bakery throughput falls as threads are added (2 -> 4 -> 8)",
-      tp("bakery", 2) > tp("bakery", 4) > tp("bakery", 8))
-check("on one CPU, Peterson and Bakery with 2+ threads run < 1/100 of mutex",
-      all(tp(l, t, "one-cpu") < tp("mutex", t, "one-cpu") / 100
-          for l, ts in (("peterson", (2,)), ("bakery", (2, 4, 8))) for t in ts))
+MULTI = ("llsc", "mcs", "tas", "mutex")   # locks that run 8 threads
+
+check("Peterson (2 threads) and MCS (2-8 threads) stay fair on all CPUs: median min/max >= 0.9",
+      fair("peterson", 2) >= 0.9 and all(fair("mcs", t) >= 0.9 for t in (2, 4, 8)))
+check("at 8 threads on all CPUs, MCS is the fairest lock",
+      all(fair(l, 8) < fair("mcs", 8) for l in MULTI if l != "mcs"))
+check("on all CPUs at 8 threads, mutex is the fastest lock",
+      max(MULTI, key=lambda l: tp(l, 8)) == "mutex")
+check("on one CPU, Peterson and MCS with 2+ threads run over 10x slower than mutex",
+      all(tp(l, t, "one-cpu") < tp("mutex", t, "one-cpu") / 10
+          for l, ts in (("peterson", (2,)), ("mcs", (2, 4, 8))) for t in ts))
 check("on one CPU at 8 threads, TAS and LL/SC starve a thread (median min/max <= 0.1) but mutex does not (>= 0.5)",
       fair("tas", 8, "one-cpu") <= 0.1 and fair("llsc", 8, "one-cpu") <= 0.1
       and fair("mutex", 8, "one-cpu") >= 0.5)

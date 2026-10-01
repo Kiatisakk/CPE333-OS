@@ -26,15 +26,16 @@ SRC = ROOT / "src"
 TEMPLATE = ROOT / "UTF-8_PS8_2025.pptx"
 OUT = ROOT / "slides" / "PS08.pptx"
 
-MEMBERS = {  # part -> (id, name), in presentation order
-    "How We Evaluate": ("67070501021", "Thanaboon Tikaew"),
-    "Peterson's Algorithm": ("67070501005", "Kiatisak Markmeeshap"),
-    "Load-Linked / Store-Conditional": ("67070501018", "Tithinan Sobking"),
-    "Lamport's Bakery Algorithm": ("67070501040", "Worawut Sereethai"),
-    "Comparison": ("67070501059", "Chanon Lhumsa-ard"),
-    "Conclusion": ("67070501075", "Siriwan Yindeephot"),
-}
-LABEL = {"peterson": "Peterson", "llsc": "LL/SC", "bakery": "Bakery",
+MEMBERS = [  # (id, name, the parts they present)
+    ("67070501021", "Thanaboon Tikaew", ["How We Evaluate", "MCS Lock"]),
+    ("67070501005", "Kiatisak Markmeeshap", ["Peterson's Algorithm"]),
+    ("67070501018", "Tithinan Sobking", ["Load-Linked / Store-Conditional"]),
+    ("67070501040", "Worawut Sereethai", ["Comparison: Throughput"]),
+    ("67070501059", "Chanon Lhumsa-ard", ["Comparison: Summary"]),
+    ("67070501075", "Siriwan Yindeephot", ["Conclusion"]),
+]
+PRESENTER = {part: (sid, name) for sid, name, parts in MEMBERS for part in parts}
+LABEL = {"peterson": "Peterson", "llsc": "LL/SC", "mcs": "MCS",
          "tas": "TAS (lecture)", "mutex": "pthread_mutex (lecture)"}
 ACCENT = RGBColor(0xC0, 0x39, 0x2B)    # the red the template uses for remarks
 CODE_FONT = "Consolas"
@@ -228,7 +229,7 @@ def mps(lock, t, mode):
 def section(part, notes):
     """Section header naming the member who presents `part`."""
     s = new_slide(part, notes, L_SECTION)
-    s.placeholders[1].text = "\n".join(MEMBERS[part])
+    s.placeholders[1].text = "\n".join(PRESENTER[part])
 
 
 # ============================================================== slides ===
@@ -236,18 +237,19 @@ def section(part, notes):
 s = new_slide("Problem Session 08: Lock Mechanisms",
               "We are group OS InW. This deck studies three locks that were not "
               "covered in Lecture 8: Peterson's algorithm, Load-Linked/Store-Conditional, "
-              "and Lamport's bakery algorithm. Each lock is judged on correctness and "
-              "performance with the metrics from the lecture.", L_TITLE)
-s.placeholders[1].text = ("Peterson's Algorithm · LL/SC · Lamport's Bakery\n"
+              "and the MCS queue lock. Each lock is judged on correctness and performance "
+              "with the metrics from the lecture.", L_TITLE)
+s.placeholders[1].text = ("Peterson's Algorithm · LL/SC · MCS Lock\n"
                           "CPE 333 Operating Systems, 1/2026 — Group OS InW")
 
 # ---- 2 group
 s = new_slide("Group: OS InW",
-              "There are six of us. One member explains how we measured, three members each "
-              "present one lock, one compares them, and one concludes.", L_TITLE_ONLY)
-for k, (part, (sid, name)) in enumerate(MEMBERS.items()):
+              "There are six of us. Three members each present one lock, and one of them "
+              "also explains how we measured; two compare the locks and one concludes.",
+              L_TITLE_ONLY)
+for k, (sid, name, parts) in enumerate(MEMBERS):
     tf = text(s, 0.5 + 4.15 * (k % 3), 1.9 + 2.5 * (k // 3), 4.0, 2.2,
-              [sid, name, ("", 0), (part, 0, ACCENT)], size=20, bullet=False)
+              [sid, name, ("", 0)] + [(p, 0, ACCENT) for p in parts], size=20, bullet=False)
     for p in tf.paragraphs:
         p.alignment = PP_ALIGN.CENTER
         p.space_after = Pt(0)
@@ -437,78 +439,85 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
     "(no ABA problem)",
 ], size=20)
 
-# ================================================================== Bakery
-bak = [r for (l, _, _), rs in B.items() if l == "bakery" for r in rs]
-section("Lamport's Bakery Algorithm",
-        "Part three, the lock not covered in the lecture: Lamport's bakery algorithm.")
+# ===================================================================== MCS
+mcs = [r for (l, _, _), rs in B.items() if l == "mcs" for r in rs]
+section("MCS Lock",
+        "Part three, the lock not covered in the lecture: the MCS queue lock.")
 
-s = new_slide("Bakery Algorithm: Idea",
-              "The bakery algorithm works like taking a number at a bakery counter. Each thread "
-              "takes one more than the largest number it sees, and the smallest number is "
-              "served first. Two threads choosing at the same moment can get the same number, "
-              "so the lower thread id breaks the tie.")
+s = new_slide("MCS Lock: Idea",
+              "The MCS lock, by Mellor-Crummey and Scott, won the Dijkstra Prize in 2006. "
+              "Waiting threads form a queue, a linked list. Each thread spins on a flag in its "
+              "own node, and the thread ahead of it clears that flag when it is done. Linux's "
+              "spinlock today, the qspinlock, is built on this idea.")
 text(s, 0.6, 1.7, 4.8, 5.4, [
-    "Take a number: 1 + the largest number in use",
-    "Smallest number enters first; equal numbers → lower thread id first",
-    "choosing[j]: wait until j has finished picking",
-    "N threads, only loads and stores (Lamport, 1974)",
-], size=20)
-code(s, 5.6, 1.6, 7.3, 5.5, cut(SRC / "3_bakery.c", r"^void lock_acquire")
-     + "\n\n" + cut(SRC / "3_bakery.c", r"^void lock_release"))
+    "Mellor-Crummey and Scott, 1991; Dijkstra Prize 2006",
+    "Waiters form a queue: a linked list of nodes, tail points to the last",
+    "Join: one atomic exchange on tail, then link in behind the previous node",
+    "Each thread spins on its OWN node; the one ahead clears it on release",
+    ("Linux's spinlock (qspinlock, since v4.2) is built on MCS", 0, ACCENT),
+], size=18)
+code(s, 5.6, 1.6, 7.3, 5.5, cut(SRC / "3_mcs.c", r"^struct node \{", r"^\}")
+     + "\n\n" + cut(SRC / "3_mcs.c", r"^void lock_acquire"))
 
-s = new_slide("Bakery: Mutual Exclusion and Deadlock",
-              f"The pairs of number and thread id are all different, so they put the waiting "
-              f"threads in one order. A thread only enters once every thread ahead of it has "
-              f"left. All {len(bak)} bakery runs finished with nothing lost.")
-text(s, 0.9, 1.7, 11.8, 5.4, [
-    "Mutual exclusion: (number, id) pairs are unique and ordered; a thread enters only after "
-    "every thread with a smaller pair has left",
-    "choosing[] closes the race where j has read the maximum but not yet written its number",
-    "No deadlock: the waiting thread with the smallest pair waits for nobody, so it enters",
-    "Like Peterson, it needs memory fences on x86 (FENCE() in the code)",
-    f"Measured: all {len(bak)} runs (1–8 threads, all CPUs and one CPU) finished with lost = 0",
-], size=20)
+s = new_slide("MCS: Mutual Exclusion and Deadlock",
+              f"The atomic exchange puts every thread in one queue, and only the head of that "
+              f"queue may enter. A thread leaves by handing the lock to the node behind it, or by "
+              f"resetting tail if nobody is waiting. All {len(mcs)} runs finished with nothing "
+              f"lost.")
+text(s, 0.6, 1.7, 4.8, 5.4, [
+    "Mutual exclusion: the exchange gives every thread one place in one queue; only the "
+    "head is inside, and it wakes exactly one node",
+    "No deadlock: the holder always hands over — to the next node, or resets tail "
+    "when nobody waits",
+    "release() waits for a waiter that has swapped tail but not linked in yet",
+    f"Measured: all {len(mcs)} runs (1–8 threads, all CPUs and one CPU) finished with lost = 0",
+], size=17)
+code(s, 5.6, 1.6, 7.3, 5.5, cut(SRC / "3_mcs.c", r"^void lock_release"))
 
-s = new_slide("Bakery: Performance",
-              f"Every acquisition reads every thread's number and choosing flag, so the cost "
-              f"grows with the number of threads, and each entry is a cache line shared with "
-              f"other cores. On one CPU each handoff waits until the next thread in line is "
-              f"scheduled.")
+s = new_slide("MCS: Performance",
+              f"Every waiter spins on its own cache line, so a handover touches one line instead "
+              f"of making every core fight over the same flag. On one CPU it collapses: the queue "
+              f"hands the lock to a thread that is not running. The Linux kernel avoids that by "
+              f"disabling preemption while a spinlock is held or awaited.")
 chart(s, 0.6, 1.6, 7.0, 5.4, XL_CHART_TYPE.LINE_MARKERS, [str(t) for t in THREADS],
-      [(f"Bakery, all {NCPU} CPUs", [mps("bakery", t, "all-cpus") for t in THREADS]),
-       ("Bakery, one CPU", [mps("bakery", t, "one-cpu") for t in THREADS]),
-       (f"pthread_mutex, all {NCPU} CPUs", [mps("mutex", t, "all-cpus") for t in THREADS])],
+      [(f"MCS, all {NCPU} CPUs", [mps("mcs", t, "all-cpus") for t in THREADS]),
+       ("MCS, one CPU", [mps("mcs", t, "one-cpu") for t in THREADS]),
+       (f"TAS, all {NCPU} CPUs", [mps("tas", t, "all-cpus") for t in THREADS]),
+       ("TAS, one CPU", [mps("tas", t, "one-cpu") for t in THREADS])],
       "threads")
 text(s, 7.9, 1.7, 5.0, 5.3, [
-    f"lock() scans all N threads twice: O(N) per acquisition",
-    f"All CPUs: {rate(tp('bakery', 2))} → {rate(tp('bakery', 4))} → "
-    f"{rate(tp('bakery', 8))} acq/s at 2/4/8 threads",
-    (f"One CPU, 8 threads: {rate(tp('bakery', 8, 'one-cpu'))} acq/s — the next in line "
-     f"must be scheduled first", 0, ACCENT),
-], size=19)
+    "Each waiter spins on its own cache line; a handover touches one line",
+    f"All CPUs, 8 threads: {rate(tp('mcs', 8))} acq/s (TAS: {rate(tp('tas', 8))})",
+    (f"One CPU, 8 threads: {rate(tp('mcs', 8, 'one-cpu'))} acq/s — the next in the "
+     f"queue is not running", 0, ACCENT),
+    "In the kernel, spinlocks run with preemption disabled, so a queued waiter is never "
+    "descheduled",
+], size=18)
 
-s = new_slide("Bakery: Fairness and Limitations",
-              f"Bakery is first-come, first-served, and it was the fairest lock we measured at "
-              f"eight threads. Its costs are linear time and space in the number of threads and "
-              f"ticket numbers that keep growing while threads keep contending.")
+s = new_slide("MCS: Fairness and Limitations",
+              "The queue makes MCS first-come, first-served: it was the fairest lock we measured "
+              "at eight threads. It needs a node per waiting thread and an atomic exchange, and "
+              "like every spin lock it suffers when the next thread in line is not running.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
-    f"First-come, first-served: fairness {fair('bakery', 2):.2f} / {fair('bakery', 4):.2f} / "
-    f"{fair('bakery', 8):.2f} at 2/4/8 threads (all CPUs) — the fairest lock at 8 threads",
+    f"First-come, first-served through the queue: fairness {fair('mcs', 2):.2f} / "
+    f"{fair('mcs', 4):.2f} / {fair('mcs', 8):.2f} at 2/4/8 threads (all CPUs) — the fairest "
+    f"lock at 8 threads",
     "Limitations:",
-    ("O(N) time and O(N) memory per lock", 1),
-    ("Numbers grow without bound while threads keep contending (overflow)", 1),
-    ("Needs memory fences on modern CPUs; spins instead of sleeping", 1),
-    (f"Collapses on one CPU: {rate(tp('bakery', 8, 'one-cpu'))} acq/s at 8 threads", 1),
+    ("Needs an atomic exchange (and CAS for release) from the hardware", 1),
+    ("One queue node per waiting thread, passed in or kept per thread", 1),
+    ("A preempted waiter stalls everyone behind it — the kernel disables preemption", 1),
+    (f"On one CPU here: {rate(tp('mcs', 8, 'one-cpu'))} acq/s at 8 threads, fairness "
+     f"{fair('mcs', 8, 'one-cpu'):.2f}", 1),
 ], size=20)
 
 # ============================================================== comparison
-section("Comparison",
+section("Comparison: Throughput",
         "Now the three locks side by side, with two locks from the lecture as references.")
 
 s = new_slide("Throughput: All CPUs vs One CPU",
-              f"On all {NCPU} CPUs, pthread_mutex was fastest at eight threads and Bakery "
-              f"slowest. On one CPU the spinning locks waste time slices, while the mutex puts "
-              f"waiting threads to sleep.")
+              f"On all {NCPU} CPUs, pthread_mutex was the fastest lock at eight threads. On one "
+              f"CPU the spinning locks waste time slices, while the mutex puts waiting threads "
+              f"to sleep.")
 cats = [str(t) for t in THREADS]
 for k, (mode, name) in enumerate((("all-cpus", f"All {NCPU} CPUs"), ("one-cpu", "One CPU"))):
     c = chart(s, 0.4 + 6.4 * k, 1.5, 6.3, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
@@ -522,38 +531,43 @@ def most(lock):
     return 2 if lock == "peterson" else 8
 
 
+section("Comparison: Summary",
+        "Next, the same results as one table.")
 s = new_slide("Summary",
               "This table puts the three locks and the two references on one page, each at the "
-              "most threads it supports. Fairness and speed pull in opposite directions: the fair "
-              "software locks are slow, the fast hardware spin locks are unfair.")
+              "most threads it supports. Peterson is fair but limited to two threads, the simple "
+              "hardware spin locks are unfair, and the MCS queue is fair at every thread count "
+              "we ran.")
 rows = [["Lock", "Needs", "Mutual excl.", "Deadlock-free", "Fairness",
          f"acq/s, all {NCPU} CPUs", "acq/s, one CPU"]]
 needs = {"peterson": "loads/stores + fence", "llsc": "LL/SC instructions",
-         "bakery": "loads/stores + fence", "tas": "test-and-set", "mutex": "atomics + futex"}
+         "mcs": "atomic exchange + CAS", "tas": "test-and-set", "mutex": "atomics + futex"}
 for l in LOCKS:
     t = most(l)
-    rows.append([f"{LABEL[l].replace(' (lecture)', '')} ({t} thr)", needs[l], "yes", "yes",
+    rows.append([f"{re.sub(r' [(].*', '', LABEL[l])} ({t} thr)", needs[l], "yes", "yes",
                  f"{fair(l, t):.2f}", rate(tp(l, t)), rate(tp(l, t, "one-cpu"))])
-table(s, 0.5, 1.7, 12.3, rows, [2.6, 2.6, 1.4, 1.5, 1.2, 1.6, 1.4], size=14, row_h=0.5)
-text(s, 0.5, 5.1, 12.3, 2.0, [
+table(s, 0.5, 1.6, 12.3, rows, [2.6, 2.6, 1.4, 1.5, 1.2, 1.6, 1.4], size=14, row_h=0.45)
+text(s, 0.5, 1.6 + 0.45 * len(rows) + 0.4, 12.3, 1.5, [
     "Fairness = fewest ÷ most acquisitions per thread; medians of "
     f"{REPS} runs of {SECS} s",
-    ("Peterson and Bakery give mutual exclusion on x86 only with the fence", 0, ACCENT),
+    ("Peterson gives mutual exclusion on x86 only with the fence", 0, ACCENT),
 ], size=16)
 
 section("Conclusion",
         "Last part: what the measurements tell us, and where the material comes from.")
 s = new_slide("Conclusion",
-              "All three locks provide mutual exclusion and avoid deadlock, but the two software "
-              "locks only do so on today's CPUs with memory fences. Software locks are fair but "
-              "slow and limited; the hardware lock is fast but unfair. Real systems combine a "
-              "hardware atomic with sleeping in the kernel, which is what pthread_mutex does.")
+              "All three locks provide mutual exclusion and avoid deadlock, but Peterson only "
+              "does so on today's CPUs with a memory fence. Peterson is fair but limited to two "
+              "threads; LL/SC is short and fast but unfair; the MCS queue is fair for any number "
+              "of threads and is what Linux builds its spinlock on. When threads can be "
+              "preempted, sleeping locks such as pthread_mutex win.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
-    "All three give mutual exclusion and no deadlock — Peterson and Bakery only with fences on modern CPUs",
-    "Software locks (Peterson, Bakery): fair (bounded waiting), but slow and limited (2 threads / O(N))",
+    "All three give mutual exclusion and no deadlock — Peterson only with a fence on modern CPUs",
+    "Peterson: software only and fair (bounded waiting), but two threads only",
     "Hardware LL/SC: one short loop, fast, but no fairness and not on x86",
+    "MCS: a queue gives first-come, first-served for any number of threads; Linux builds on it",
     "Spinning on one CPU wastes time slices; sleeping locks (futex, pthread_mutex) avoid it",
-], size=21)
+], size=20)
 
 s = new_slide("References",
               "These are the sources for the algorithms and the instructions.")
@@ -561,7 +575,9 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
     "R. H. Arpaci-Dusseau, A. C. Arpaci-Dusseau, Operating Systems: Three Easy Pieces, ch. 28 “Locks”",
     "CPE 333 Lecture 8: Locks Mechanism",
     "G. L. Peterson, “Myths About the Mutual Exclusion Problem”, Information Processing Letters 12(3), 1981",
-    "L. Lamport, “A New Solution of Dijkstra's Concurrent Programming Problem”, CACM 17(8), 1974",
+    "J. M. Mellor-Crummey, M. L. Scott, “Algorithms for Scalable Synchronization on "
+    "Shared-Memory Multiprocessors”, ACM TOCS 9(1), 1991",
+    "Linux kernel source: kernel/locking/qspinlock.c",
     "Arm Architecture Reference Manual for A-profile architecture: LDAXR, STXR",
     "Code and raw results: PS08/src, PS08/results",
 ], size=18)

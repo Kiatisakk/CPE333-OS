@@ -25,7 +25,7 @@ build() {  # build <out> <cc> <extra flags> <lock source>
 build peterson         gcc ""          1_peterson.c
 build peterson_nofence gcc -DNO_FENCE  1_peterson.c
 build llsc             gcc ""          2_llsc.c
-build bakery           gcc ""          3_bakery.c
+build mcs              gcc ""          3_mcs.c
 build tas              gcc ""          ref_tas.c
 build mutex            gcc ""          ref_mutex.c
 build llsc_arm64       aarch64-linux-gnu-gcc -static 2_llsc.c
@@ -87,7 +87,7 @@ echo ">>> bench: every lock at 1/2/4/8 threads, all CPUs and one CPU"
 {
     for mode in all-cpus one-cpu; do
         pin=(); [ "$mode" = one-cpu ] && pin=(taskset -c 0)
-        for lock in peterson llsc bakery tas mutex; do
+        for lock in peterson llsc mcs tas mutex; do
             for t in 1 2 4 8; do
                 [ "$lock" = peterson ] && [ "$t" -gt 2 ] && continue
                 for r in $(seq 1 $REPS); do
