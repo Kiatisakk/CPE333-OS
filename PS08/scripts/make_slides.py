@@ -26,13 +26,13 @@ SRC = ROOT / "src"
 TEMPLATE = ROOT / "UTF-8_PS8_2025.pptx"
 OUT = ROOT / "slides" / "PS08.pptx"
 
-MEMBERS = [  # (id, name, the parts they present)
-    ("67070501021", "Thanaboon Tikaew", ["How We Evaluate", "MCS Lock"]),
-    ("67070501005", "Kiatisak Markmeeshap", ["Peterson's Algorithm"]),
-    ("67070501018", "Tithinan Sobking", ["Load-Linked / Store-Conditional"]),
+MEMBERS = [  # (id, name, the parts they present), in speaking order
+    ("67070501075", "Siriwan Yindeephot", ["How We Evaluate", "Conclusion"]),
+    ("67070501018", "Tithinan Sobking", ["Peterson's Algorithm"]),
+    ("67070501005", "Kiatisak Markmeeshap", ["Load-Linked / Store-Conditional"]),
+    ("67070501021", "Thanaboon Tikaew", ["MCS Lock"]),
     ("67070501040", "Worawut Sereethai", ["Comparison: Throughput"]),
     ("67070501059", "Chanon Lhumsa-ard", ["Comparison: Summary"]),
-    ("67070501075", "Siriwan Yindeephot", ["Conclusion"]),
 ]
 PRESENTER = {part: (sid, name) for sid, name, parts in MEMBERS for part in parts}
 LABEL = {"peterson": "Peterson", "llsc": "LL/SC", "mcs": "MCS",
@@ -244,8 +244,8 @@ s.placeholders[1].text = ("Peterson's Algorithm · LL/SC · MCS Lock\n"
 
 # ---- 2 group
 s = new_slide("Group: OS InW",
-              "There are six of us. Three members each present one lock, and one of them "
-              "also explains how we measured; two compare the locks and one concludes.",
+              "There are six of us. Three members each present one lock and two compare "
+              "them; one member explains how we measured and draws the conclusion.",
               L_TITLE_ONLY)
 for k, (sid, name, parts) in enumerate(MEMBERS):
     tf = text(s, 0.5 + 4.15 * (k % 3), 1.9 + 2.5 * (k // 3), 4.0, 2.2,
