@@ -1,20 +1,20 @@
-$ objdump -d --disassemble=lock_acquire bin/peterson
-0000000000001670 <lock_acquire>:
-1670:	endbr64
-1674:	mov    $0x1,%edx
-1679:	lea    0x2bf8(%rip),%rcx        # 4278 <flag>
-1680:	sub    %edi,%edx
-1682:	movslq %edi,%rdi
-1685:	movl   $0x1,(%rcx,%rdi,4)
-168c:	movslq %edx,%rsi
-168f:	mov    %edx,0x2bdb(%rip)        # 4270 <turn>
-1695:	lock orq $0x0,(%rsp)
-169b:	jmp    16aa <lock_acquire+0x3a>
-169d:	nopl   (%rax)
-16a0:	mov    0x2bca(%rip),%eax        # 4270 <turn>
-16a6:	cmp    %edx,%eax
-16a8:	jne    16b2 <lock_acquire+0x42>
-16aa:	mov    (%rcx,%rsi,4),%eax
-16ad:	cmp    $0x1,%eax
-16b0:	je     16a0 <lock_acquire+0x30>
-16b2:	ret
+$ objdump -d --disassemble=lock_acquire bin/peterson_fence
+0000000000001730 <lock_acquire>:
+1730:	endbr64
+1734:	mov    $0x1,%edx
+1739:	lea    0x2f38(%rip),%rcx        # 4678 <flag>
+1740:	sub    %edi,%edx
+1742:	movslq %edi,%rdi
+1745:	movl   $0x1,(%rcx,%rdi,4)
+174c:	movslq %edx,%rsi
+174f:	mov    %edx,0x2f1b(%rip)        # 4670 <turn>
+1755:	lock orq $0x0,(%rsp)
+175b:	jmp    176a <lock_acquire+0x3a>
+175d:	nopl   (%rax)
+1760:	mov    0x2f0a(%rip),%eax        # 4670 <turn>
+1766:	cmp    %edx,%eax
+1768:	jne    1772 <lock_acquire+0x42>
+176a:	mov    (%rcx,%rsi,4),%eax
+176d:	cmp    $0x1,%eax
+1770:	je     1760 <lock_acquire+0x30>
+1772:	ret

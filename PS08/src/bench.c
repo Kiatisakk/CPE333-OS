@@ -9,7 +9,8 @@
  *   mutual exclusion  counter must equal the sum of acquisitions (lost = 0)
  *   absence of deadlock  every thread returns and the run ends
  *   fairness          per-thread counts, min/max ratio
- *   performance       acquisitions per second
+ *   performance       acquisitions per second over the measurement window
+ *                     (first worker start to last worker stop)
  */
 #define _GNU_SOURCE
 #include <pthread.h>
@@ -27,6 +28,14 @@ static volatile long counter;          /* the shared variable; plain, not atomic
 static atomic_int stop;
 static pthread_barrier_t start;
 static long acquired[MAX_THREADS];
+static double t_begin[MAX_THREADS], t_end[MAX_THREADS];  /* each worker's own window */
+
+static double now(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return t.tv_sec + t.tv_nsec / 1e9;
+}
 
 static void *worker(void *arg)
 {
@@ -34,21 +43,16 @@ static void *worker(void *arg)
     long n = 0;
 
     pthread_barrier_wait(&start);
+    t_begin[id] = now();                /* counting starts here */
     while (!stop) {
         lock_acquire(id);
         counter = counter + 1;          /* critical section */
         lock_release(id);
         n++;
     }
+    t_end[id] = now();                  /* ... and stops here */
     acquired[id] = n;
     return NULL;
-}
-
-static double now(void)
-{
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec + t.tv_nsec / 1e9;
 }
 
 int main(int argc, char *argv[])
@@ -72,12 +76,19 @@ int main(int argc, char *argv[])
         pthread_create(&t[i], NULL, worker, (void *)(long)i);
 
     pthread_barrier_wait(&start);
-    double t0 = now();
     usleep((useconds_t)(secs * 1e6));
     atomic_store(&stop, 1);
     for (int i = 0; i < nthreads; i++)
         pthread_join(t[i], NULL);
-    double elapsed = now() - t0;
+    /* The window covers exactly the time in which acquisitions were counted:
+     * first worker start to last worker stop.  Thread creation and join are
+     * outside it. */
+    double first = t_begin[0], last = t_end[0];
+    for (int i = 1; i < nthreads; i++) {
+        if (t_begin[i] < first) first = t_begin[i];
+        if (t_end[i] > last) last = t_end[i];
+    }
+    double window = last - first;
 
     long total = 0, lo = acquired[0], hi = acquired[0];
     cpu_set_t cpus;
@@ -90,7 +101,7 @@ int main(int argc, char *argv[])
         if (acquired[i] > hi) hi = acquired[i];
     }
     printf("total=%ld counter=%ld lost=%ld\n", total, counter, total - counter);
-    printf("elapsed=%.3f s  throughput=%.0f acq/s  fairness(min/max)=%.3f\n",
-           elapsed, total / elapsed, hi ? (double)lo / hi : 0.0);
+    printf("window=%.3f s  throughput=%.0f acq/s  fairness(min/max)=%.3f\n",
+           window, total / window, hi ? (double)lo / hi : 0.0);
     return 0;
 }

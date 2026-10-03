@@ -23,6 +23,7 @@ def parse(body):
         run[key] = int(re.search(rf"\b{key}=(-?\d+)", body).group(1))
     run["throughput"] = float(re.search(r"throughput=(\d+)", body).group(1))
     run["fairness"] = float(re.search(r"min/max\)=([\d.]+)", body).group(1))
+    run["window"] = float(re.search(r"window=([\d.]+)", body).group(1))
     run["cpus"] = int(re.search(r"cpus=(\d+)", body).group(1))
     return run
 

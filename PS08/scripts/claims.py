@@ -36,7 +36,7 @@ check("at 1 thread (no contention), TAS and LL/SC are the two fastest locks",
       sorted(LOCKS, key=lambda l: -tp(l, 1))[:2] in (["tas", "llsc"], ["llsc", "tas"]))
 check("on all CPUs, every spin lock (LL/SC, MCS, TAS) is slower at 8 threads than at 1",
       all(tp(l, 8) < tp(l, 1) for l in ("llsc", "mcs", "tas")))
-check("on one CPU, every spin lock at its most threads lets a thread starve (median min/max <= 0.1)",
+check("on one CPU, every spin lock at its most threads shows severe imbalance (median min/max <= 0.1)",
       all(fair(l, 2 if l == "peterson" else 8, "one-cpu") <= 0.1
           for l in ("peterson", "llsc", "mcs", "tas")))
 check("on one CPU, mutex at 8 threads keeps at least half its 1-thread throughput",
@@ -44,8 +44,17 @@ check("on one CPU, mutex at 8 threads keeps at least half its 1-thread throughpu
 check("on one CPU, Peterson and MCS with 2+ threads run over 10x slower than mutex",
       all(tp(l, t, "one-cpu") < tp("mutex", t, "one-cpu") / 10
           for l, ts in (("peterson", (2,)), ("mcs", (2, 4, 8))) for t in ts))
-check("on one CPU at 8 threads, TAS and LL/SC starve a thread (median min/max <= 0.1) but mutex does not (>= 0.5)",
+check("on one CPU at 8 threads, TAS and the CAS spin lock show severe imbalance (median min/max <= 0.1) but mutex does not (>= 0.5)",
       fair("tas", 8, "one-cpu") <= 0.1 and fair("llsc", 8, "one-cpu") <= 0.1
       and fair("mutex", 8, "one-cpu") >= 0.5)
+
+# the slides quote fewest-vs-most counts; the ratio alone can print 0.000 for a thread that got in
+nz = [r for rs in B.values() for r in rs if r["fairness"] == 0 and min(r["counts"]) > 0]
+print(f"  info  {len(nz)} runs print fairness 0.000 although every thread got in at least once")
+check("the run-to-run spread of one-CPU throughput is reported, not hidden: some one-CPU setting varies >= 3x",
+      any(max(r["throughput"] for r in B[k]) >= 3 * min(r["throughput"] for r in B[k])
+          for k in B if k[2] == "one-cpu"))
+check("every run window is about the requested 1 s (0.99 s to 1.5 s)",
+      all(0.99 <= r["window"] < 1.5 for rs in B.values() for r in rs))
 
 sys.exit(fail)

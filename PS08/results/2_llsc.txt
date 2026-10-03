@@ -1,30 +1,100 @@
 --- llsc arm64 run 1 ---
 $ qemu-aarch64 bin/llsc_arm64 4 1
 lock=llsc threads=4 cpus=8
-  thread 0: 1439537 acquisitions
-  thread 1: 1326841 acquisitions
-  thread 2: 1400169 acquisitions
-  thread 3: 1256912 acquisitions
-total=5423459 counter=5423459 lost=0
-elapsed=1.007 s  throughput=5388148 acq/s  fairness(min/max)=0.873
+  thread 0: 1195824 acquisitions
+  thread 1: 1327010 acquisitions
+  thread 2: 1271336 acquisitions
+  thread 3: 1313535 acquisitions
+total=5107705 counter=5107705 lost=0
+window=1.003 s  throughput=5093417 acq/s  fairness(min/max)=0.901
 
 --- llsc arm64 run 2 ---
 $ qemu-aarch64 bin/llsc_arm64 4 1
 lock=llsc threads=4 cpus=8
-  thread 0: 1318601 acquisitions
-  thread 1: 1393915 acquisitions
-  thread 2: 1343657 acquisitions
-  thread 3: 1356542 acquisitions
-total=5412715 counter=5412715 lost=0
-elapsed=1.008 s  throughput=5370620 acq/s  fairness(min/max)=0.946
+  thread 0: 1190199 acquisitions
+  thread 1: 1336713 acquisitions
+  thread 2: 1313319 acquisitions
+  thread 3: 1288291 acquisitions
+total=5128522 counter=5128522 lost=0
+window=1.004 s  throughput=5106872 acq/s  fairness(min/max)=0.890
 
 --- llsc arm64 run 3 ---
 $ qemu-aarch64 bin/llsc_arm64 4 1
 lock=llsc threads=4 cpus=8
-  thread 0: 1349904 acquisitions
-  thread 1: 1331955 acquisitions
-  thread 2: 1288741 acquisitions
-  thread 3: 1282262 acquisitions
-total=5252862 counter=5252862 lost=0
-elapsed=1.008 s  throughput=5212552 acq/s  fairness(min/max)=0.950
+  thread 0: 1326220 acquisitions
+  thread 1: 1373831 acquisitions
+  thread 2: 1190570 acquisitions
+  thread 3: 1364699 acquisitions
+total=5255320 counter=5255320 lost=0
+window=1.006 s  throughput=5224922 acq/s  fairness(min/max)=0.867
+
+--- llsc arm64 run 4 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1478421 acquisitions
+  thread 1: 1367941 acquisitions
+  thread 2: 1352501 acquisitions
+  thread 3: 1384951 acquisitions
+total=5583814 counter=5583814 lost=0
+window=1.003 s  throughput=5568223 acq/s  fairness(min/max)=0.915
+
+--- llsc arm64 run 5 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1354273 acquisitions
+  thread 1: 1243917 acquisitions
+  thread 2: 1600745 acquisitions
+  thread 3: 1349083 acquisitions
+total=5548018 counter=5548018 lost=0
+window=1.005 s  throughput=5521866 acq/s  fairness(min/max)=0.777
+
+--- llsc arm64 run 6 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1545147 acquisitions
+  thread 1: 1452159 acquisitions
+  thread 2: 1390128 acquisitions
+  thread 3: 1375306 acquisitions
+total=5762740 counter=5762740 lost=0
+window=1.003 s  throughput=5746853 acq/s  fairness(min/max)=0.890
+
+--- llsc arm64 run 7 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1539503 acquisitions
+  thread 1: 1191700 acquisitions
+  thread 2: 1211330 acquisitions
+  thread 3: 1239105 acquisitions
+total=5181638 counter=5181638 lost=0
+window=1.004 s  throughput=5158601 acq/s  fairness(min/max)=0.774
+
+--- llsc arm64 run 8 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1348613 acquisitions
+  thread 1: 1141519 acquisitions
+  thread 2: 1237625 acquisitions
+  thread 3: 1407323 acquisitions
+total=5135080 counter=5135080 lost=0
+window=1.003 s  throughput=5118754 acq/s  fairness(min/max)=0.811
+
+--- llsc arm64 run 9 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1381663 acquisitions
+  thread 1: 1473518 acquisitions
+  thread 2: 1393211 acquisitions
+  thread 3: 1485277 acquisitions
+total=5733669 counter=5733669 lost=0
+window=1.005 s  throughput=5707829 acq/s  fairness(min/max)=0.930
+
+--- llsc arm64 run 10 ---
+$ qemu-aarch64 bin/llsc_arm64 4 1
+lock=llsc threads=4 cpus=8
+  thread 0: 1450284 acquisitions
+  thread 1: 1320269 acquisitions
+  thread 2: 1146755 acquisitions
+  thread 3: 1193347 acquisitions
+total=5110655 counter=5110655 lost=0
+window=1.003 s  throughput=5094328 acq/s  fairness(min/max)=0.791
 

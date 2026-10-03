@@ -1,104 +1,320 @@
 --- peterson_nofence all-cpus run 1 ---
 $ bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=8
-  thread 0: 9650826 acquisitions
-  thread 1: 8226738 acquisitions
-total=17877564 counter=17644456 lost=233108
-elapsed=1.000 s  throughput=17872724 acq/s  fairness(min/max)=0.852
+  thread 0: 8259251 acquisitions
+  thread 1: 14106276 acquisitions
+total=22365527 counter=22162507 lost=203020
+window=1.000 s  throughput=22361585 acq/s  fairness(min/max)=0.586
 
 --- peterson_nofence all-cpus run 2 ---
 $ bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=8
-  thread 0: 11987109 acquisitions
-  thread 1: 10789772 acquisitions
-total=22776881 counter=22292307 lost=484574
-elapsed=1.000 s  throughput=22770042 acq/s  fairness(min/max)=0.900
+  thread 0: 22348254 acquisitions
+  thread 1: 10569173 acquisitions
+total=32917427 counter=32827153 lost=90274
+window=1.000 s  throughput=32912091 acq/s  fairness(min/max)=0.473
 
 --- peterson_nofence all-cpus run 3 ---
 $ bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=8
-  thread 0: 12961645 acquisitions
-  thread 1: 9677677 acquisitions
-total=22639322 counter=22345767 lost=293555
-elapsed=1.000 s  throughput=22632203 acq/s  fairness(min/max)=0.747
+  thread 0: 10279171 acquisitions
+  thread 1: 10421734 acquisitions
+total=20700905 counter=20463756 lost=237149
+window=1.000 s  throughput=20697331 acq/s  fairness(min/max)=0.986
 
 --- peterson_nofence all-cpus run 4 ---
 $ bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=8
-  thread 0: 11096590 acquisitions
-  thread 1: 12196411 acquisitions
-total=23293001 counter=22479600 lost=813401
-elapsed=1.000 s  throughput=23285989 acq/s  fairness(min/max)=0.910
+  thread 0: 8391852 acquisitions
+  thread 1: 11341262 acquisitions
+total=19733114 counter=19697631 lost=35483
+window=1.000 s  throughput=19729748 acq/s  fairness(min/max)=0.740
 
 --- peterson_nofence all-cpus run 5 ---
 $ bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=8
-  thread 0: 13238821 acquisitions
-  thread 1: 14325467 acquisitions
-total=27564288 counter=26887004 lost=677284
-elapsed=1.000 s  throughput=27556032 acq/s  fairness(min/max)=0.924
+  thread 0: 6801655 acquisitions
+  thread 1: 6479153 acquisitions
+total=13280808 counter=13196808 lost=84000
+window=1.000 s  throughput=13278097 acq/s  fairness(min/max)=0.953
+
+--- peterson_nofence all-cpus run 6 ---
+$ bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=8
+  thread 0: 11710261 acquisitions
+  thread 1: 7339514 acquisitions
+total=19049775 counter=18855357 lost=194418
+window=1.000 s  throughput=19046124 acq/s  fairness(min/max)=0.627
+
+--- peterson_nofence all-cpus run 7 ---
+$ bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=8
+  thread 0: 7498330 acquisitions
+  thread 1: 8088646 acquisitions
+total=15586976 counter=15392317 lost=194659
+window=1.000 s  throughput=15585022 acq/s  fairness(min/max)=0.927
+
+--- peterson_nofence all-cpus run 8 ---
+$ bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=8
+  thread 0: 10944729 acquisitions
+  thread 1: 5947387 acquisitions
+total=16892116 counter=16872251 lost=19865
+window=1.000 s  throughput=16888463 acq/s  fairness(min/max)=0.543
+
+--- peterson_nofence all-cpus run 9 ---
+$ bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=8
+  thread 0: 7558727 acquisitions
+  thread 1: 6858075 acquisitions
+total=14416802 counter=14399624 lost=17178
+window=1.000 s  throughput=14413778 acq/s  fairness(min/max)=0.907
+
+--- peterson_nofence all-cpus run 10 ---
+$ bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=8
+  thread 0: 9494197 acquisitions
+  thread 1: 8020666 acquisitions
+total=17514863 counter=17372720 lost=142143
+window=1.000 s  throughput=17512145 acq/s  fairness(min/max)=0.845
 
 --- peterson_nofence one-cpu run 1 ---
 $ taskset -c 0 bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=1
-  thread 0: 780803 acquisitions
-  thread 1: 1361702 acquisitions
-total=2142505 counter=2142505 lost=0
-elapsed=1.000 s  throughput=2142054 acq/s  fairness(min/max)=0.573
+  thread 0: 1083326 acquisitions
+  thread 1: 1874023 acquisitions
+total=2957349 counter=2957349 lost=0
+window=1.007 s  throughput=2936754 acq/s  fairness(min/max)=0.578
 
 --- peterson_nofence one-cpu run 2 ---
 $ taskset -c 0 bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=1
-  thread 0: 850469 acquisitions
-  thread 1: 1616008 acquisitions
-total=2466477 counter=2466477 lost=0
-elapsed=1.004 s  throughput=2456401 acq/s  fairness(min/max)=0.526
+  thread 0: 1112290 acquisitions
+  thread 1: 934449 acquisitions
+total=2046739 counter=2046739 lost=0
+window=1.008 s  throughput=2031317 acq/s  fairness(min/max)=0.840
 
 --- peterson_nofence one-cpu run 3 ---
 $ taskset -c 0 bin/peterson_nofence 2 1
 lock=peterson_nofence threads=2 cpus=1
-  thread 0: 1650028 acquisitions
-  thread 1: 2352798 acquisitions
-total=4002826 counter=4002826 lost=0
-elapsed=1.004 s  throughput=3986389 acq/s  fairness(min/max)=0.701
+  thread 0: 2357714 acquisitions
+  thread 1: 1343315 acquisitions
+total=3701029 counter=3701029 lost=0
+window=1.009 s  throughput=3667795 acq/s  fairness(min/max)=0.570
+
+--- peterson_nofence one-cpu run 4 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 125 acquisitions
+  thread 1: 802981 acquisitions
+total=803106 counter=803106 lost=0
+window=1.008 s  throughput=797005 acq/s  fairness(min/max)=0.000
+
+--- peterson_nofence one-cpu run 5 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 2327110 acquisitions
+  thread 1: 1725205 acquisitions
+total=4052315 counter=4052315 lost=0
+window=1.009 s  throughput=4016934 acq/s  fairness(min/max)=0.741
+
+--- peterson_nofence one-cpu run 6 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 2874358 acquisitions
+  thread 1: 3786200 acquisitions
+total=6660558 counter=6660558 lost=0
+window=1.015 s  throughput=6563337 acq/s  fairness(min/max)=0.759
+
+--- peterson_nofence one-cpu run 7 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 2219778 acquisitions
+  thread 1: 735763 acquisitions
+total=2955541 counter=2955541 lost=0
+window=1.013 s  throughput=2916752 acq/s  fairness(min/max)=0.331
+
+--- peterson_nofence one-cpu run 8 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 123 acquisitions
+  thread 1: 379140 acquisitions
+total=379263 counter=379263 lost=0
+window=1.007 s  throughput=376491 acq/s  fairness(min/max)=0.000
+
+--- peterson_nofence one-cpu run 9 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 88 acquisitions
+  thread 1: 668018 acquisitions
+total=668106 counter=668106 lost=0
+window=1.003 s  throughput=665822 acq/s  fairness(min/max)=0.000
+
+--- peterson_nofence one-cpu run 10 ---
+$ taskset -c 0 bin/peterson_nofence 2 1
+lock=peterson_nofence threads=2 cpus=1
+  thread 0: 890735 acquisitions
+  thread 1: 1278030 acquisitions
+total=2168765 counter=2168765 lost=0
+window=1.006 s  throughput=2154891 acq/s  fairness(min/max)=0.697
+
+--- peterson_fence all-cpus run 1 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 11160408 acquisitions
+  thread 1: 10740268 acquisitions
+total=21900676 counter=21900676 lost=0
+window=1.000 s  throughput=21896405 acq/s  fairness(min/max)=0.962
+
+--- peterson_fence all-cpus run 2 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 7084239 acquisitions
+  thread 1: 9647279 acquisitions
+total=16731518 counter=16731518 lost=0
+window=1.000 s  throughput=16727933 acq/s  fairness(min/max)=0.734
+
+--- peterson_fence all-cpus run 3 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 4141735 acquisitions
+  thread 1: 5012674 acquisitions
+total=9154409 counter=9154409 lost=0
+window=1.002 s  throughput=9134904 acq/s  fairness(min/max)=0.826
+
+--- peterson_fence all-cpus run 4 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 6135212 acquisitions
+  thread 1: 6316698 acquisitions
+total=12451910 counter=12451910 lost=0
+window=1.000 s  throughput=12446455 acq/s  fairness(min/max)=0.971
+
+--- peterson_fence all-cpus run 5 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 8114737 acquisitions
+  thread 1: 9387270 acquisitions
+total=17502007 counter=17502007 lost=0
+window=1.000 s  throughput=17499276 acq/s  fairness(min/max)=0.864
+
+--- peterson_fence all-cpus run 6 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 7452281 acquisitions
+  thread 1: 7649735 acquisitions
+total=15102016 counter=15102016 lost=0
+window=1.000 s  throughput=15099498 acq/s  fairness(min/max)=0.974
+
+--- peterson_fence all-cpus run 7 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 7353334 acquisitions
+  thread 1: 9492897 acquisitions
+total=16846231 counter=16846231 lost=0
+window=1.000 s  throughput=16843127 acq/s  fairness(min/max)=0.775
+
+--- peterson_fence all-cpus run 8 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 8876619 acquisitions
+  thread 1: 12943559 acquisitions
+total=21820178 counter=21820178 lost=0
+window=1.000 s  throughput=21816553 acq/s  fairness(min/max)=0.686
+
+--- peterson_fence all-cpus run 9 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 8160988 acquisitions
+  thread 1: 11769502 acquisitions
+total=19930490 counter=19930490 lost=0
+window=1.000 s  throughput=19927407 acq/s  fairness(min/max)=0.693
+
+--- peterson_fence all-cpus run 10 ---
+$ bin/peterson_fence 2 1
+lock=peterson_fence threads=2 cpus=8
+  thread 0: 9273067 acquisitions
+  thread 1: 10136322 acquisitions
+total=19409389 counter=19409389 lost=0
+window=1.000 s  throughput=19405368 acq/s  fairness(min/max)=0.915
 
 --- peterson all-cpus run 1 ---
 $ bin/peterson 2 1
 lock=peterson threads=2 cpus=8
-  thread 0: 7619837 acquisitions
-  thread 1: 7591845 acquisitions
-total=15211682 counter=15211682 lost=0
-elapsed=1.000 s  throughput=15207055 acq/s  fairness(min/max)=0.996
+  thread 0: 5869375 acquisitions
+  thread 1: 5857992 acquisitions
+total=11727367 counter=11727367 lost=0
+window=1.000 s  throughput=11724997 acq/s  fairness(min/max)=0.998
 
 --- peterson all-cpus run 2 ---
 $ bin/peterson 2 1
 lock=peterson threads=2 cpus=8
-  thread 0: 7255984 acquisitions
-  thread 1: 7245864 acquisitions
-total=14501848 counter=14501848 lost=0
-elapsed=1.000 s  throughput=14497484 acq/s  fairness(min/max)=0.999
+  thread 0: 5193451 acquisitions
+  thread 1: 5205689 acquisitions
+total=10399140 counter=10399140 lost=0
+window=1.000 s  throughput=10397418 acq/s  fairness(min/max)=0.998
 
 --- peterson all-cpus run 3 ---
 $ bin/peterson 2 1
 lock=peterson threads=2 cpus=8
-  thread 0: 7457192 acquisitions
-  thread 1: 7484064 acquisitions
-total=14941256 counter=14941256 lost=0
-elapsed=1.000 s  throughput=14936198 acq/s  fairness(min/max)=0.996
+  thread 0: 6959301 acquisitions
+  thread 1: 6905251 acquisitions
+total=13864552 counter=13864552 lost=0
+window=1.000 s  throughput=13860858 acq/s  fairness(min/max)=0.992
 
 --- peterson all-cpus run 4 ---
 $ bin/peterson 2 1
 lock=peterson threads=2 cpus=8
-  thread 0: 7835970 acquisitions
-  thread 1: 7850283 acquisitions
-total=15686253 counter=15686253 lost=0
-elapsed=1.000 s  throughput=15680585 acq/s  fairness(min/max)=0.998
+  thread 0: 6406703 acquisitions
+  thread 1: 6458498 acquisitions
+total=12865201 counter=12865201 lost=0
+window=1.000 s  throughput=12862756 acq/s  fairness(min/max)=0.992
 
 --- peterson all-cpus run 5 ---
 $ bin/peterson 2 1
 lock=peterson threads=2 cpus=8
-  thread 0: 6915699 acquisitions
-  thread 1: 6876437 acquisitions
-total=13792136 counter=13792136 lost=0
-elapsed=1.000 s  throughput=13788794 acq/s  fairness(min/max)=0.994
+  thread 0: 5021259 acquisitions
+  thread 1: 5026368 acquisitions
+total=10047627 counter=10047627 lost=0
+window=1.000 s  throughput=10045966 acq/s  fairness(min/max)=0.999
+
+--- peterson all-cpus run 6 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 6098312 acquisitions
+  thread 1: 6060597 acquisitions
+total=12158909 counter=12158909 lost=0
+window=1.000 s  throughput=12157245 acq/s  fairness(min/max)=0.994
+
+--- peterson all-cpus run 7 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 5507984 acquisitions
+  thread 1: 5495414 acquisitions
+total=11003398 counter=11003398 lost=0
+window=1.000 s  throughput=11001396 acq/s  fairness(min/max)=0.998
+
+--- peterson all-cpus run 8 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 5291164 acquisitions
+  thread 1: 5307888 acquisitions
+total=10599052 counter=10599052 lost=0
+window=1.000 s  throughput=10597177 acq/s  fairness(min/max)=0.997
+
+--- peterson all-cpus run 9 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 5272964 acquisitions
+  thread 1: 5253690 acquisitions
+total=10526654 counter=10526654 lost=0
+window=1.000 s  throughput=10524558 acq/s  fairness(min/max)=0.996
+
+--- peterson all-cpus run 10 ---
+$ bin/peterson 2 1
+lock=peterson threads=2 cpus=8
+  thread 0: 5152525 acquisitions
+  thread 1: 5136434 acquisitions
+total=10288959 counter=10288959 lost=0
+window=1.000 s  throughput=10286996 acq/s  fairness(min/max)=0.997
 

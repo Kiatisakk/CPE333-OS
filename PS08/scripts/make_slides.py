@@ -35,7 +35,7 @@ MEMBERS = [  # (id, name, the parts they present), in speaking order
     ("67070501059", "Chanon Lhumsa-ard", ["Comparison: Summary"]),
 ]
 PRESENTER = {part: (sid, name) for sid, name, parts in MEMBERS for part in parts}
-LABEL = {"peterson": "Peterson", "llsc": "LL/SC", "mcs": "MCS",
+LABEL = {"peterson": "Peterson", "llsc": "CAS spin lock (x86 proxy for LL/SC)", "mcs": "MCS",
          "tas": "TAS (lecture)", "mutex": "pthread_mutex (lecture)"}
 ACCENT = RGBColor(0xC0, 0x39, 0x2B)    # the red the template uses for remarks
 CODE_FONT = "Consolas"
@@ -67,6 +67,16 @@ def first_run(lock, t, mode):
     """Run 1 of a configuration, for quoting one concrete set of counts."""
     return B[(lock, t, mode)][0]
 
+
+pet = runs("1_peterson.txt", r".")
+nofence = runs("1_peterson.txt", r"peterson_nofence all-cpus")
+nofence1 = runs("1_peterson.txt", r"peterson_nofence one-cpu")
+fenced = runs("1_peterson.txt", r"peterson_fence all-cpus")
+atomic = runs("1_peterson.txt", r"^peterson all-cpus")
+arm = runs("2_llsc.txt", r".")
+# every run of a build that is meant to be correct (the no-fence demo is not)
+good_runs = [r for rs in B.values() for r in rs] + fenced + atomic + arm
+N_GOOD = len(good_runs)
 
 SECS = re.search(r"\$ \S+ \d+ (\S+)", (RESULTS / "bench.txt").read_text()).group(1)
 REPS = len(B[("mutex", 1, "all-cpus")])
@@ -266,18 +276,39 @@ section("How We Evaluate",
 s = new_slide("Metrics from Lecture 8",
               "Lecture 8 judges a lock on four things: mutual exclusion, absence of deadlock, "
               "fairness, and performance. We turn each one into something a program can "
-              "measure, so every lock is judged the same way.")
+              "measure, so every lock is judged the same way. A measurement can only show a "
+              "violation; it cannot prove that none exists, and the next slide separates the two.")
 table(s, 0.6, 1.7, 12.1, [
     ["Metric (Lecture 8)", "Question", "What we measure"],
     ["Mutual exclusion", "Is only one thread inside at a time?",
-     "Shared counter must equal total acquisitions: lost = total − counter = 0"],
+     "Shared counter must equal total acquisitions: lost = total − counter, expected 0"],
     ["Absence of deadlock", "Does some waiting thread always get in?",
-     "Every run must finish when the time is up"],
+     "Every run must finish when the time is up (a hang would show)"],
     ["Fairness", "Does every thread get a fair chance?",
-     "Fewest ÷ most acquisitions per thread (1.0 = equal, 0 = starved)"],
+     "Fewest ÷ most acquisitions per thread (1.0 = equal, near 0 = severe imbalance)"],
     ["Performance", "How much time does the lock cost?",
-     "Acquisitions per second, with 1 to 8 threads"],
+     "Acquisitions per second over the measurement window, 1 to 8 threads"],
 ], [2.6, 4.0, 5.5], size=16, row_h=0.9)
+
+s = new_slide("Argument vs. Experiment",
+              f"A test and a proof answer different questions. The argument says why a lock "
+              f"should work, under stated assumptions. The experiment only reports what we "
+              f"saw: in {N_GOOD} runs of the correct builds we observed no lost update and no "
+              f"hang. That is evidence, not proof, because a rare interleaving could be missed.")
+table(s, 0.6, 1.7, 12.1, [
+    ["Property", "Argument (why it should hold)", "Experiment (what we observed)"],
+    ["Mutual exclusion", "An invariant: at most one thread is past lock_acquire",
+     f"No violation observed in {N_GOOD} runs: lost = 0"],
+    ["Absence of deadlock", "Some waiting thread can always proceed",
+     f"No violation observed in {N_GOOD} runs: every run finished"],
+    ["Fairness", "Bounded waiting or FIFO order, if the algorithm has it",
+     "Acquisition counts per thread in a 1 s window; the scheduler affects them"],
+], [2.6, 4.9, 4.6], size=16, row_h=0.8)
+text(s, 0.6, 5.2, 12.1, 1.8, [
+    "The arguments assume: sequentially consistent memory (or the right fences), a scheduler "
+    "that eventually runs every thread, and a holder that calls unlock",
+    "The no-fence Peterson demo is the one build that is expected to fail",
+], size=18)
 
 s = new_slide("The Benchmark Loop",
               f"Every lock runs this same loop. All threads start together at a barrier and "
@@ -288,7 +319,8 @@ text(s, 0.6, 1.7, 5.4, 5.4, [
     "All threads start together at a barrier",
     f"Loop until main raises stop after {SECS} s",
     "counter is a plain variable: two threads inside together lose an update",
-    "Each thread counts its own acquisitions (n)",
+    "Each thread counts its own acquisitions (n) and timestamps its start and stop",
+    "Window = first thread's start to last thread's stop; creating and joining threads is outside it",
     "Same loop for every lock: only lock_acquire / lock_release change",
 ], size=19)
 code(s, 6.3, 1.7, 6.6, 5.0, cut(SRC / "bench.c", r"^static void \*worker"))
@@ -319,21 +351,20 @@ table(s, 0.6, 1.7, 7.2, [
     ["References (Lecture 8)", "TAS spin lock, pthread_mutex"],
     ["Threads", "1, 2, 4, 8 (Peterson: 1, 2)"],
     ["CPUs", f"all {NCPU}, and one (taskset -c 0)"],
-    ["Runs", f"{REPS} × {SECS} s per setting, median shown"],
+    ["Runs", f"{REPS} × {SECS} s per setting, median shown (spread: Run-to-Run slide)"],
 ], [3.0, 4.2], size=16, row_h=0.6)
 text(s, 8.2, 1.7, 4.7, 5.4, [
     f"WSL2 Ubuntu, kernel {E['kernel']}",
     f"{NCPU} CPUs",
     f"gcc {E['gcc']} -O2",
     f"LL/SC on AArch64: qemu-aarch64 {E['qemu']}",
+    "WSL2 vCPUs are scheduled by Windows too, so absolute numbers will differ on other machines",
+    f"Tiny critical section, no work outside it, 1 s runs, {REPS} repetitions: compare locks "
+    "with each other, not with other machines",
     ("One CPU shows what spinning costs when the lock holder cannot run", 0, ACCENT),
-], size=17)
+], size=16)
 
 # ================================================================ Peterson
-pet = runs("1_peterson.txt", r".")
-nofence = runs("1_peterson.txt", r"peterson_nofence all-cpus")
-nofence1 = runs("1_peterson.txt", r"peterson_nofence one-cpu")
-fenced = runs("1_peterson.txt", r"^peterson all-cpus")
 barrier = next(l.split("\t", 1)[1].strip() for l in
                (RESULTS / "1_peterson_disasm.txt").read_text().splitlines()
                if re.search(r"mfence|lock or", l))
@@ -351,36 +382,47 @@ text(s, 0.6, 1.7, 4.8, 5.4, [
     "turn = other — “you go first”",
     "Wait while the other wants in and it is the other's turn",
     "The thread that wrote turn last waits",
+    "Reference build: _Atomic ints, seq_cst; FENCE() is empty there (the seq_cst stores order the loads)",
 ], size=20)
 code(s, 5.6, 1.6, 7.3, 5.5,
-     cut(SRC / "1_peterson.c", r"^static volatile int flag", r"^static volatile int turn")
+     cut(SRC / "1_peterson.c", r"^typedef _Atomic int shared_t;", r"^typedef _Atomic int shared_t;")
+     + "\n" + cut(SRC / "1_peterson.c", r"^static shared_t flag", r"^static shared_t turn")
      + "\n\n" + cut(SRC / "1_peterson.c", r"^void lock_acquire")
      + "\n\n" + cut(SRC / "1_peterson.c", r"^void lock_release"))
 
 lost_n = [r["lost"] for r in nofence]
 s = new_slide("Peterson: Mutual Exclusion and Deadlock",
-              f"On paper Peterson is correct: both threads inside would need turn to hold two "
-              f"values at once. On a real x86 CPU the textbook code fails, because a load may "
-              f"overtake an earlier store. Without the fence we lost updates in "
-              f"{sum(l > 0 for l in lost_n)} of {len(nofence)} runs; on one CPU, or with the "
-              f"fence, nothing was lost.")
-text(s, 0.9, 1.6, 11.8, 2.3, [
-    "Mutual exclusion: if both were inside, each saw turn == itself — impossible, turn holds one value",
-    "No deadlock: turn is 0 or 1, so one waiting thread always passes",
-    ("But x86 lets a load pass an earlier store (store buffer): both read flag[other] == 0 and both enter", 0, ACCENT),
-], size=19)
-table(s, 0.9, 3.9, 11.5, [
-    ["Build (2 threads)", "CPUs", "Runs with lost updates", "Lost updates per run"],
-    ["no fence", f"all {NCPU}", f"{sum(l > 0 for l in lost_n)} / {len(nofence)}",
-     f"{min(lost_n):,} – {max(lost_n):,}"],
-    ["no fence", "one", f"{sum(r['lost'] > 0 for r in nofence1)} / {len(nofence1)}",
-     f"{max(r['lost'] for r in nofence1):,}"],
-    ["with FENCE()", f"all {NCPU}", f"{sum(r['lost'] > 0 for r in fenced)} / {len(fenced)}",
-     f"{max(r['lost'] for r in fenced):,}"],
-], [3.2, 1.6, 3.2, 3.5], size=16)
-text(s, 0.9, 5.9, 11.8, 1.0, [
-    f"FENCE() compiles to  {barrier}  — a full barrier: the stores drain before the loads",
+              f"The argument assumes sequential consistency. Suppose both threads were inside, "
+              f"and take the one that wrote turn last. The other thread's flag was set before "
+              f"that thread's own write of turn, so the last writer reads flag[other] == 1 and "
+              f"turn == other, and it must wait. On a real x86 CPU the textbook volatile code "
+              f"breaks this assumption, because a load may overtake an earlier store. Without "
+              f"the fence we lost updates in {sum(l > 0 for l in lost_n)} of {len(nofence)} "
+              f"runs. With the fence, or with _Atomic, we observed no violation in "
+              f"{len(fenced)} runs each.")
+text(s, 0.7, 1.55, 12.0, 2.5, [
+    "Mutual exclusion (assuming sequential consistency): if both were inside, take the thread "
+    "P that wrote turn last; the other thread's flag[] = 1 came before its own turn write, "
+    "so P reads flag[other] == 1 and turn == other, and waits — contradiction",
+    "No deadlock: both waiting would need turn == 1 and turn == 0 at once; and the holder must call unlock",
+    ("x86 lets a load pass an earlier store (store buffer): both can read flag[other] == 0 and both enter. "
+     "That breaks the assumption, not the logic", 0, ACCENT),
 ], size=17)
+table(s, 0.7, 4.2, 12.0, [
+    ["Build (2 threads)", "CPUs", "Runs with lost updates", "Lost updates per run"],
+    ["volatile, no fence", f"all {NCPU}", f"{sum(l > 0 for l in lost_n)} / {len(nofence)}",
+     f"{min(lost_n):,} – {max(lost_n):,}"],
+    ["volatile, no fence", "one", f"{sum(r['lost'] > 0 for r in nofence1)} / {len(nofence1)}",
+     f"{max(r['lost'] for r in nofence1):,}"],
+    ["volatile + FENCE()", f"all {NCPU}", f"{sum(r['lost'] > 0 for r in fenced)} / {len(fenced)}",
+     f"{max(r['lost'] for r in fenced):,}"],
+    ["_Atomic, seq_cst (reference)", f"all {NCPU}", f"{sum(r['lost'] > 0 for r in atomic)} / {len(atomic)}",
+     f"{max(r['lost'] for r in atomic):,}"],
+], [3.8, 1.5, 3.2, 3.5], size=15, row_h=0.45)
+text(s, 0.7, 6.55, 12.0, 0.7, [
+    f"FENCE() = {barrier}, a full barrier. The volatile builds are data races in C11: "
+    f"they show GCC on x86 only",
+], size=14)
 
 s = new_slide("Peterson: Performance",
               f"With one thread there is no contention and the lock is cheap. With two threads "
@@ -404,20 +446,21 @@ s = new_slide("Peterson: Fairness and Limitations",
               f"With both threads on their own CPU, turn hands priority to the other thread, so "
               f"neither waits for more than one entry of the other; the counts were nearly equal. "
               f"On one CPU the counts were lopsided because who gets in follows the scheduler. "
-              f"The algorithm also only works for two threads and needs a fence on modern CPUs.")
+              f"The algorithm also only works for two threads and needs sequential consistency, "
+              f"which means a fence on x86.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
     f"All CPUs, 2 threads: fairness {fair('peterson', 2):.2f} — turn gives way to the other thread, "
     f"so a waiter enters after at most one entry by the other (bounded waiting)",
     f"One CPU, 2 threads: fairness {fair('peterson', 2, 'one-cpu'):.3f} "
-    f"(run 1: {min(r1['counts']):,} vs {max(r1['counts']):,}) — with spinning, the scheduler decides",
+    f"(run 1: {min(r1['counts']):,} vs {max(r1['counts']):,}) — the imbalance comes from the "
+    f"scheduler's time slices; bounded waiting is a property of the algorithm, not of this window",
     "Limitations:",
     ("Two threads only (N threads need a tournament of Peterson locks or the filter lock)", 1),
-    ("Needs a memory fence on modern CPUs — the textbook version is broken on x86", 1),
+    ("Needs sequential consistency: a full fence on x86 — the textbook volatile version is broken there", 1),
     ("Spins instead of sleeping", 1),
 ], size=20)
 
 # =================================================================== LL/SC
-arm = runs("2_llsc.txt", r".")
 section("Load-Linked / Store-Conditional",
         "Part two: Load-Linked and Store-Conditional, a pair of hardware instructions.")
 
@@ -441,17 +484,18 @@ code(s, 5.6, 1.6, 7.3, 5.5,
 s = new_slide("LL/SC: Mutual Exclusion and Deadlock",
               f"Two threads may both load-link a zero, but only the first store-conditional "
               f"succeeds; the second sees that the address changed and fails. We ran the AArch64 "
-              f"build under qemu with {arm[0]['counts'].__len__()} threads: nothing was lost in "
-              f"{sum(r['lost'] == 0 for r in arm)} of {len(arm)} runs. The disassembly shows the "
-              f"real ldaxr and stxr instructions.")
+              f"build under qemu with {arm[0]['counts'].__len__()} threads: no lost update was observed "
+              f"in {sum(r['lost'] == 0 for r in arm)} of {len(arm)} runs, which checks the "
+              f"implementation and proves nothing about every interleaving. The disassembly "
+              f"shows the real ldaxr and stxr instructions.")
 text(s, 0.9, 1.6, 6.3, 5.5, [
     "Mutual exclusion: two threads may both LL a 0, but the first SC writes the flag, "
     "so the second SC fails",
     "No deadlock: an SC fails only if another store got in (that thread now holds the lock) "
     "or spuriously (e.g. an interrupt) — the loop retries",
-    f"AArch64 build under qemu-aarch64 {E['qemu']}, {len(arm[0]['counts'])} threads: lost = 0 in "
-    f"{sum(r['lost'] == 0 for r in arm)} / {len(arm)} runs "
-    f"({min(r['total'] for r in arm):,}+ acquisitions each)",
+    f"AArch64 build under qemu-aarch64 {E['qemu']}, {len(arm[0]['counts'])} threads: "
+    f"no violation observed in {sum(r['lost'] == 0 for r in arm)} / {len(arm)} runs "
+    f"(lost = 0, {min(r['total'] for r in arm):,}+ acquisitions each)",
 ], size=19)
 code(s, 7.5, 1.7, 5.4, 4.0, disasm("2_llsc_disasm.txt"))
 text(s, 7.5, (s.shapes[-1].top + s.shapes[-1].height) / 914400 + 0.15, 5.4, 1.0, [("ldaxr = Load-Linked, stxr = Store-Conditional "
@@ -459,27 +503,29 @@ text(s, 7.5, (s.shapes[-1].top + s.shapes[-1].height) / 914400 + 0.15, 5.4, 1.0,
 
 s = new_slide("LL/SC: Performance",
               f"qemu emulates the CPU, so its speed means nothing; we time the x86 build, which "
-              f"runs the same loop with compare-and-swap standing in for the LL/SC pair. It "
-              f"behaves like the test-and-set lock from the lecture: fast alone, slower as "
-              f"threads fight over one cache line.")
+              f"runs the same loop with compare-and-swap standing in for the LL/SC pair. These "
+              f"numbers belong to a CAS spin lock on x86; they compare implementations on x86 "
+              f"and say nothing about the speed of real LL/SC hardware. It behaves like the "
+              f"test-and-set lock from the lecture: fast alone, slower as threads fight over "
+              f"one cache line.")
 chart(s, 0.6, 1.6, 7.0, 5.4, XL_CHART_TYPE.LINE_MARKERS, [str(t) for t in THREADS],
-      [(f"LL/SC, all {NCPU} CPUs", [mps("llsc", t, "all-cpus") for t in THREADS]),
-       ("LL/SC, one CPU", [mps("llsc", t, "one-cpu") for t in THREADS]),
+      [(f"CAS proxy, all {NCPU} CPUs", [mps("llsc", t, "all-cpus") for t in THREADS]),
+       ("CAS proxy, one CPU", [mps("llsc", t, "one-cpu") for t in THREADS]),
        (f"TAS, all {NCPU} CPUs", [mps("tas", t, "all-cpus") for t in THREADS]),
        ("TAS, one CPU", [mps("tas", t, "one-cpu") for t in THREADS])],
       "threads")
 text(s, 7.9, 1.7, 5.0, 5.3, [
-    ("Timed on x86 with CAS standing in for LL/SC (qemu speed is meaningless)", 0, ACCENT),
+    ("Timed on x86: a CAS spin lock, NOT hardware LL/SC (qemu speed is meaningless)", 0, ACCENT),
     f"All CPUs: {rate(tp('llsc', 1))} acq/s with 1 thread → {rate(tp('llsc', 8))} with 8 "
     f"— every try pulls the flag's cache line",
     f"One CPU, 8 threads: {rate(tp('llsc', 8, 'one-cpu'))} acq/s",
-    "Waiters only read (LL) until the flag looks free, then write once (SC)",
+    "Waiters only read until the flag looks free, then try once (the LL/SC pair on Arm)",
 ], size=18)
 
 r8 = first_run("llsc", 8, "one-cpu")
 s = new_slide("LL/SC: Fairness and Limitations",
               f"Nothing orders the waiters: whichever store-conditional lands first wins. With "
-              f"eight threads on one CPU a thread was starved outright. The lock also depends on "
+              f"eight threads on one CPU the acquisition counts were severely unbalanced, though the scheduler plays a part. The lock also depends on "
               f"the hardware, which x86 does not have.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
     f"No queue: the first SC to land wins — fairness at 8 threads {fair('llsc', 8):.2f} (all CPUs), "
@@ -517,15 +563,16 @@ code(s, 5.6, 1.6, 7.3, 5.5, cut(SRC / "3_mcs.c", r"^struct node \{", r"^\}")
 s = new_slide("MCS: Mutual Exclusion and Deadlock",
               f"The atomic exchange puts every thread in one queue, and only the head of that "
               f"queue may enter. A thread leaves by handing the lock to the node behind it, or by "
-              f"resetting tail if nobody is waiting. All {len(mcs)} runs finished with nothing "
-              f"lost.")
+              f"resetting tail if nobody is waiting. We observed no lost update and no hang in "
+              f"all {len(mcs)} runs.")
 text(s, 0.6, 1.7, 4.8, 5.4, [
     "Mutual exclusion: the exchange gives every thread one place in one queue; only the "
     "head is inside, and it wakes exactly one node",
     "No deadlock: the holder always hands over — to the next node, or resets tail "
     "when nobody waits",
     "release() waits for a waiter that has swapped tail but not linked in yet",
-    f"Measured: all {len(mcs)} runs (1–8 threads, all CPUs and one CPU) finished with lost = 0",
+    f"No violation observed in {len(mcs)} runs (1–8 threads, all CPUs and one CPU): "
+    f"lost = 0, every run finished",
 ], size=17)
 code(s, 5.6, 1.6, 7.3, 5.5, cut(SRC / "3_mcs.c", r"^void lock_release"))
 
@@ -549,10 +596,13 @@ text(s, 7.9, 1.7, 5.0, 5.3, [
     "descheduled",
 ], size=18)
 
+m1 = first_run("mcs", 8, "one-cpu")
 s = new_slide("MCS: Fairness and Limitations",
               "The queue makes MCS first-come, first-served: it was the fairest lock we measured "
-              "at eight threads. It needs a node per waiting thread and an atomic exchange, and "
-              "like every spin lock it suffers when the next thread in line is not running.")
+              "at eight threads on all CPUs. That order is a property of the algorithm. On one "
+              "CPU the acquisition counts were very unequal, but that is the scheduler: a queued "
+              "thread that is not running cannot take its turn. MCS needs a node per waiting "
+              "thread and an atomic exchange.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
     f"First-come, first-served through the queue: fairness {fair('mcs', 2):.2f} / "
     f"{fair('mcs', 4):.2f} / {fair('mcs', 8):.2f} at 2/4/8 threads (all CPUs) — the fairest "
@@ -562,7 +612,8 @@ text(s, 0.9, 1.7, 11.8, 5.4, [
     ("One queue node per waiting thread, passed in or kept per thread", 1),
     ("A preempted waiter stalls everyone behind it — the kernel disables preemption", 1),
     (f"On one CPU here: {rate(tp('mcs', 8, 'one-cpu'))} acq/s at 8 threads, fairness "
-     f"{fair('mcs', 8, 'one-cpu'):.2f}", 1),
+     f"{fair('mcs', 8, 'one-cpu'):.2f} (run 1: {min(m1['counts']):,} vs {max(m1['counts']):,}) — "
+     f"the scheduler, not the queue order", 1),
 ], size=20)
 
 # ============================================================== comparison
@@ -581,32 +632,33 @@ section("Comparison: Throughput",
         "Now the three locks side by side, with two locks from the lecture as references.")
 
 s = new_slide(f"Throughput on All {NCPU} CPUs",
-              f"With one thread nobody waits, so the simplest locks, test-and-set and LL/SC, "
-              f"are fastest. As threads are added every spin lock slows down, because the "
+              f"With one thread nobody waits, so the simplest locks, test-and-set and the CAS "
+              f"spin lock, are fastest. As threads are added every spin lock slows down, because the "
               f"threads fight over shared cache lines. pthread_mutex was the fastest lock at "
               f"eight threads.")
 chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
       [(LABEL[l], [mps(l, t, "all-cpus") for t in THREADS]) for l in LOCKS], "threads")
 lead1 = sorted(LOCKS, key=lambda l: -tp(l, 1))[:2]
 text(s, 8.4, 1.7, 4.5, 5.3, [
-    f"1 thread, no contention: {short(lead1[0])} {rate(tp(lead1[0], 1))} and "
+    f"Medians of {REPS} runs. 1 thread, no contention: {short(lead1[0])} {rate(tp(lead1[0], 1))} and "
     f"{short(lead1[1])} {rate(tp(lead1[1], 1))} acq/s are fastest",
     "More threads: every spin lock slows down as threads fight over cache lines",
-    f"8 threads: MCS {rate(tp('mcs', 8))}, LL/SC {rate(tp('llsc', 8))}, "
+    f"8 threads: MCS {rate(tp('mcs', 8))}, CAS spin {rate(tp('llsc', 8))}, "
     f"TAS {rate(tp('tas', 8))} acq/s",
     (f"Fastest at 8 threads: pthread_mutex, {rate(tp('mutex', 8))} acq/s", 0, ACCENT),
 ], size=17)
 
 s = new_slide("Throughput on One CPU",
-              "Pinned to one CPU, the picture changes. Test-and-set and LL/SC stay fast only "
-              "because one thread keeps the lock for its whole time slice while the others "
-              "starve. Peterson and MCS hand the lock to a thread that is not running, so they "
-              "collapse. The mutex puts waiters to sleep and keeps its speed.")
+              "Pinned to one CPU, the picture changes. Test-and-set and the CAS spin lock stay "
+              "fast only because one thread keeps the lock for its whole time slice while the "
+              "others get almost nothing. Peterson and MCS hand the lock to a thread that is "
+              "not running, so they collapse. The mutex puts waiters to sleep and keeps its "
+              "speed. These one-CPU numbers vary a lot between runs, as the variation slide shows.")
 chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.LINE_MARKERS, cats,
       [(LABEL[l], [mps(l, t, "one-cpu") for t in THREADS]) for l in LOCKS], "threads")
 text(s, 8.4, 1.7, 4.5, 5.3, [
-    f"TAS / LL/SC stay fast ({rate(tp('tas', 8, 'one-cpu'))} / {rate(tp('llsc', 8, 'one-cpu'))} "
-    f"at 8 threads), but one thread holds on while the others starve",
+    f"TAS / CAS spin stay fast ({rate(tp('tas', 8, 'one-cpu'))} / {rate(tp('llsc', 8, 'one-cpu'))} "
+    f"at 8 threads), but one thread holds on while the others get almost nothing",
     f"Peterson and MCS hand the lock to a thread that is not running: "
     f"{rate(tp('peterson', 2, 'one-cpu'))} (Peterson, 2 thr), "
     f"{rate(tp('mcs', 8, 'one-cpu'))} (MCS, 8 thr)",
@@ -619,34 +671,44 @@ section("Comparison: Summary",
 
 pet_bench = [r for (l, _, _), rs in B.items() if l == "peterson" for r in rs]
 s = new_slide("Correctness: Mutual Exclusion and Deadlock",
-              "Every lock passed both correctness metrics in every run: no update was lost, and "
-              "every run finished. The one exception is the deliberate one, Peterson without "
-              "its memory fence, which lost updates on every multi-CPU run.")
+              "For every lock we observed no violation of either correctness metric: no update "
+              "was lost and every run finished. That is what the runs showed, not a proof. The "
+              "one exception is the deliberate one, Peterson without its memory fence, which "
+              "lost updates on every multi-CPU run.")
 rows = [["Lock", "Runs", "Lost updates", "Runs finished", "Also tested"]]
 extra = {
-    "peterson": f"no fence: lost updates in {sum(r['lost'] > 0 for r in nofence)} / "
+    "peterson": f"volatile, no fence: lost updates in {sum(r['lost'] > 0 for r in nofence)} / "
                 f"{len(nofence)} runs",
-    "llsc": f"real ldaxr/stxr under qemu: lost = 0 in "
+    "llsc": f"x86 = CAS proxy; real ldaxr/stxr under qemu: lost = 0 in "
             f"{sum(r['lost'] == 0 for r in arm)} / {len(arm)} runs",
     "mcs": "", "tas": "", "mutex": "",
 }
 for l in LOCKS:
     rs = [r for (k, _, _), v in B.items() if k == l for r in v]
     if l == "peterson":
-        rs += fenced
+        rs += fenced + atomic
     rows.append([short(l), str(len(rs)), f"{sum(r['lost'] for r in rs):,}",
                  f"{len(rs)} / {len(rs)}", extra[l]])
-table(s, 0.5, 1.7, 12.3, rows, [2.2, 1.0, 1.7, 1.8, 5.6], size=15, row_h=0.55)
+table(s, 0.5, 1.7, 12.3, rows, [3.2, 0.9, 1.5, 1.6, 5.1], size=14, row_h=0.55)
 text(s, 0.5, 1.7 + 0.55 * len(rows) + 0.4, 12.3, 1.5, [
-    "Mutual exclusion: lost = total acquisitions − counter, summed over all runs",
-    ("Peterson is correct on x86 only with the fence", 0, ACCENT),
+    "Mutual exclusion: lost = total acquisitions − counter, summed over all runs of the correct builds",
+    ("Peterson held on x86 only with the fence (or _Atomic seq_cst)", 0, ACCENT),
 ], size=16)
 
+def counts_text(lock):
+    """Fewest and most acquisitions in run 1 on one CPU, at the lock's most threads."""
+    r = first_run(lock, most(lock), "one-cpu")
+    return f"{min(r['counts']):,} vs {max(r['counts']):,}"
+
+
+zero = sum(min(r["counts"]) == 0 for rs in B.values() for r in rs)
 s = new_slide("Fairness",
               f"Fairness is the fewest acquisitions of any thread divided by the most. On all "
               f"CPUs the MCS queue was the fairest lock at eight threads. On one CPU every spin "
-              f"lock let some thread starve, even the fair ones, because who gets in follows "
-              f"the scheduler. Only the mutex stayed fair.")
+              f"lock showed severe acquisition imbalance during the measurement window. That "
+              f"does not prove starvation: a thread that got one acquisition shows as 0.00 "
+              f"here. Whether the algorithm is FIFO or has bounded waiting is a separate "
+              f"question from what the scheduler did in one second.")
 chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.COLUMN_CLUSTERED,
       [f"{short(l)} ({most(l)} thr)" for l in LOCKS],
       # rounded here so the bar labels match the text, which uses the same rounding
@@ -657,20 +719,47 @@ chart(s, 0.5, 1.5, 7.6, 5.6, XL_CHART_TYPE.COLUMN_CLUSTERED,
 text(s, 8.4, 1.7, 4.5, 5.3, [
     f"All CPUs: MCS {fair('mcs', 8):.2f} is the fairest at 8 threads — its queue is "
     f"first-come, first-served",
-    f"TAS {fair('tas', 8):.2f}, LL/SC {fair('llsc', 8):.2f}: whoever wins the race gets in",
-    ("One CPU: every spin lock lets a thread starve (the bars near 0) — the scheduler "
-     "decides who gets in", 0, ACCENT),
-    f"Only pthread_mutex stays fair on one CPU: {fair('mutex', 8, 'one-cpu'):.2f}",
-], size=17)
+    f"TAS {fair('tas', 8):.2f}, CAS spin {fair('llsc', 8):.2f}: whoever wins the race gets in",
+    ("One CPU: severe imbalance for every spin lock — the scheduler decides who runs, "
+     f"e.g. MCS {counts_text('mcs')}, TAS {counts_text('tas')} acquisitions (run 1, fewest vs most)",
+     0, ACCENT),
+    f"Only pthread_mutex stays balanced on one CPU: {fair('mutex', 8, 'one-cpu'):.2f}",
+    f"Thread-runs with zero acquisitions: {zero} of "
+    f"{sum(len(r['counts']) for rs in B.values() for r in rs)}",
+], size=16)
+
+def spread(lock, t, mode):
+    xs = [r["throughput"] for r in B[(lock, t, mode)]]
+    return max(xs) / min(xs)
+
+
+s = new_slide("Run-to-Run Variation",
+              f"A median hides how much runs differ. Here are the slowest and fastest of {REPS} "
+              f"runs for each lock. The spread shows how far one number can be trusted, so we "
+              f"read the results as the shape of the behaviour, not as values that would "
+              f"repeat exactly.")
+rows = [["Lock (threads)", "CPUs", "slowest run", "median", "fastest run", "max ÷ min"]]
+for mode, name in (("all-cpus", f"all {NCPU}"), ("one-cpu", "one")):
+    for l in LOCKS:
+        t = most(l)
+        rows.append([f"{short(l)} ({t})", name,
+                     rate(min(r["throughput"] for r in B[(l, t, mode)])),
+                     rate(tp(l, t, mode)),
+                     rate(max(r["throughput"] for r in B[(l, t, mode)])),
+                     f"{spread(l, t, mode):.1f}×"])
+table(s, 0.5, 1.5, 12.3, rows, [4.3, 1.4, 1.6, 1.6, 1.6, 1.8], size=13, row_h=0.43)
+text(s, 0.5, 1.5 + 0.43 * len(rows) + 0.15, 12.3, 0.8, [
+    f"acq/s per run; {REPS} runs per setting, no confidence intervals",
+], size=14)
 
 s = new_slide("Summary",
               "This table puts the three locks and the two references on one page, each at the "
-              "most threads it supports. Peterson is fair but limited to two threads, the simple "
-              "hardware spin locks are unfair, and the MCS queue is fair at every thread count "
-              "we ran.")
+              "most threads it supports. Peterson is balanced but limited to two threads, the "
+              "simple spin locks are unbalanced, and the MCS queue was balanced at every thread "
+              "count we ran on all CPUs. The CAS spin lock is the x86 proxy for LL/SC.")
 rows = [["Lock", "Needs", "Mutual excl.", "Deadlock-free", "Fairness",
          f"acq/s, all {NCPU} CPUs", "acq/s, one CPU"]]
-needs = {"peterson": "loads/stores + fence", "llsc": "LL/SC instructions",
+needs = {"peterson": "loads/stores + seq_cst", "llsc": "CAS (LL/SC on Arm)",
          "mcs": "atomic exchange + CAS", "tas": "test-and-set", "mutex": "atomics + futex"}
 for l in LOCKS:
     t = most(l)
@@ -679,24 +768,28 @@ for l in LOCKS:
 table(s, 0.5, 1.6, 12.3, rows, [2.6, 2.6, 1.4, 1.5, 1.2, 1.6, 1.4], size=14, row_h=0.45)
 text(s, 0.5, 1.6 + 0.45 * len(rows) + 0.4, 12.3, 1.5, [
     "Fairness = fewest ÷ most acquisitions per thread; medians of "
-    f"{REPS} runs of {SECS} s",
-    ("Peterson gives mutual exclusion on x86 only with the fence", 0, ACCENT),
+    f"{REPS} runs of {SECS} s; mutual exclusion and deadlock: no violation observed",
+    "CAS spin lock = x86 stand-in for LL/SC: its speed is not the speed of LL/SC hardware",
+    ("Peterson held on x86 only with the fence (or _Atomic seq_cst)", 0, ACCENT),
 ], size=16)
 
 section("Conclusion",
         "Last part: what the measurements tell us, and where the material comes from.")
 s = new_slide("Conclusion",
-              "All three locks provide mutual exclusion and avoid deadlock, but Peterson only "
-              "does so on today's CPUs with a memory fence. Peterson is fair but limited to two "
-              "threads; LL/SC is short and fast but unfair; the MCS queue is fair for any number "
-              "of threads and is what Linux builds its spinlock on. When threads can be "
-              "preempted, sleeping locks such as pthread_mutex win.")
+              "Each lock has an argument for mutual exclusion and deadlock freedom, and in our "
+              "runs we observed no violation, though Peterson needs sequential consistency, a "
+              "fence on today's x86. Peterson is balanced but limited to two threads; LL/SC is "
+              "short and, as a CAS spin lock on x86, fast but unbalanced; the MCS queue is "
+              "first-come, first-served for any number of threads and is what Linux builds its "
+              "spinlock on. When threads can be preempted, sleeping locks such as pthread_mutex "
+              "win. Our numbers compare locks with each other on one WSL2 machine.")
 text(s, 0.9, 1.7, 11.8, 5.4, [
-    "All three give mutual exclusion and no deadlock — Peterson only with a fence on modern CPUs",
-    "Peterson: software only and fair (bounded waiting), but two threads only",
-    "Hardware LL/SC: one short loop, fast, but no fairness and not on x86",
+    f"Arguments plus no violation observed in {N_GOOD} runs — Peterson only with sequential consistency (a fence on x86)",
+    "Peterson: software only, bounded waiting, but two threads only",
+    "LL/SC: one short loop; our x86 numbers are a CAS proxy; no queue, so unbalanced",
     "MCS: a queue gives first-come, first-served for any number of threads; Linux builds on it",
     "Spinning on one CPU wastes time slices; sleeping locks (futex, pthread_mutex) avoid it",
+    f"Limits: WSL2 vCPUs, tiny critical section, {REPS} × {SECS} s runs; some results vary widely",
 ], size=20)
 
 s = new_slide("References",
