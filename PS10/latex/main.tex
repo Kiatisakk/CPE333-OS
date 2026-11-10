@@ -38,12 +38,13 @@
       \begin{itemize}
         \item Making a cigarette needs \textbf{tobacco}, \textbf{paper} and \textbf{matches}.
         \item Three smokers each hold an unlimited supply of \emph{one} ingredient.
-        \item An \textbf{agent} holds all three. It repeatedly puts two different
+        \item An \textbf{agent} (a dealer that supplies ingredients, like
+              the OS) holds all three. It repeatedly puts two different
               ingredients on the table, then waits for a smoker to finish.
         \item The smoker holding the third ingredient should take both, smoke,
               and wake the agent.
-        \item \textbf{Constraint:} the agent's code is fixed (it stands for the OS);
-              only the smokers may be written.
+        \item \textbf{Constraint:} the agent's code is fixed; only the
+              smokers may be written.
       \end{itemize}
       \vspace{0.3em}
       {\footnotesize Patil posed it to argue that semaphores (P/V) are too weak
@@ -176,6 +177,30 @@ makeCigarette(); agentSem.signal(); smoke()
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
+      % The naive deadlock: P_p holds fork p (solid) and waits for fork p+1
+      % (dashed). Fork p sits between P_{p-1} and P_p.
+      \begin{tikzpicture}[scale=0.41,>=stealth,
+          phil/.style={circle,draw=phil,fill=phil!10,thick,minimum size=5mm,
+                       inner sep=0pt,font=\tiny\bfseries},
+          fork/.style={rectangle,rounded corners=1pt,draw=ink,fill=white,
+                       inner sep=0.8pt,font=\tiny}]
+        \draw[draw=muted,fill=codebg] (0,0) circle (1.0);
+        \foreach \p in {0,...,4} {
+          \node[phil] (P\p) at ({90-72*\p}:2.7) {P\p};
+          \node[fork] (F\p) at ({126-72*\p}:1.0) {f\p};
+        }
+        \foreach \p in {0,...,4} {
+          \pgfmathtruncatemacro{\q}{mod(\p+1,5)}
+          \draw[->,semithick,ink,shorten >=1pt] (P\p) -- (F\p);
+          \draw[->,semithick,densely dashed,phil,shorten >=1pt] (P\p) -- (F\q);
+        }
+        \node[anchor=west,align=left,font=\scriptsize,text width=2.9cm]
+          at (3.6,0) {All take the left fork:\\
+            \textcolor{ink}{\rule[0.5ex]{1.2em}{0.8pt}} holds\\
+            \textcolor{phil}{\rule[0.5ex]{0.35em}{0.8pt}\,\rule[0.5ex]{0.35em}{0.8pt}\,\rule[0.5ex]{0.35em}{0.8pt}} waits for\\
+            \textbf{a cycle: deadlock}};
+      \end{tikzpicture}
+
       {\footnotesize\color{muted} Breaking the circular wait (Lecture~10)~[6]}
 \begin{lstlisting}
 int left(int p)  { return p; }

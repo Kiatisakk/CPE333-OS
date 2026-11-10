@@ -82,6 +82,11 @@ try {
     Write-Host "OK  $pages"
     Write-Host "    overfull/underfull boxes: $($warn.Count)"
     Write-Host "    output: $pdf"
+
+    # The copy to hand in, named for the submission.
+    $submit = Join-Path (Split-Path -Parent $latexDir) "PS10_DiningPhilosophers_vs_CigaretteSmokers.pdf"
+    Copy-Item -LiteralPath $pdf -Destination $submit -Force
+    Write-Host "    submit: $submit"
 }
 finally {
     Pop-Location
