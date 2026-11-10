@@ -1,0 +1,41 @@
+% Beamer setup for PS10. Hand-edited.
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% The sheet's own colours: philosophers in red, smokers in blue.
+\definecolor{phil}{HTML}{C00000}
+\definecolor{smok}{HTML}{0070C0}
+\definecolor{ink}{HTML}{222222}
+\definecolor{muted}{HTML}{666666}
+\definecolor{codebg}{HTML}{F4F4F4}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{normal text}{fg=ink}
+\setbeamercolor{frametitle}{fg=ink}
+\setbeamercolor{structure}{fg=smok}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\setbeamertemplate{itemize items}{\textbullet}
+\setbeamertemplate{footline}{%
+  \hfill{\scriptsize\color{muted}\insertframenumber\ /\ \inserttotalframenumber}\hspace{1.2em}\vspace{0.8em}}
+
+\newcommand{\Smk}{\textcolor{smok}{\textbf{Cigarette Smokers}}}
+\newcommand{\Dph}{\textcolor{phil}{\textbf{Dining Philosophers}}}
+
+\lstdefinestyle{pseudo}{
+  basicstyle=\ttfamily\scriptsize,
+  backgroundcolor=\color{codebg},
+  frame=none,
+  xleftmargin=0.4em, xrightmargin=0.4em,
+  aboveskip=0.3em, belowskip=0.3em,
+  columns=fullflexible, keepspaces=true,
+  keywordstyle=\bfseries,
+  morekeywords={if,elif,else,while,return,void,int},
+  commentstyle=\color{muted}\itshape,
+  morecomment=[l]{//},
+}
+\lstset{style=pseudo}

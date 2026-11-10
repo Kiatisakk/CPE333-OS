@@ -21,3 +21,6 @@ __pycache__/
 # Office lock files and Windows shortcuts
 ~$*
 *.lnk
+*.nav
+*.snm
+*.vrb
