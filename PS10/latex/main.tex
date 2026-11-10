@@ -14,7 +14,7 @@
 
 % ------------------------------------------------------------- cover ---
 {\setbeamertemplate{footline}{}
-\begin{frame}[noframenumbering]
+\begin{frame}
   \centering
   \vspace{1.2em}
   {\small\color{muted} CPE 333 Operating Systems, 1/2026 \quad\textbullet\quad Problem Session 10}\\[1.6em]
@@ -31,7 +31,7 @@
 }
 
 % ------------------------------------------------------ 1. the problem ---
-\begin{frame}[fragile]{1.\ The \Smk{} problem (Patil, 1971)}
+\begin{frame}[fragile]{The \Smk{} problem (Patil, 1971)}
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \small
@@ -71,7 +71,8 @@ paper.signal()
 \end{frame}
 
 % ------------------------------------------- 2. the obvious attempt ---
-\begin{frame}[fragile]{2.\ Why the obvious solution deadlocks}
+\begin{frame}[fragile]{Why the obvious solution deadlocks}
+  \label{naive}
   \begin{columns}[T]
     \begin{column}{0.40\textwidth}
 \begin{lstlisting}
@@ -112,7 +113,7 @@ agentSem.signal()
 \end{frame}
 
 % ----------------------------------------------------- 3. pushers ---
-\begin{frame}[fragile]{3.\ A solution: pushers decide who smokes}
+\begin{frame}[fragile]{A solution: pushers decide who smokes}
   \begin{columns}[T]
     \begin{column}{0.53\textwidth}
 \begin{lstlisting}
@@ -157,7 +158,7 @@ makeCigarette(); agentSem.signal(); smoke()
 \end{frame}
 
 % --------------------------------------- 4. dining philosophers recap ---
-\begin{frame}[fragile]{4.\ The \Dph{} (Dijkstra, 1971)}
+\begin{frame}[fragile]{The \Dph{} (Dijkstra, 1971)}
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
       \small
@@ -221,7 +222,7 @@ void getforks(int p) {
 \end{frame}
 
 % ------------------------------------------------- 5. comparison table ---
-\begin{frame}{5.\ The two problems side by side}
+\begin{frame}{The two problems side by side}
   \footnotesize
   \renewcommand{\arraystretch}{1.25}
   \begin{tabular}{@{}>{\bfseries}p{0.17\textwidth}p{0.385\textwidth}p{0.385\textwidth}@{}}
@@ -247,11 +248,11 @@ void getforks(int p) {
 \end{frame}
 
 % ------------------------------------- 6. why the fixes do not transfer ---
-\begin{frame}{6.\ Why the philosophers' fixes do not save the smokers}
+\begin{frame}{Why the philosophers' fixes do not save the smokers}
   \small
   \begin{itemize}
     \item \textbf{Resource ordering.} Order the ingredients
-          tobacco $<$ paper $<$ match. The code on slide~2 already acquires
+          tobacco $<$ paper $<$ match. The code on page~\pageref{naive} already acquires
           in that order, and it still deadlocks. Ordering breaks a cycle of
           processes \emph{holding} resources; here the missing ingredient is
           held by no one: the agent never produces it.
@@ -268,7 +269,7 @@ void getforks(int p) {
 \end{frame}
 
 % ------------------------------------------------------ 7. conclusion ---
-\begin{frame}{7.\ Conclusion}
+\begin{frame}{Conclusion}
   \small
   \begin{itemize}
     \item Both problems deadlock when a process takes one resource and waits
@@ -287,8 +288,7 @@ void getforks(int p) {
 \end{frame}
 
 % ------------------------------------------------------- references ---
-{\setbeamertemplate{footline}{}
-\begin{frame}[noframenumbering]{References}
+\begin{frame}{References}
   \scriptsize
   \begin{enumerate}
     \item[{[1]}] S.\,S. Patil, ``Limitations and capabilities of Dijkstra's
@@ -310,6 +310,5 @@ void getforks(int p) {
       and Deadlock, 1/2026, slides 9--21.
   \end{enumerate}
 \end{frame}
-}
 
 \end{document}
