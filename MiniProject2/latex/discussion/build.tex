@@ -7,7 +7,8 @@ the type information used by BPF tools. The module is not signed and is built
 outside the kernel tree; the kernel loads it because signatures are not
 enforced, but marks itself tainted. \texttt{/proc/sys/kernel/tainted} reads
 \Tainted{}: 4096 for an out-of-tree module and 8192 for an unsigned one, both
-from \texttt{pfcount}, plus 16384 for the soft lockups the kernel reported
-while booting, before the module was loaded. Those come from the slow
-virtualisation of this VM (Mini-Project~1), not from the module. The test programs
+from \texttt{pfcount}\ifnum\Tainted>12288{}, plus 16384 for the soft lockups
+the kernel reported while booting, before the module was loaded. Those come
+from the slow virtualisation of this VM (Mini-Project~1), not from the
+module\fi. The test programs
 compile without warnings under \texttt{-Wall -Wextra}.

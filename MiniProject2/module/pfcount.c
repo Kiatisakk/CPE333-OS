@@ -38,14 +38,19 @@
 #include <linux/sched/signal.h>
 #include <linux/sched/task.h>
 #include <linux/seq_file.h>
+#include <linux/seqlock.h>
 #include <linux/string.h>
 #include <linux/tracepoint.h>
 #include <linux/uaccess.h>
 
-static DEFINE_MUTEX(pfcount_lock);	/* serialises target changes and reads */
-static struct pid *target;		/* thread group monitored, or NULL */
-static unsigned long base_min, base_maj; /* lifetime totals when it began */
-static atomic64_t seen_user, seen_kernel; /* tracepoint hits since then */
+/* Serialises changes of the monitored process and reads of /proc files. */
+static DEFINE_MUTEX(pfcount_lock);
+/* Thread group being monitored, or NULL. */
+static struct pid *monitored;
+/* Its lifetime fault totals when monitoring began. */
+static unsigned long start_min, start_maj;
+/* Tracepoint hits since then. */
+static atomic64_t seen_user, seen_kernel;
 
 static struct tracepoint *tp_user, *tp_kernel;
 
@@ -61,7 +66,7 @@ static struct tracepoint *tp_user, *tp_kernel;
 static void on_fault(void *data, unsigned long address,
 		     struct pt_regs *regs, unsigned long error_code)
 {
-	if (task_tgid(current) == READ_ONCE(target))
+	if (task_tgid(current) == READ_ONCE(monitored))
 		atomic64_inc(data);
 }
 
@@ -78,20 +83,29 @@ static void find_tracepoint(struct tracepoint *tp, void *priv)
 /*
  * Lifetime fault totals of a whole thread group, summed the way
  * /proc/<pid>/stat sums them: what exited threads left in signal_struct,
- * plus every live thread's own counter.
+ * plus every live thread's own counter. A thread that exits moves its
+ * counts into signal_struct and leaves the thread list inside one write
+ * section of stats_lock (__exit_signal() in kernel/exit.c), so the sum is
+ * retried until no exit happened during it; otherwise that thread could be
+ * counted twice or not at all.
  */
 static void group_faults(struct task_struct *task, unsigned long *min,
 			 unsigned long *maj)
 {
+	struct signal_struct *sig = task->signal;
 	struct task_struct *t;
+	unsigned int seq;
 
-	*min = task->signal->min_flt;
-	*maj = task->signal->maj_flt;
 	rcu_read_lock();
-	for_each_thread(task, t) {
-		*min += t->min_flt;
-		*maj += t->maj_flt;
-	}
+	do {
+		seq = read_seqbegin(&sig->stats_lock);
+		*min = sig->min_flt;
+		*maj = sig->maj_flt;
+		for_each_thread(task, t) {
+			*min += t->min_flt;
+			*maj += t->maj_flt;
+		}
+	} while (read_seqretry(&sig->stats_lock, seq));
 	rcu_read_unlock();
 }
 
@@ -103,19 +117,20 @@ static unsigned long rss_pages(struct mm_struct *mm)
 	       get_mm_counter_sum(mm, MM_SHMEMPAGES);
 }
 
-/* The monitored task with a reference held, or NULL. Call under pfcount_lock. */
-static struct task_struct *target_task(struct seq_file *m)
+/* The monitored task with a reference held, or NULL if there is none. */
+static struct task_struct *get_monitored_task(void)
 {
-	struct task_struct *task;
+	lockdep_assert_held(&pfcount_lock);
+	return monitored ? get_pid_task(monitored, PIDTYPE_TGID) : NULL;
+}
 
-	if (!target) {
+/* Explain to the reader why get_monitored_task() returned NULL. */
+static void say_why_no_task(struct seq_file *m)
+{
+	if (!monitored)
 		seq_puts(m, "not monitoring: echo <pid> > /proc/pfcount\n");
-		return NULL;
-	}
-	task = get_pid_task(target, PIDTYPE_TGID);
-	if (!task)
-		seq_printf(m, "pid %d has exited\n", pid_nr(target));
-	return task;
+	else
+		seq_printf(m, "pid %d has exited\n", pid_nr(monitored));
 }
 
 /* ----------------------------------------------------- /proc/pfcount --- */
@@ -130,9 +145,11 @@ static int summary_show(struct seq_file *m, void *v)
 	int threads;
 
 	mutex_lock(&pfcount_lock);
-	task = target_task(m);
-	if (!task)
+	task = get_monitored_task();
+	if (!task) {
+		say_why_no_task(m);
 		goto out;
+	}
 
 	mm = get_task_mm(task);
 	if (mm) {
@@ -153,7 +170,7 @@ static int summary_show(struct seq_file *m, void *v)
 	user = atomic64_read(&seen_user);
 	kernel = atomic64_read(&seen_kernel);
 
-	seq_printf(m, "pid %d (%s), %d thread%s\n", pid_nr(target), task->comm,
+	seq_printf(m, "pid %d (%s), %d thread%s\n", pid_nr(monitored), task->comm,
 		   threads, threads == 1 ? "" : "s");
 	seq_printf(m, "  memory regions       : %lu\n", regions);
 	seq_printf(m, "  total virtual space  : %lu kB (%lu pages)\n",
@@ -166,7 +183,7 @@ static int summary_show(struct seq_file *m, void *v)
 	seq_printf(m, "    faults seen        : %-8ld (%ld user mode, %ld kernel mode)\n",
 		   user + kernel, user, kernel);
 	seq_printf(m, "    minor / major      : %lu / %lu\n",
-		   min - base_min, maj - base_maj);
+		   min - start_min, maj - start_maj);
 	put_task_struct(task);
 out:
 	mutex_unlock(&pfcount_lock);
@@ -200,34 +217,35 @@ static ssize_t summary_write(struct file *file, const char __user *buf,
 		put_pid(pid);
 		if (!task)
 			return -ESRCH;
-		tgid = get_pid(task_tgid(task));	/* a thread id counts too */
+		/* A thread id selects the process it belongs to. */
+		tgid = get_pid(task_tgid(task));
 		put_task_struct(task);
 	}
 
 	mutex_lock(&pfcount_lock);
-	if (tgid && tgid == target) {
+	if (tgid && tgid == monitored) {
 		mutex_unlock(&pfcount_lock);
 		put_pid(tgid);
 		return len;
 	}
-	old = target;
+	old = monitored;
 	/*
 	 * Detach first, and wait until no probe can still be counting for
-	 * the old target, so the reset below starts from a clean zero.
+	 * the old process, so the reset below starts from a clean zero.
 	 */
-	WRITE_ONCE(target, NULL);
+	WRITE_ONCE(monitored, NULL);
 	synchronize_rcu();
 	atomic64_set(&seen_user, 0);
 	atomic64_set(&seen_kernel, 0);
-	base_min = base_maj = 0;
+	start_min = start_maj = 0;
 	if (tgid) {
 		task = get_pid_task(tgid, PIDTYPE_TGID);
 		if (task) {
-			group_faults(task, &base_min, &base_maj);
+			group_faults(task, &start_min, &start_maj);
 			put_task_struct(task);
 		}
 	}
-	WRITE_ONCE(target, tgid);
+	WRITE_ONCE(monitored, tgid);
 	mutex_unlock(&pfcount_lock);
 	put_pid(old);
 	return len;
@@ -246,11 +264,15 @@ static const struct proc_ops summary_ops = {
 /* The name /proc/<pid>/maps would show; anonymous regions have none. */
 static void region_name(struct seq_file *m, struct vm_area_struct *vma)
 {
+	/* Special mappings such as [vdso] and [vvar] name themselves. */
+	const char *special = vma->vm_ops && vma->vm_ops->name ?
+			      vma->vm_ops->name(vma) : NULL;
+
 	if (vma->vm_file) {
 		seq_puts(m, "  ");
 		seq_file_path(m, vma->vm_file, "\n");
-	} else if (vma->vm_ops && vma->vm_ops->name && vma->vm_ops->name(vma)) {
-		seq_printf(m, "  %s", vma->vm_ops->name(vma));	/* [vdso], [vvar] */
+	} else if (special) {
+		seq_printf(m, "  %s", special);
 	} else if (vma_is_initial_heap(vma)) {
 		seq_puts(m, "  [heap]");
 	} else if (vma_is_initial_stack(vma)) {
@@ -265,9 +287,11 @@ static int regions_show(struct seq_file *m, void *v)
 	struct vm_area_struct *vma;
 
 	mutex_lock(&pfcount_lock);
-	task = target_task(m);
-	if (!task)
+	task = get_monitored_task();
+	if (!task) {
+		say_why_no_task(m);
 		goto out;
+	}
 	mm = get_task_mm(task);
 	put_task_struct(task);
 	if (mm) {
@@ -330,16 +354,13 @@ static int __init pfcount_init(void)
 	if (err)
 		return err;
 	err = tracepoint_probe_register(tp_kernel, on_fault, &seen_kernel);
-	if (err) {
-		tracepoint_probe_unregister(tp_user, on_fault, &seen_user);
-		tracepoint_synchronize_unregister();
-		return err;
-	}
+	if (err)
+		goto detach_user;
 
 	/* Root only: these files expose any process's address space. */
 	err = -ENOMEM;
 	if (!proc_create("pfcount", 0600, NULL, &summary_ops))
-		goto detach;
+		goto detach_both;
 	if (!proc_create("pfcount_regions", 0400, NULL, &regions_ops))
 		goto remove_summary;
 	pr_info("attached to tracepoints %s and %s\n",
@@ -348,8 +369,11 @@ static int __init pfcount_init(void)
 
 remove_summary:
 	remove_proc_entry("pfcount", NULL);
-detach:
-	detach_probes();
+detach_both:
+	tracepoint_probe_unregister(tp_kernel, on_fault, &seen_kernel);
+detach_user:
+	tracepoint_probe_unregister(tp_user, on_fault, &seen_user);
+	tracepoint_synchronize_unregister();
 	return err;
 }
 
@@ -358,7 +382,7 @@ static void __exit pfcount_exit(void)
 	remove_proc_entry("pfcount_regions", NULL);
 	remove_proc_entry("pfcount", NULL);
 	detach_probes();
-	put_pid(target);
+	put_pid(monitored);
 	pr_info("detached\n");
 }
 

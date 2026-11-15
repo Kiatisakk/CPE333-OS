@@ -111,6 +111,9 @@ the counters while nothing is running and then send `SIGCONT`.
    follows.
 5. **Residency** (`1_touch`): virtual size constant across stages, RSS grows by
    the pages touched; RSS equals field 2 of `/proc/<pid>/statm`.
+   *Changed in implementation:* RSS is compared with `Rss` in
+   `/proc/<pid>/smaps_rollup` instead, because `statm` reads the per-CPU RSS
+   counters approximately and can lag the module's exact sum.
 
 The script exits 1 when any assertion fails. Exact figures in the report are
 read from `results/` at build time.

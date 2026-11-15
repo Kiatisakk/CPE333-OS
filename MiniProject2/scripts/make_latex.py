@@ -115,10 +115,12 @@ def numbers():
     n = {}
     n["KernelRelease"] = output_of(BUILD, r"uname -r")[0]
     n["Tainted"] = output_of(BUILD, r"cat /proc/sys/kernel/tainted")[0]
-    # build.tex explains the value as these three bits: out-of-tree (O),
-    # unsigned (E) and soft lockup (L). Stop if that is no longer the value.
-    if int(n["Tainted"]) != 4096 + 8192 + 16384:
-        die("taint is %s; build.tex explains 28672 -- rewrite it" % n["Tainted"])
+    # build.tex explains the value as out-of-tree (O) plus unsigned (E), and
+    # adds soft lockup (L) only when that bit is set: the VM's boot sets it
+    # on some boots and not others. Stop on any other value.
+    if int(n["Tainted"]) not in (4096 + 8192, 4096 + 8192 + 16384):
+        die("taint is %s; build.tex explains only 12288 and 28672"
+            % n["Tainted"])
 
     one = summaries(REGIONS)[0]
     maps = output_of(REGIONS, r"cat /proc/\d+/maps")

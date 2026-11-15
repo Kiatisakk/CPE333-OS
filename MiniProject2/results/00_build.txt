@@ -23,14 +23,12 @@ make: Leaving directory '/home/builder/mp2/module'
 # gcc -Wall -Wextra -fsyntax-only src/*.c
 # insmod module/pfcount.ko
 # cat /proc/sys/kernel/tainted
-28672
+12288
 # dmesg | grep -E "soft lockup -|taints kernel|tainting kernel" | sed "s/^\[ *[0-9.]*\] //"
-watchdog: BUG: soft lockup - CPU#5 stuck for 22s! [swapper/5:0]
-watchdog: BUG: soft lockup - CPU#2 stuck for 22s! [swapper/0:1]
 pfcount: loading out-of-tree module taints kernel.
 pfcount: module verification failed: signature and/or required key missing - tainting kernel
 # dmesg | grep "pfcount: attached" | tail -1 | sed "s/^\[ *[0-9.]*\] //"
 pfcount: attached to tracepoints page_fault_user and page_fault_kernel
 # ls -l /proc/pfcount /proc/pfcount_regions
--rw------- 1 root root 0 Nov 15 02:09 /proc/pfcount
--r-------- 1 root root 0 Nov 15 02:09 /proc/pfcount_regions
+-rw------- 1 root root 0 Nov 15 07:05 /proc/pfcount
+-r-------- 1 root root 0 Nov 15 07:05 /proc/pfcount_regions

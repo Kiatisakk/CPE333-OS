@@ -34,8 +34,8 @@ T=/dev/null                          # the transcript being written
 
 begin() { T=$R/$1; : > "$T"; }
 
-# show <command>: record "# command" and its output in the transcript.
-show() {
+# record <command>: record "# command" and its output in the transcript.
+record() {
     printf '# %s\n' "$*" >> "$T"
     bash -c "$*" >> "$T" 2>&1
 }
@@ -66,20 +66,20 @@ wait_stop() {
     return 1
 }
 
-# start <transcript-label> <program> [args]: run it in the background with
-# its output in the transcript, and wait for its first stop. Sets PID.
+# start <program> [args]: run it in the background with its output in the
+# transcript, and wait for its first stop. Sets PID.
 start() {
     note "# $(echo "./$(basename "$1")" "${@:2}") &"
     "$BIN/$(basename "$1")" "${@:2}" >> "$T" 2>&1 &
     PID=$!
-    wait_stop "$PID" || { echo "FAIL  $1 did not stop" >> "$CHECKS"; FAILED=1; }
+    check "$(basename "$1") stops at its first stage" wait_stop "$PID"
 }
 
 # resume: let PID run to its next stop.
 resume() {
     note "# kill -CONT $PID"
     kill -CONT "$PID"
-    wait_stop "$PID" || { echo "FAIL  pid $PID did not stop again" >> "$CHECKS"; FAILED=1; }
+    check "pid $PID stops at its next stage" wait_stop "$PID"
 }
 
 # finish: let PID run to the end.
@@ -126,19 +126,19 @@ against_proc() {
 
 # --------------------------------------------------------------- build ---
 begin 00_build.txt
-show 'uname -r'
-show 'gcc --version | head -1'
-show 'make -C module'
+record 'uname -r'
+record 'gcc --version | head -1'
+record 'make -C module'
 for prog in 1_touch 2_filemap 3_regions; do
-    show "gcc -O2 -o $BIN/$prog src/$prog.c"
+    record "gcc -O2 -o $BIN/$prog src/$prog.c"
 done
-show 'gcc -Wall -Wextra -fsyntax-only src/*.c'
+record 'gcc -Wall -Wextra -fsyntax-only src/*.c'
 rmmod pfcount 2>/dev/null
-show 'insmod module/pfcount.ko'
-show 'cat /proc/sys/kernel/tainted'
-show 'dmesg | grep -E "soft lockup -|taints kernel|tainting kernel" | sed "s/^\[ *[0-9.]*\] //"'
-show 'dmesg | grep "pfcount: attached" | tail -1 | sed "s/^\[ *[0-9.]*\] //"'
-show 'ls -l /proc/pfcount /proc/pfcount_regions'
+record 'insmod module/pfcount.ko'
+record 'cat /proc/sys/kernel/tainted'
+record 'dmesg | grep -E "soft lockup -|taints kernel|tainting kernel" | sed "s/^\[ *[0-9.]*\] //"'
+record 'dmesg | grep "pfcount: attached" | tail -1 | sed "s/^\[ *[0-9.]*\] //"'
+record 'ls -l /proc/pfcount /proc/pfcount_regions'
 check "kernel is 6.8.0-999-generic" [ "$(uname -r)" = 6.8.0-999-generic ]
 check "pfcount.ko built" [ -f module/pfcount.ko ]
 check "pfcount loaded" grep -q '^pfcount ' /proc/modules
@@ -148,10 +148,10 @@ check "test programs compile without warnings under -Wall -Wextra" \
 # -------------------------------------- experiment 1: regions vs maps ---
 begin 01_regions.txt
 start 1_touch $TOUCH_PAGES
-show "pfcount -r $PID"
-show "cat /proc/$PID/maps"
-show "diff <(cut -d' ' -f1 /proc/$PID/maps) <(cut -d' ' -f1 /proc/pfcount_regions)"
-show "grep VmSize /proc/$PID/status"
+record "pfcount -r $PID"
+record "cat /proc/$PID/maps"
+record "diff <(cut -d' ' -f1 /proc/$PID/maps) <(cut -d' ' -f1 /proc/pfcount_regions)"
+record "grep VmSize /proc/$PID/status"
 against_proc "exp1 1_touch"
 check "exp1: maps has exactly one line more, [vsyscall]" \
     [ "$(diff <(cut -d' ' -f1 "/proc/$PID/maps") <(cut -d' ' -f1 /proc/pfcount_regions) | grep -c '^<')" = 1 ]
@@ -161,12 +161,12 @@ wait "$PID" 2>/dev/null
 # ------------------- experiments 2 and 5: demand paging, minor faults ---
 begin 02_touch.txt
 start 1_touch $TOUCH_PAGES
-show "pfcount $PID"
+record "pfcount $PID"
 against_proc "exp2 stage 0"
 RSS0=$RSS V0=$VPAGES
 for touched in $((TOUCH_PAGES / 4)) $((TOUCH_PAGES / 2)) $TOUCH_PAGES; do
     resume
-    show "pfcount $PID"
+    record "pfcount $PID"
     against_proc "exp2 $touched touched"
     check "exp2 $touched touched: minor since start $DMIN in [$touched, $touched+4]" \
         test "$DMIN" -ge "$touched" -a "$DMIN" -le $((touched + 4))
@@ -181,16 +181,16 @@ finish
 
 # --------------------------------------------- experiment 3: major faults ---
 begin 03_filemap.txt
-show 'cat /sys/kernel/debug/fault_around_bytes'
-show "dd if=/dev/urandom of=$DATA bs=4096 count=$DATA_PAGES status=none"
-show 'sync; echo 3 > /proc/sys/vm/drop_caches'
+record 'cat /sys/kernel/debug/fault_around_bytes'
+record "dd if=/dev/urandom of=$DATA bs=4096 count=$DATA_PAGES status=none"
+record 'sync; echo 3 > /proc/sys/vm/drop_caches'
 note "--- cold page cache ---"
 start 2_filemap "$DATA"
-show "pfcount $PID"
+record "pfcount $PID"
 snap
 RSS0=$RSS
 resume
-show "pfcount $PID"
+record "pfcount $PID"
 against_proc "exp3 cold"
 check "exp3 cold: faults seen $SEEN = minor + major ($DMIN + $DMAJ)" [ "$SEEN" = $((DMIN + DMAJ)) ]
 check "exp3 cold: RSS grew by the file's pages ($RSS - $RSS0 = $DATA_PAGES)" [ $((RSS - RSS0)) = "$DATA_PAGES" ]
@@ -199,11 +199,11 @@ check "exp3 cold: major faults $DMAJ >= 90% of $DATA_PAGES pages" \
 finish
 note "--- warm page cache (same file, second run) ---"
 start 2_filemap "$DATA"
-show "pfcount $PID"
+record "pfcount $PID"
 snap
 RSS0=$RSS
 resume
-show "pfcount $PID"
+record "pfcount $PID"
 against_proc "exp3 warm"
 check "exp3 warm: faults seen $SEEN = minor + major ($DMIN + $DMAJ)" [ "$SEEN" = $((DMIN + DMAJ)) ]
 check "exp3 warm: RSS grew by the file's pages ($RSS - $RSS0 = $DATA_PAGES)" [ $((RSS - RSS0)) = "$DATA_PAGES" ]
@@ -217,15 +217,15 @@ rm -f "$DATA"
 # ------------------------------------ experiment 4: regions come and go ---
 begin 04_regions.txt
 start 3_regions
-show "pfcount $PID"
-show "grep -E 'Rss(Anon|File)' /proc/$PID/status"
+record "pfcount $PID"
+record "grep -E 'Rss(Anon|File)' /proc/$PID/status"
 against_proc "exp4 before"
 REG0=$REG V0=$VPAGES RSS0=$RSS
 ANON0=$(awk '/^RssAnon/ {print $2}' "/proc/$PID/status")
 resume
-show "pfcount $PID"
-show "grep -E 'Rss(Anon|File)' /proc/$PID/status"
-show "grep '^6000' /proc/pfcount_regions"
+record "pfcount $PID"
+record "grep -E 'Rss(Anon|File)' /proc/$PID/status"
+record "grep '^6000' /proc/pfcount_regions"
 against_proc "exp4 mapped"
 check "exp4 mapped: regions $REG = $REG0 + 8" [ "$REG" = $((REG0 + 8)) ]
 check "exp4 mapped: virtual pages $VPAGES = $V0 + 128" [ "$VPAGES" = $((V0 + 128)) ]
@@ -237,7 +237,7 @@ check "exp4 mapped: the 8 new regions hold no resident pages (smaps Rss $new_rss
 anon=$(awk '/^RssAnon/ {print $2}' "/proc/$PID/status")
 check "exp4 mapped: anonymous RSS unchanged ($anon = $ANON0 kB)" [ "$anon" = "$ANON0" ]
 resume
-show "pfcount $PID"
+record "pfcount $PID"
 against_proc "exp4 unmapped"
 check "exp4 unmapped: regions back to $REG0 ($REG)" [ "$REG" = "$REG0" ]
 check "exp4 unmapped: virtual pages back to $V0 ($VPAGES)" [ "$VPAGES" = "$V0" ]

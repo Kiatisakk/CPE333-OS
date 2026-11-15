@@ -7,7 +7,8 @@ end \texttt{vm\_end} (exclusive), its permissions in \texttt{vm\_flags} and,
 for a file mapping, the file in \texttt{vm\_file}. In Linux~6.8 the VMAs of an
 address space are kept in a maple tree (\texttt{mm->mm\_mt}) and walked in
 address order with \texttt{for\_each\_vma} while holding \texttt{mmap\_lock}.
-\texttt{/proc/<pid>/maps} prints one line per VMA, and the sum of their sizes
+\texttt{/proc/<pid>/maps} prints one line per VMA (plus, on x86-64, a
+\texttt{[vsyscall]} line that is not a VMA; Section~4.1), and the sum of the VMA sizes
 is the total virtual address space, reported as \texttt{VmSize} in
 \texttt{/proc/<pid>/status}.
 

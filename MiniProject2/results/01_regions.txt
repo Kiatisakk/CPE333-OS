@@ -1,66 +1,66 @@
 # ./1_touch 1024 &
 [touch] mapped 1024 pages, touched none
-# pfcount -r 12364
-pid 12364 (1_touch), 1 thread
+# pfcount -r 1414
+pid 1414 (1_touch), 1 thread
   memory regions       : 23
   total virtual space  : 6780 kB (1695 pages)
-  resident (RSS)       : 1672 kB (418 pages)
-  minor faults         : 158      since process start
+  resident (RSS)       : 1668 kB (417 pages)
+  minor faults         : 153      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 0        (0 user mode, 0 kernel mode)
     minor / major      : 0 / 0
   regions:
-60ca69c0f000-60ca69c10000 r--p        4 kB  /home/builder/mp2/bin/1_touch
-60ca69c10000-60ca69c11000 r-xp        4 kB  /home/builder/mp2/bin/1_touch
-60ca69c11000-60ca69c12000 r--p        4 kB  /home/builder/mp2/bin/1_touch
-60ca69c12000-60ca69c13000 r--p        4 kB  /home/builder/mp2/bin/1_touch
-60ca69c13000-60ca69c14000 rw-p        4 kB  /home/builder/mp2/bin/1_touch
-60ca7aef1000-60ca7af12000 rw-p      132 kB  [heap]
-75e19d400000-75e19d800000 rw-p     4096 kB
-75e19d800000-75e19d828000 r--p      160 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19d828000-75e19d9b1000 r-xp     1572 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19d9b1000-75e19da00000 r--p      316 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da00000-75e19da04000 r--p       16 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da04000-75e19da06000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da06000-75e19da13000 rw-p       52 kB
-75e19dae4000-75e19dae7000 rw-p       12 kB
-75e19daee000-75e19daf0000 rw-p        8 kB
-75e19daf0000-75e19daf1000 r--p        4 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19daf1000-75e19db1c000 r-xp      172 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db1c000-75e19db26000 r--p       40 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db26000-75e19db28000 r--p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db28000-75e19db2a000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-7ffd5e7a3000-7ffd5e7c4000 rw-p      132 kB  [stack]
-7ffd5e7f8000-7ffd5e7fc000 r--p       16 kB  [vvar]
-7ffd5e7fc000-7ffd5e7fe000 r-xp        8 kB  [vdso]
-# cat /proc/12364/maps
-60ca69c0f000-60ca69c10000 r--p 00000000 08:02 142783                     /home/builder/mp2/bin/1_touch
-60ca69c10000-60ca69c11000 r-xp 00001000 08:02 142783                     /home/builder/mp2/bin/1_touch
-60ca69c11000-60ca69c12000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
-60ca69c12000-60ca69c13000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
-60ca69c13000-60ca69c14000 rw-p 00003000 08:02 142783                     /home/builder/mp2/bin/1_touch
-60ca7aef1000-60ca7af12000 rw-p 00000000 00:00 0                          [heap]
-75e19d400000-75e19d800000 rw-p 00000000 00:00 0 
-75e19d800000-75e19d828000 r--p 00000000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19d828000-75e19d9b1000 r-xp 00028000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19d9b1000-75e19da00000 r--p 001b1000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da00000-75e19da04000 r--p 001ff000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da04000-75e19da06000 rw-p 00203000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
-75e19da06000-75e19da13000 rw-p 00000000 00:00 0 
-75e19dae4000-75e19dae7000 rw-p 00000000 00:00 0 
-75e19daee000-75e19daf0000 rw-p 00000000 00:00 0 
-75e19daf0000-75e19daf1000 r--p 00000000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19daf1000-75e19db1c000 r-xp 00001000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db1c000-75e19db26000 r--p 0002c000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db26000-75e19db28000 r--p 00036000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-75e19db28000-75e19db2a000 rw-p 00038000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
-7ffd5e7a3000-7ffd5e7c4000 rw-p 00000000 00:00 0                          [stack]
-7ffd5e7f8000-7ffd5e7fc000 r--p 00000000 00:00 0                          [vvar]
-7ffd5e7fc000-7ffd5e7fe000 r-xp 00000000 00:00 0                          [vdso]
+56d69e3a5000-56d69e3a6000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+56d69e3a6000-56d69e3a7000 r-xp        4 kB  /home/builder/mp2/bin/1_touch
+56d69e3a7000-56d69e3a8000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+56d69e3a8000-56d69e3a9000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+56d69e3a9000-56d69e3aa000 rw-p        4 kB  /home/builder/mp2/bin/1_touch
+56d6d94b0000-56d6d94d1000 rw-p      132 kB  [heap]
+72f177600000-72f177a00000 rw-p     4096 kB
+72f177a00000-72f177a28000 r--p      160 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177a28000-72f177bb1000 r-xp     1572 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177bb1000-72f177c00000 r--p      316 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c00000-72f177c04000 r--p       16 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c04000-72f177c06000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c06000-72f177c13000 rw-p       52 kB
+72f177d2d000-72f177d30000 rw-p       12 kB
+72f177d37000-72f177d39000 rw-p        8 kB
+72f177d39000-72f177d3a000 r--p        4 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d3a000-72f177d65000 r-xp      172 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d65000-72f177d6f000 r--p       40 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d6f000-72f177d71000 r--p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d71000-72f177d73000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7fff667c3000-7fff667e4000 rw-p      132 kB  [stack]
+7fff667f5000-7fff667f9000 r--p       16 kB  [vvar]
+7fff667f9000-7fff667fb000 r-xp        8 kB  [vdso]
+# cat /proc/1414/maps
+56d69e3a5000-56d69e3a6000 r--p 00000000 08:02 142783                     /home/builder/mp2/bin/1_touch
+56d69e3a6000-56d69e3a7000 r-xp 00001000 08:02 142783                     /home/builder/mp2/bin/1_touch
+56d69e3a7000-56d69e3a8000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
+56d69e3a8000-56d69e3a9000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
+56d69e3a9000-56d69e3aa000 rw-p 00003000 08:02 142783                     /home/builder/mp2/bin/1_touch
+56d6d94b0000-56d6d94d1000 rw-p 00000000 00:00 0                          [heap]
+72f177600000-72f177a00000 rw-p 00000000 00:00 0 
+72f177a00000-72f177a28000 r--p 00000000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177a28000-72f177bb1000 r-xp 00028000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177bb1000-72f177c00000 r--p 001b1000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c00000-72f177c04000 r--p 001ff000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c04000-72f177c06000 rw-p 00203000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72f177c06000-72f177c13000 rw-p 00000000 00:00 0 
+72f177d2d000-72f177d30000 rw-p 00000000 00:00 0 
+72f177d37000-72f177d39000 rw-p 00000000 00:00 0 
+72f177d39000-72f177d3a000 r--p 00000000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d3a000-72f177d65000 r-xp 00001000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d65000-72f177d6f000 r--p 0002c000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d6f000-72f177d71000 r--p 00036000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72f177d71000-72f177d73000 rw-p 00038000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7fff667c3000-7fff667e4000 rw-p 00000000 00:00 0                          [stack]
+7fff667f5000-7fff667f9000 r--p 00000000 00:00 0                          [vvar]
+7fff667f9000-7fff667fb000 r-xp 00000000 00:00 0                          [vdso]
 ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
-# diff <(cut -d' ' -f1 /proc/12364/maps) <(cut -d' ' -f1 /proc/pfcount_regions)
+# diff <(cut -d' ' -f1 /proc/1414/maps) <(cut -d' ' -f1 /proc/pfcount_regions)
 24d23
 < ffffffffff600000-ffffffffff601000
-# grep VmSize /proc/12364/status
+# grep VmSize /proc/1414/status
 VmSize:	    6780 kB

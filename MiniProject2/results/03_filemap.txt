@@ -5,24 +5,24 @@
 --- cold page cache ---
 # ./2_filemap /var/tmp/mp2_data.bin &
 [filemap] mapped 2048 pages of /var/tmp/mp2_data.bin, read none
-# pfcount 12562
-pid 12562 (2_filemap), 1 thread
+# pfcount 1614
+pid 1614 (2_filemap), 1 thread
   memory regions       : 23
   total virtual space  : 10876 kB (2719 pages)
   resident (RSS)       : 1612 kB (403 pages)
-  minor faults         : 181      since process start
+  minor faults         : 175      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 0        (0 user mode, 0 kernel mode)
     minor / major      : 0 / 0
-# kill -CONT 12562
+# kill -CONT 1614
 [filemap] read one byte from each of 2048 pages
-# pfcount 12562
-pid 12562 (2_filemap), 1 thread
+# pfcount 1614
+pid 1614 (2_filemap), 1 thread
   memory regions       : 23
   total virtual space  : 10876 kB (2719 pages)
   resident (RSS)       : 9804 kB (2451 pages)
-  minor faults         : 181      since process start
+  minor faults         : 175      since process start
   major faults         : 2048     since process start
   since monitoring started:
     faults seen        : 2048     (2048 user mode, 0 kernel mode)
@@ -30,24 +30,24 @@ pid 12562 (2_filemap), 1 thread
 --- warm page cache (same file, second run) ---
 # ./2_filemap /var/tmp/mp2_data.bin &
 [filemap] mapped 2048 pages of /var/tmp/mp2_data.bin, read none
-# pfcount 12986
-pid 12986 (2_filemap), 1 thread
+# pfcount 1983
+pid 1983 (2_filemap), 1 thread
   memory regions       : 23
   total virtual space  : 10876 kB (2719 pages)
-  resident (RSS)       : 1616 kB (404 pages)
-  minor faults         : 180      since process start
+  resident (RSS)       : 1612 kB (403 pages)
+  minor faults         : 178      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 0        (0 user mode, 0 kernel mode)
     minor / major      : 0 / 0
-# kill -CONT 12986
+# kill -CONT 1983
 [filemap] read one byte from each of 2048 pages
-# pfcount 12986
-pid 12986 (2_filemap), 1 thread
+# pfcount 1983
+pid 1983 (2_filemap), 1 thread
   memory regions       : 23
   total virtual space  : 10876 kB (2719 pages)
-  resident (RSS)       : 9808 kB (2452 pages)
-  minor faults         : 308      since process start
+  resident (RSS)       : 9804 kB (2451 pages)
+  minor faults         : 306      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 128      (128 user mode, 0 kernel mode)
