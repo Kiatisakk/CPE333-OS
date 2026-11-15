@@ -6,9 +6,12 @@ virtual space but no memory until it is touched; touching anonymous memory
 causes one minor fault per page; reading a file that is not cached causes
 major faults; and a cached file is mapped with far fewer faults than pages.
 
-The tool has three limits. The tracepoints are x86-specific, so the
+The tool has four limits. The tracepoints are x86-specific, so the
 ``faults seen'' figures need other hooks on other architectures. The
 tracepoints count fault exceptions, not completed faults, so a fault that
 ends in \texttt{SIGSEGV} would be seen but not counted as minor or major.
-Finally, the module looks the tracepoints up by name, which ties it to
+Conversely, a fault the kernel resolves on the process's behalf without an
+exception, as when \texttt{MAP\_POPULATE} or \texttt{mlock()} fills a region
+in advance, is counted in \texttt{min\_flt} but never seen by the
+tracepoints; the programs here do neither, so the two counts agree. Finally, the module looks the tracepoints up by name, which ties it to
 kernels that use these names.

@@ -99,6 +99,12 @@ def output_of(rel, command):
     die("no '%s' in %s" % (command, rel))
 
 
+def touched(summary):
+    """Pages 1_touch had touched when it printed its last line."""
+    m = re.search(r"touched (\d+) of", summary["prog"])
+    return int(m.group(1)) if m else 0
+
+
 def kb(line):
     return int(re.search(r"(\d+) kB", line).group(1))
 
@@ -108,6 +114,11 @@ def numbers():
     """Every figure the prose quotes, as \\newcommand macros."""
     n = {}
     n["KernelRelease"] = output_of(BUILD, r"uname -r")[0]
+    n["Tainted"] = output_of(BUILD, r"cat /proc/sys/kernel/tainted")[0]
+    # build.tex explains the value as these three bits: out-of-tree (O),
+    # unsigned (E) and soft lockup (L). Stop if that is no longer the value.
+    if int(n["Tainted"]) != 4096 + 8192 + 16384:
+        die("taint is %s; build.tex explains 28672 -- rewrite it" % n["Tainted"])
 
     one = summaries(REGIONS)[0]
     maps = output_of(REGIONS, r"cat /proc/\d+/maps")
@@ -142,9 +153,8 @@ def numbers():
     files = summaries(FILEMAP)
     cold = [s for s in files if s["part"].startswith("cold")][-1]
     warm = [s for s in files if s["part"].startswith("warm")][-1]
-    n["FilePages"] = int(re.search(r"mapped (\d+) pages", cold["prog"]).group(1)
-                         if "mapped" in cold["prog"] else
-                         re.search(r"each of (\d+) pages", cold["prog"]).group(1))
+    n["FilePages"] = int(re.search(r"each of (\d+) pages", cold["prog"]).group(1))
+    n["FileRssGrowth"] = cold["rss"] - [s for s in files if s["part"].startswith("cold")][0]["rss"]
     n["ColdMajor"], n["ColdMinor"], n["ColdSeen"] = cold["dmaj"], cold["dmin"], cold["seen"]
     n["WarmMajor"], n["WarmMinor"], n["WarmSeen"] = warm["dmaj"], warm["dmin"], warm["seen"]
 
@@ -267,7 +277,7 @@ def build_body(touch, cold, warm, regs):
     prose("design")
     head("subsection", "Attaching to the Page Fault Tracepoints")
     prose("design_tp")
-    out.append(excerpt(MODULE, r"^static void on_user_fault", r"^static void find_tracepoint",
+    out.append(excerpt(MODULE, r"^static void on_fault", r"^static void find_tracepoint",
                        r"The probes and the tracepoint lookup, \texttt{module/pfcount.c}"))
     out.append(excerpt(MODULE, r"^static int __init pfcount_init", r"^static int __init pfcount_init",
                        r"Attaching at load time, \texttt{module/pfcount.c}"))
@@ -294,10 +304,7 @@ def build_body(touch, cold, warm, regs):
     head("subsection", "Demand Paging and Minor Faults")
     prose("exp2")
     out += [transcript(TOUCH, r"\texttt{1\_touch} at each stage, \texttt{results/02\_touch.txt}"), ""]
-    rows = []
-    for s in touch:
-        m = re.search(r"touched (\d+) of", s["prog"])
-        rows.append((m.group(1) if m else "0", s["dmin"], s["dmaj"], s["seen"]))
+    rows = [(touched(s), s["dmin"], s["dmaj"], s["seen"]) for s in touch]
     out += [table("rrrr", ["Pages touched", "Minor faults", "Major faults", "Faults seen"], rows,
                   r"Faults of \texttt{1\_touch} since monitoring started"), ""]
 
@@ -321,11 +328,8 @@ def build_body(touch, cold, warm, regs):
 
     head("subsection", "Residency")
     prose("exp5")
-    rows = []
-    for s in touch:
-        m = re.search(r"touched (\d+) of", s["prog"])
-        rows.append((m.group(1) if m else "0", s["vpages"], s["rss"],
-                     s["rss"] - touch[0]["rss"], s["dmin"]))
+    rows = [(touched(s), s["vpages"], s["rss"], s["rss"] - touch[0]["rss"], s["dmin"])
+            for s in touch]
     out += [table("rrrrr", ["Pages touched", "Virtual (pages)", "RSS (pages)", "RSS growth",
                             "Minor faults"], rows,
                   r"Virtual size and resident set of \texttt{1\_touch}, from "

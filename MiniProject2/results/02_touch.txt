@@ -1,47 +1,47 @@
 # ./1_touch 1024 &
 [touch] mapped 1024 pages, touched none
-# pfcount 8591
-pid 8591 (1_touch), 1 thread
+# pfcount 12414
+pid 12414 (1_touch), 1 thread
   memory regions       : 23
   total virtual space  : 6780 kB (1695 pages)
-  resident (RSS)       : 1672 kB (418 pages)
-  minor faults         : 162      since process start
+  resident (RSS)       : 1676 kB (419 pages)
+  minor faults         : 166      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 0        (0 user mode, 0 kernel mode)
     minor / major      : 0 / 0
-# kill -CONT 8591
+# kill -CONT 12414
 [touch] touched 256 of 1024 pages
-# pfcount 8591
-pid 8591 (1_touch), 1 thread
+# pfcount 12414
+pid 12414 (1_touch), 1 thread
   memory regions       : 23
   total virtual space  : 6780 kB (1695 pages)
-  resident (RSS)       : 2696 kB (674 pages)
-  minor faults         : 418      since process start
+  resident (RSS)       : 2700 kB (675 pages)
+  minor faults         : 422      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 256      (256 user mode, 0 kernel mode)
     minor / major      : 256 / 0
-# kill -CONT 8591
+# kill -CONT 12414
 [touch] touched 512 of 1024 pages
-# pfcount 8591
-pid 8591 (1_touch), 1 thread
+# pfcount 12414
+pid 12414 (1_touch), 1 thread
   memory regions       : 23
   total virtual space  : 6780 kB (1695 pages)
-  resident (RSS)       : 3720 kB (930 pages)
-  minor faults         : 674      since process start
+  resident (RSS)       : 3724 kB (931 pages)
+  minor faults         : 678      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 512      (512 user mode, 0 kernel mode)
     minor / major      : 512 / 0
-# kill -CONT 8591
+# kill -CONT 12414
 [touch] touched 1024 of 1024 pages
-# pfcount 8591
-pid 8591 (1_touch), 1 thread
+# pfcount 12414
+pid 12414 (1_touch), 1 thread
   memory regions       : 23
   total virtual space  : 6780 kB (1695 pages)
-  resident (RSS)       : 5768 kB (1442 pages)
-  minor faults         : 1186     since process start
+  resident (RSS)       : 5772 kB (1443 pages)
+  minor faults         : 1190     since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 1024     (1024 user mode, 0 kernel mode)

@@ -1,33 +1,33 @@
 # ./3_regions &
 [regions] nothing mapped yet
-# pfcount 9228
-pid 9228 (3_regions), 1 thread
+# pfcount 13052
+pid 13052 (3_regions), 1 thread
   memory regions       : 22
   total virtual space  : 2684 kB (671 pages)
-  resident (RSS)       : 1412 kB (353 pages)
-  minor faults         : 174      since process start
+  resident (RSS)       : 1424 kB (356 pages)
+  minor faults         : 186      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 0        (0 user mode, 0 kernel mode)
     minor / major      : 0 / 0
-# grep -E 'Rss(Anon|File)' /proc/9228/status
-RssAnon:	      96 kB
-RssFile:	    1316 kB
-# kill -CONT 9228
+# grep -E 'Rss(Anon|File)' /proc/13052/status
+RssAnon:	     104 kB
+RssFile:	    1320 kB
+# kill -CONT 13052
 [regions] mapped 8 regions of 16 pages from 0x600000000000
-# pfcount 9228
-pid 9228 (3_regions), 1 thread
+# pfcount 13052
+pid 13052 (3_regions), 1 thread
   memory regions       : 30
   total virtual space  : 3196 kB (799 pages)
-  resident (RSS)       : 1604 kB (401 pages)
-  minor faults         : 177      since process start
+  resident (RSS)       : 1616 kB (404 pages)
+  minor faults         : 189      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 3        (3 user mode, 0 kernel mode)
     minor / major      : 3 / 0
-# grep -E 'Rss(Anon|File)' /proc/9228/status
-RssAnon:	      96 kB
-RssFile:	    1508 kB
+# grep -E 'Rss(Anon|File)' /proc/13052/status
+RssAnon:	     104 kB
+RssFile:	    1512 kB
 # grep '^6000' /proc/pfcount_regions
 600000000000-600000010000 rw-p       64 kB
 600000020000-600000030000 rw-p       64 kB
@@ -37,14 +37,14 @@ RssFile:	    1508 kB
 6000000a0000-6000000b0000 rw-p       64 kB
 6000000c0000-6000000d0000 rw-p       64 kB
 6000000e0000-6000000f0000 rw-p       64 kB
-# kill -CONT 9228
+# kill -CONT 13052
 [regions] unmapped all 8
-# pfcount 9228
-pid 9228 (3_regions), 1 thread
+# pfcount 13052
+pid 13052 (3_regions), 1 thread
   memory regions       : 22
   total virtual space  : 2684 kB (671 pages)
-  resident (RSS)       : 1604 kB (401 pages)
-  minor faults         : 177      since process start
+  resident (RSS)       : 1616 kB (404 pages)
+  minor faults         : 189      since process start
   major faults         : 0        since process start
   since monitoring started:
     faults seen        : 3        (3 user mode, 0 kernel mode)

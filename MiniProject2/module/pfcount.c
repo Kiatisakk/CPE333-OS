@@ -23,6 +23,8 @@
  * name with for_each_kernel_tracepoint() and attached with
  * tracepoint_probe_register().
  */
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
 #include <linux/atomic.h>
 #include <linux/kernel.h>
 #include <linux/mm.h>
@@ -40,7 +42,7 @@
 #include <linux/tracepoint.h>
 #include <linux/uaccess.h>
 
-static DEFINE_MUTEX(lock);		/* serialises target changes and reads */
+static DEFINE_MUTEX(pfcount_lock);	/* serialises target changes and reads */
 static struct pid *target;		/* thread group monitored, or NULL */
 static unsigned long base_min, base_maj; /* lifetime totals when it began */
 static atomic64_t seen_user, seen_kernel; /* tracepoint hits since then */
@@ -53,20 +55,14 @@ static struct tracepoint *tp_user, *tp_kernel;
  * Called on every page fault in the system, with preemption disabled, so it
  * must be cheap: one pointer comparison, and an increment when it matches.
  * Comparing struct pid pointers rather than numbers cannot be fooled by the
- * pid number being reused after the process exits.
+ * pid number being reused after the process exits. The same probe serves
+ * both tracepoints; data is the counter it was registered with.
  */
-static void on_user_fault(void *data, unsigned long address,
-			  struct pt_regs *regs, unsigned long error_code)
+static void on_fault(void *data, unsigned long address,
+		     struct pt_regs *regs, unsigned long error_code)
 {
 	if (task_tgid(current) == READ_ONCE(target))
-		atomic64_inc(&seen_user);
-}
-
-static void on_kernel_fault(void *data, unsigned long address,
-			    struct pt_regs *regs, unsigned long error_code)
-{
-	if (task_tgid(current) == READ_ONCE(target))
-		atomic64_inc(&seen_kernel);
+		atomic64_inc(data);
 }
 
 static void find_tracepoint(struct tracepoint *tp, void *priv)
@@ -107,7 +103,7 @@ static unsigned long rss_pages(struct mm_struct *mm)
 	       get_mm_counter_sum(mm, MM_SHMEMPAGES);
 }
 
-/* The monitored task with a reference held, or NULL. Call under lock. */
+/* The monitored task with a reference held, or NULL. Call under pfcount_lock. */
 static struct task_struct *target_task(struct seq_file *m)
 {
 	struct task_struct *task;
@@ -133,7 +129,7 @@ static int summary_show(struct seq_file *m, void *v)
 	long user, kernel;
 	int threads;
 
-	mutex_lock(&lock);
+	mutex_lock(&pfcount_lock);
 	task = target_task(m);
 	if (!task)
 		goto out;
@@ -173,7 +169,7 @@ static int summary_show(struct seq_file *m, void *v)
 		   min - base_min, maj - base_maj);
 	put_task_struct(task);
 out:
-	mutex_unlock(&lock);
+	mutex_unlock(&pfcount_lock);
 	return 0;
 }
 
@@ -208,15 +204,17 @@ static ssize_t summary_write(struct file *file, const char __user *buf,
 		put_task_struct(task);
 	}
 
-	mutex_lock(&lock);
+	mutex_lock(&pfcount_lock);
 	if (tgid && tgid == target) {
-		mutex_unlock(&lock);
+		mutex_unlock(&pfcount_lock);
 		put_pid(tgid);
 		return len;
 	}
 	old = target;
-	/* Detach first, and wait until no probe can still be counting for
-	 * the old target, so the reset below starts from a clean zero. */
+	/*
+	 * Detach first, and wait until no probe can still be counting for
+	 * the old target, so the reset below starts from a clean zero.
+	 */
 	WRITE_ONCE(target, NULL);
 	synchronize_rcu();
 	atomic64_set(&seen_user, 0);
@@ -230,7 +228,7 @@ static ssize_t summary_write(struct file *file, const char __user *buf,
 		}
 	}
 	WRITE_ONCE(target, tgid);
-	mutex_unlock(&lock);
+	mutex_unlock(&pfcount_lock);
 	put_pid(old);
 	return len;
 }
@@ -251,7 +249,7 @@ static void region_name(struct seq_file *m, struct vm_area_struct *vma)
 	if (vma->vm_file) {
 		seq_puts(m, "  ");
 		seq_file_path(m, vma->vm_file, "\n");
-	} else if (vma->vm_ops && vma->vm_ops->name) {
+	} else if (vma->vm_ops && vma->vm_ops->name && vma->vm_ops->name(vma)) {
 		seq_printf(m, "  %s", vma->vm_ops->name(vma));	/* [vdso], [vvar] */
 	} else if (vma_is_initial_heap(vma)) {
 		seq_puts(m, "  [heap]");
@@ -266,7 +264,7 @@ static int regions_show(struct seq_file *m, void *v)
 	struct mm_struct *mm;
 	struct vm_area_struct *vma;
 
-	mutex_lock(&lock);
+	mutex_lock(&pfcount_lock);
 	task = target_task(m);
 	if (!task)
 		goto out;
@@ -293,7 +291,7 @@ static int regions_show(struct seq_file *m, void *v)
 		mmput(mm);
 	}
 out:
-	mutex_unlock(&lock);
+	mutex_unlock(&pfcount_lock);
 	return 0;
 }
 
@@ -311,39 +309,47 @@ static const struct proc_ops regions_ops = {
 
 /* ------------------------------------------------------- load/unload --- */
 
+/* Detach both probes and wait until none is still running. */
+static void detach_probes(void)
+{
+	tracepoint_probe_unregister(tp_kernel, on_fault, &seen_kernel);
+	tracepoint_probe_unregister(tp_user, on_fault, &seen_user);
+	tracepoint_synchronize_unregister();
+}
+
 static int __init pfcount_init(void)
 {
 	int err;
 
 	for_each_kernel_tracepoint(find_tracepoint, NULL);
 	if (!tp_user || !tp_kernel) {
-		pr_err("pfcount: page fault tracepoints not found\n");
+		pr_err("page fault tracepoints not found\n");
 		return -ENOENT;
 	}
-	err = tracepoint_probe_register(tp_user, on_user_fault, NULL);
+	err = tracepoint_probe_register(tp_user, on_fault, &seen_user);
 	if (err)
 		return err;
-	err = tracepoint_probe_register(tp_kernel, on_kernel_fault, NULL);
-	if (err)
-		goto unreg_user;
+	err = tracepoint_probe_register(tp_kernel, on_fault, &seen_kernel);
+	if (err) {
+		tracepoint_probe_unregister(tp_user, on_fault, &seen_user);
+		tracepoint_synchronize_unregister();
+		return err;
+	}
 
 	/* Root only: these files expose any process's address space. */
-	if (!proc_create("pfcount", 0600, NULL, &summary_ops) ||
-	    !proc_create("pfcount_regions", 0400, NULL, &regions_ops)) {
-		err = -ENOMEM;
-		goto remove;
-	}
-	pr_info("pfcount: attached to tracepoints %s and %s\n",
+	err = -ENOMEM;
+	if (!proc_create("pfcount", 0600, NULL, &summary_ops))
+		goto detach;
+	if (!proc_create("pfcount_regions", 0400, NULL, &regions_ops))
+		goto remove_summary;
+	pr_info("attached to tracepoints %s and %s\n",
 		tp_user->name, tp_kernel->name);
 	return 0;
 
-remove:
-	remove_proc_entry("pfcount_regions", NULL);
+remove_summary:
 	remove_proc_entry("pfcount", NULL);
-	tracepoint_probe_unregister(tp_kernel, on_kernel_fault, NULL);
-unreg_user:
-	tracepoint_probe_unregister(tp_user, on_user_fault, NULL);
-	tracepoint_synchronize_unregister();
+detach:
+	detach_probes();
 	return err;
 }
 
@@ -351,11 +357,9 @@ static void __exit pfcount_exit(void)
 {
 	remove_proc_entry("pfcount_regions", NULL);
 	remove_proc_entry("pfcount", NULL);
-	tracepoint_probe_unregister(tp_kernel, on_kernel_fault, NULL);
-	tracepoint_probe_unregister(tp_user, on_user_fault, NULL);
-	tracepoint_synchronize_unregister();	/* no probe still running */
+	detach_probes();
 	put_pid(target);
-	pr_info("pfcount: detached\n");
+	pr_info("detached\n");
 }
 
 module_init(pfcount_init);

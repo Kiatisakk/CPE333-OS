@@ -105,7 +105,7 @@ snap() {
 
 # against_proc <tag>: the module's figures for PID agree with /proc.
 against_proc() {
-    local tag=$1 stat maps_n vmsize smaps_rss
+    local tag=$1 stat maps_n vmsize smaps_rss sizes
     snap
     read -r -a stat <<< "$(sed 's/.*) //' "/proc/$PID/stat")"
     # After "comm) ", field 3 (state) is index 0, so field N is index N-3.
@@ -118,6 +118,8 @@ against_proc() {
     check "$tag: region list = maps address column without [vsyscall]" \
         cmp -s <(grep -v '\[vsyscall\]' "/proc/$PID/maps" | cut -d' ' -f1) \
                <(cut -d' ' -f1 /proc/pfcount_regions)
+    sizes=$(awk '{s += $3} END {print s}' /proc/pfcount_regions)
+    check "$tag: virtual size $VKB kB = sum of region sizes ($sizes kB)" [ "$VKB" = "$sizes" ]
     check "$tag: virtual size $VKB kB = VmSize ($vmsize kB)" [ "$VKB" = "$vmsize" ]
     check "$tag: RSS $((RSS * 4)) kB = smaps_rollup Rss ($smaps_rss kB)" [ "$((RSS * 4))" = "$smaps_rss" ]
 }
@@ -133,7 +135,9 @@ done
 show 'gcc -Wall -Wextra -fsyntax-only src/*.c'
 rmmod pfcount 2>/dev/null
 show 'insmod module/pfcount.ko'
-show 'dmesg | grep pfcount: | tail -1 | sed "s/^\[ *[0-9.]*\] //"'
+show 'cat /proc/sys/kernel/tainted'
+show 'dmesg | grep -E "soft lockup -|taints kernel|tainting kernel" | sed "s/^\[ *[0-9.]*\] //"'
+show 'dmesg | grep "pfcount: attached" | tail -1 | sed "s/^\[ *[0-9.]*\] //"'
 show 'ls -l /proc/pfcount /proc/pfcount_regions'
 check "kernel is 6.8.0-999-generic" [ "$(uname -r)" = 6.8.0-999-generic ]
 check "pfcount.ko built" [ -f module/pfcount.ko ]
@@ -183,19 +187,26 @@ show 'sync; echo 3 > /proc/sys/vm/drop_caches'
 note "--- cold page cache ---"
 start 2_filemap "$DATA"
 show "pfcount $PID"
+snap
+RSS0=$RSS
 resume
 show "pfcount $PID"
 against_proc "exp3 cold"
+check "exp3 cold: faults seen $SEEN = minor + major ($DMIN + $DMAJ)" [ "$SEEN" = $((DMIN + DMAJ)) ]
+check "exp3 cold: RSS grew by the file's pages ($RSS - $RSS0 = $DATA_PAGES)" [ $((RSS - RSS0)) = "$DATA_PAGES" ]
 check "exp3 cold: major faults $DMAJ >= 90% of $DATA_PAGES pages" \
     [ "$DMAJ" -ge $((DATA_PAGES * 9 / 10)) ]
-COLD_MAJ=$DMAJ
 finish
 note "--- warm page cache (same file, second run) ---"
 start 2_filemap "$DATA"
 show "pfcount $PID"
+snap
+RSS0=$RSS
 resume
 show "pfcount $PID"
 against_proc "exp3 warm"
+check "exp3 warm: faults seen $SEEN = minor + major ($DMIN + $DMAJ)" [ "$SEEN" = $((DMIN + DMAJ)) ]
+check "exp3 warm: RSS grew by the file's pages ($RSS - $RSS0 = $DATA_PAGES)" [ $((RSS - RSS0)) = "$DATA_PAGES" ]
 check "exp3 warm: no major faults ($DMAJ)" [ "$DMAJ" = 0 ]
 FA_PAGES=$(( $(cat /sys/kernel/debug/fault_around_bytes) / 4096 ))
 check "exp3 warm: one minor fault per $FA_PAGES pages (fault-around): $DMIN = $DATA_PAGES / $FA_PAGES" \

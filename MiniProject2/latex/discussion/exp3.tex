@@ -9,5 +9,6 @@ only \WarmMinor{} minor faults, not \FilePages{}: when a fault finds its page
 in the cache, the kernel also maps the neighbouring cached pages in the same
 fault (fault-around, \FaultAroundBytes{}~bytes or \FaultAroundPages{}~pages
 here), so \FilePages{}~/~\FaultAroundPages{} faults cover the file. In both
-runs the tracepoints saw exactly as many faults as were counted, and the same
-pages ended up resident.
+runs the tracepoints saw exactly as many faults as were counted, and the RSS
+grew by the same \FileRssGrowth{} pages: the whole file ends up resident
+either way, and only the cost of getting it there differs.
