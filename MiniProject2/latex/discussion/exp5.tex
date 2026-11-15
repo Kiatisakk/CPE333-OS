@@ -1,0 +1,4 @@
+The same run of \texttt{1\_touch} shows demand paging directly. Its virtual
+size stays at \TouchVirtualPages{} pages throughout, because the whole buffer
+was reserved by one \texttt{mmap}. Its RSS grows only as pages are touched,
+by exactly one page per minor fault, \TouchRssGrowth{} pages in all.

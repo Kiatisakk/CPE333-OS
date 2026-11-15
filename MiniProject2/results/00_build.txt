@@ -1,0 +1,29 @@
+# uname -r
+6.8.0-999-generic
+# gcc --version | head -1
+gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+# make -C module
+make: Entering directory '/home/builder/mp2/module'
+make -C /lib/modules/6.8.0-999-generic/build M=/home/builder/mp2/module modules
+make[1]: Entering directory '/usr/src/linux-headers-6.8.0-999-generic'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  You are using:           gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  CC [M]  /home/builder/mp2/module/pfcount.o
+  MODPOST /home/builder/mp2/module/Module.symvers
+  CC [M]  /home/builder/mp2/module/pfcount.mod.o
+  LD [M]  /home/builder/mp2/module/pfcount.ko
+  BTF [M] /home/builder/mp2/module/pfcount.ko
+Skipping BTF generation for /home/builder/mp2/module/pfcount.ko due to unavailability of vmlinux
+make[1]: Leaving directory '/usr/src/linux-headers-6.8.0-999-generic'
+make: Leaving directory '/home/builder/mp2/module'
+# gcc -O2 -o bin/1_touch src/1_touch.c
+# gcc -O2 -o bin/2_filemap src/2_filemap.c
+# gcc -O2 -o bin/3_regions src/3_regions.c
+# gcc -Wall -Wextra -fsyntax-only src/*.c
+# insmod module/pfcount.ko
+# dmesg | grep pfcount: | tail -1 | sed "s/^\[ *[0-9.]*\] //"
+pfcount: attached to tracepoints page_fault_user and page_fault_kernel
+# ls -l /proc/pfcount /proc/pfcount_regions
+-rw------- 1 root root 0 Nov 15 02:04 /proc/pfcount
+-r-------- 1 root root 0 Nov 15 02:04 /proc/pfcount_regions

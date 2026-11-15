@@ -1,0 +1,7 @@
+# Everything here except the PowerShell build script runs inside the Linux
+# VM; a CRLF checkout would break bash, make and the kernel build.
+*.sh        text eol=lf
+*.c         text eol=lf
+Makefile    text eol=lf
+tools/*     text eol=lf
+results/*   text eol=lf

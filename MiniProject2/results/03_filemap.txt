@@ -1,0 +1,54 @@
+# cat /sys/kernel/debug/fault_around_bytes
+65536
+# dd if=/dev/urandom of=/var/tmp/mp2_data.bin bs=4096 count=2048 status=none
+# sync; echo 3 > /proc/sys/vm/drop_caches
+--- cold page cache ---
+# ./2_filemap /var/tmp/mp2_data.bin &
+[filemap] mapped 2048 pages of /var/tmp/mp2_data.bin, read none
+# pfcount 8736
+pid 8736 (2_filemap), 1 thread
+  memory regions       : 23
+  total virtual space  : 10876 kB (2719 pages)
+  resident (RSS)       : 1616 kB (404 pages)
+  minor faults         : 181      since process start
+  major faults         : 0        since process start
+  since monitoring started:
+    faults seen        : 0        (0 user mode, 0 kernel mode)
+    minor / major      : 0 / 0
+# kill -CONT 8736
+[filemap] read one byte from each of 2048 pages
+# pfcount 8736
+pid 8736 (2_filemap), 1 thread
+  memory regions       : 23
+  total virtual space  : 10876 kB (2719 pages)
+  resident (RSS)       : 9808 kB (2452 pages)
+  minor faults         : 181      since process start
+  major faults         : 2048     since process start
+  since monitoring started:
+    faults seen        : 2048     (2048 user mode, 0 kernel mode)
+    minor / major      : 0 / 2048
+--- warm page cache (same file, second run) ---
+# ./2_filemap /var/tmp/mp2_data.bin &
+[filemap] mapped 2048 pages of /var/tmp/mp2_data.bin, read none
+# pfcount 9182
+pid 9182 (2_filemap), 1 thread
+  memory regions       : 23
+  total virtual space  : 10876 kB (2719 pages)
+  resident (RSS)       : 1608 kB (402 pages)
+  minor faults         : 179      since process start
+  major faults         : 0        since process start
+  since monitoring started:
+    faults seen        : 0        (0 user mode, 0 kernel mode)
+    minor / major      : 0 / 0
+# kill -CONT 9182
+[filemap] read one byte from each of 2048 pages
+# pfcount 9182
+pid 9182 (2_filemap), 1 thread
+  memory regions       : 23
+  total virtual space  : 10876 kB (2719 pages)
+  resident (RSS)       : 9800 kB (2450 pages)
+  minor faults         : 307      since process start
+  major faults         : 0        since process start
+  since monitoring started:
+    faults seen        : 128      (128 user mode, 0 kernel mode)
+    minor / major      : 128 / 0

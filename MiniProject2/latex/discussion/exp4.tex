@@ -1,0 +1,12 @@
+\texttt{3\_regions} maps \RegAdded{} regions of 16 pages at fixed addresses with a
+gap after each, so that no two of them merge into one VMA. The region count
+rose from \RegBefore{} to \RegMapped{} and the virtual size by
+\RegVirtualAddedKB{}~kB; \texttt{munmap} returned both to where they started.
+
+The new regions are never touched and hold no pages (their \texttt{Rss} in
+\texttt{smaps} is zero). RSS still grew by \RegRssGrowth{} pages over
+\RegFaults{} faults, but \texttt{RssAnon} did not change: all
+\RegRssFileGrowthKB{}~kB of the growth is file pages. These are library code
+the program ran for the first time (\texttt{mmap}, \texttt{munmap}, output),
+brought in by fault-around as in Section~4.3. Unmapping did not lower the RSS,
+since the unmapped regions had none.

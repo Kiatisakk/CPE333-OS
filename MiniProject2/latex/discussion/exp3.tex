@@ -1,0 +1,13 @@
+\texttt{2\_filemap} maps a \FilePages{}-page file read-only and reads one byte
+from each page. \texttt{MADV\_RANDOM} turns off read-ahead, so a fault reads
+only the page it needs.
+
+With a cold page cache (after \texttt{drop\_caches}), each page had to be read
+from disk: \ColdMajor{} major faults for \FilePages{} pages. In the second run
+the file was still cached, so there were no major faults. There were also
+only \WarmMinor{} minor faults, not \FilePages{}: when a fault finds its page
+in the cache, the kernel also maps the neighbouring cached pages in the same
+fault (fault-around, \FaultAroundBytes{}~bytes or \FaultAroundPages{}~pages
+here), so \FilePages{}~/~\FaultAroundPages{} faults cover the file. In both
+runs the tracepoints saw exactly as many faults as were counted, and the same
+pages ended up resident.

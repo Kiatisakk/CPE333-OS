@@ -1,0 +1,28 @@
+The module creates two files, both readable only by root because they expose
+the layout of any process. Writing a process ID to \texttt{/proc/pfcount}
+selects that process; reading the file prints the summary. Reading
+\texttt{/proc/pfcount\_regions} lists the regions one per line, in the format
+of \texttt{/proc/<pid>/maps}. The command \texttt{pfcount [-r] [-w] <pid>}
+(\texttt{tools/pfcount}) does both steps: \texttt{-r} adds the region list and
+\texttt{-w} redraws the summary every second. Asking again for the process
+already monitored keeps its counters; a different process starts them from
+zero. Table~\ref{tab:fields} lists where each figure comes from.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{9.6cm}@{}}
+\toprule
+Field & Source \\
+\midrule
+memory regions & the VMAs visited by \texttt{for\_each\_vma} \\
+total virtual space & the sum of \texttt{vm\_end - vm\_start} over those VMAs \\
+resident (RSS) & the file, anonymous and shared-memory page counters of the \texttt{mm\_struct} \\
+minor, major faults & \texttt{min\_flt} and \texttt{maj\_flt}, summed over the thread group
+  as \texttt{/proc/<pid>/stat} sums them; they cover the whole life of the process \\
+faults seen & hits on the two tracepoints since monitoring started, user and kernel mode \\
+minor / major since monitoring & the minor and major totals less their values when monitoring started \\
+\bottomrule
+\end{tabular}
+\captionof{table}{The fields of the summary}
+\label{tab:fields}
+\end{center}

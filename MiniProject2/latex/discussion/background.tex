@@ -1,0 +1,84 @@
+\paragraph{Address space and VMAs.}
+Each process has its own virtual address space, described by an
+\texttt{mm\_struct}. The space is not one block but a set of disjoint,
+page-aligned intervals called virtual memory areas (VMAs). Each VMA is a
+\texttt{vm\_area\_struct} holding its start address \texttt{vm\_start}, its
+end \texttt{vm\_end} (exclusive), its permissions in \texttt{vm\_flags} and,
+for a file mapping, the file in \texttt{vm\_file}. In Linux~6.8 the VMAs of an
+address space are kept in a maple tree (\texttt{mm->mm\_mt}) and walked in
+address order with \texttt{for\_each\_vma} while holding \texttt{mmap\_lock}.
+\texttt{/proc/<pid>/maps} prints one line per VMA, and the sum of their sizes
+is the total virtual address space, reported as \texttt{VmSize} in
+\texttt{/proc/<pid>/status}.
+
+\paragraph{Demand paging.}
+\texttt{mmap} only creates a VMA. No physical memory is assigned and no page
+table entry is made. The first access to a page therefore raises a page
+fault: the kernel finds the VMA that covers the address, checks the access
+against its permissions, and only then supplies a physical page and maps it.
+The resident set size (RSS) counts the pages currently mapped in this way, so
+a region can be large in virtual size and still cost little or no memory.
+
+\paragraph{Minor and major faults.}
+A fault is \emph{minor} when the page can be supplied without I/O: a fresh
+zero-filled page for anonymous memory, or a file page already in the page
+cache. It is \emph{major} when the kernel must wait for the page to be read
+from storage. \texttt{mm\_account\_fault()} in \texttt{mm/memory.c} makes the
+decision once the fault completes: it increments \texttt{current->maj\_flt}
+when the handler returned \texttt{VM\_FAULT\_MAJOR} or the fault had to be
+retried, and \texttt{current->min\_flt} otherwise. A fault that fails, or is
+about to be retried, is not counted. Fields~10 and~12 of
+\texttt{/proc/<pid>/stat} report these counters summed over the threads of a
+process.
+
+\paragraph{Page fault tracepoints.}
+On x86, \texttt{page\_fault\_user} and \texttt{page\_fault\_kernel} fire on
+entry to the page fault handler (\texttt{arch/x86/mm/fault.c}), before the
+fault is handled. Their arguments are the faulting address, the saved
+registers and the error code; they do not say whether the fault will succeed
+or whether it is major. In~6.8 they are declared in
+\path{arch/x86/include/asm/trace/exceptions.h}; the sheet links to
+\path{include/trace/events/exceptions.h}, where later kernels keep them.
+Figure~\ref{fig:vm} puts these pieces together.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    font=\footnotesize,
+    vma/.style={draw, fill=gray!12, minimum width=3.4cm, minimum height=0.55cm},
+    box/.style={draw, rounded corners, align=center, text width=4.4cm, inner sep=3pt},
+    arr/.style={-{Stealth[length=2mm]}},
+  ]
+  % ---- the address space
+  \node[box, text width=3.4cm] (mm) at (0,0)
+    {\texttt{mm\_struct}\\ maple tree \texttt{mm\_mt}\\ \texttt{total\_vm}, \texttt{rss\_stat}};
+  \node[vma, below=0.9cm of mm] (stack) {\texttt{[stack]} \hfill rw-p};
+  \node[vma, below=0.3cm of stack] (lib) {\texttt{libc.so.6} \hfill r-xp};
+  \node[vma, below=0cm of lib] (anon) {anonymous \hfill rw-p};
+  \node[vma, below=0.3cm of anon] (heap) {\texttt{[heap]} \hfill rw-p};
+  \node[vma, below=0cm of heap] (text) {program text \hfill r-xp};
+  \draw[arr] (mm) -- node[right, align=left] {one \texttt{vm\_area\_struct}\\ per region} (stack);
+  \node[left=0.1cm of stack, align=right, gray] {high\\ addresses};
+  \node[left=0.1cm of text, align=right, gray] {low\\ addresses};
+  % ---- one page fault
+  \node[box] (a) at (7.6,0.2) {access to a page with no page table entry};
+  \node[box, below=0.4cm of a] (b)
+    {page fault exception: tracepoint\\ \texttt{page\_fault\_user} or \texttt{page\_fault\_kernel}};
+  \node[box, below=0.4cm of b] (c) {find the VMA, check permissions};
+  \node[box, below=0.4cm of c] (d) {must the page be read from storage?};
+  \node[box, text width=2.3cm, below=0.6cm of d, xshift=-1.3cm] (maj)
+    {\textbf{major}: wait for I/O\\ \texttt{maj\_flt++}};
+  \node[box, text width=2.3cm, below=0.6cm of d, xshift=1.3cm] (min)
+    {\textbf{minor}: zero or cached page\\ \texttt{min\_flt++}};
+  \node[right=0.3cm of c, align=left] (seg) {no VMA:\\ \texttt{SIGSEGV}};
+  \draw[arr] (a) -- (b);
+  \draw[arr] (b) -- (c);
+  \draw[arr] (c) -- (d);
+  \draw[arr] (c) -- (seg);
+  \draw[arr] (d) -- node[left] {yes} (maj);
+  \draw[arr] (d) -- node[right] {no} (min);
+\end{tikzpicture}
+\caption{Left: the regions of a process, kept by its \texttt{mm\_struct}.
+Right: how a page fault is handled and counted on x86 in Linux~6.8.}
+\label{fig:vm}
+\end{figure}

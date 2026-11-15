@@ -1,0 +1,8 @@
+The module is built out of tree against the headers of the running kernel:
+the Makefile hands \texttt{M=\$(CURDIR)} to the kernel's own build system in
+\texttt{/lib/modules/\$(uname -r)/build}. The compiler warning compares two
+names for the same GCC~13.3.0 and is harmless. BTF generation is skipped
+because the headers package carries no \texttt{vmlinux}; that affects only
+the type information used by BPF tools. The module is not signed, and the
+kernel loads it because module signatures are not enforced. The test programs
+compile without warnings under \texttt{-Wall -Wextra}.

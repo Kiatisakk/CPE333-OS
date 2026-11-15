@@ -1,0 +1,17 @@
+\texttt{summary\_show()} takes a reference on the process's
+\texttt{mm\_struct} with \texttt{get\_task\_mm()}, which fails for a kernel
+thread or a process that has already released its memory. It holds
+\texttt{mmap\_lock} for reading while it walks the maple tree, so no region
+can be added or removed during the count, and it adds up
+\texttt{vm\_end - vm\_start} for each region.
+
+The resident set is read with \texttt{get\_mm\_counter\_sum()}, which adds
+every CPU's share of the RSS counters. \texttt{/proc/<pid>/statm} and the
+\texttt{VmRSS} line of \texttt{/proc/<pid>/status} use the quicker
+\texttt{get\_mm\_counter()}, which can lag behind by the counts still held per
+CPU. The experiments therefore compare RSS with \texttt{/proc/<pid>/smaps\_rollup},
+which counts the mapped pages from the page tables themselves.
+
+\texttt{group\_faults()} adds the counts that exited threads left in the
+process's \texttt{signal\_struct} to those of every live thread, the same
+sum \texttt{/proc/<pid>/stat} reports.

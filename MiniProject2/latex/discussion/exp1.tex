@@ -1,0 +1,13 @@
+The module counts \OneRegions{} regions where
+\texttt{/proc/<pid>/maps} has \OneMapsLines{} lines. \texttt{diff} shows that
+every region agrees in start and end address, and that the one extra line in
+\texttt{maps} is the \texttt{[vsyscall]} page at \texttt{\OneVsyscall}. That
+page is not a VMA of the process: it is a single ``gate'' area shared by every
+process, outside the maple tree, which \texttt{maps} appends at the end
+(\texttt{get\_gate\_vma()}). The module's total, \OneVirtualKB{}~kB, equals
+\texttt{VmSize}, which leaves out the gate area as well.
+
+The \TouchBufferKB{}~kB anonymous region is the program's \TouchPages{}-page
+buffer. It already
+counts towards the virtual size, but nothing in it has been touched, and the
+whole process has only \OneRssKB{}~kB resident.

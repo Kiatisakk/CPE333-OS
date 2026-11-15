@@ -1,0 +1,56 @@
+% ===================================================================
+%  CPE 333 Operating Systems -- Mini-Project 2
+%  Virtual Memory: a page fault counter for one process
+%
+%  BUILD:   powershell -ExecutionPolicy Bypass -File ..\scripts\build_pdf.ps1
+%
+%  WHAT IS SAFE TO EDIT
+%    main.tex           <- this file. Hand-edited.
+%    preamble.tex       <- packages and listing styles. Hand-edited.
+%    discussion/*.tex   <- the prose. Never overwritten by the generator.
+%    generated/*        <- DO NOT EDIT. Rewritten by scripts/make_latex.py.
+%
+%  The source and the transcripts are pulled out of ../module, ../src and
+%  ../results at compile time; the tables and every figure quoted in the
+%  prose (generated/numbers.tex) are parsed from the transcripts, so no
+%  figure in this report can drift from what was actually run.
+% ===================================================================
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\input{generated/numbers}
+
+\title{%
+  \vspace{-1.5cm}%
+  \large CPE 333 Operating Systems, 1/2026\\[0.4em]
+  \Large\bfseries Mini-Project 2: Virtual Memory\\[0.3em]
+  \large A Page Fault Counter for One Process\\[0.3em]
+  \normalsize Group 4%
+}
+
+\author{%
+  \begin{tabular}{@{}l@{\hspace{2em}}l@{}}
+    Kiatisak Markmeeshap & 67070501005 \\
+    Tithinan Sobking     & 67070501018 \\
+    Thanaboon Tikaew     & 67070501021 \\
+    Worawut Sereethai    & 67070501040 \\
+    Chanon Lhumsa-ard    & 67070501059 \\
+    Siriwan Yindeephot   & 67070501075
+  \end{tabular}%
+}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+\input{generated/body}
+
+% The sheet limits the report to 25 pages excluding the appendix; the build
+% script reads this line from the log.
+\clearpage
+\typeout{BODY-PAGES: \the\numexpr\value{page}-1\relax}
+
+\appendix
+\input{generated/appendix}
+
+\end{document}

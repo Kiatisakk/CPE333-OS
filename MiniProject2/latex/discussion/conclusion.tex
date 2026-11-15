@@ -1,0 +1,14 @@
+\texttt{pfcount} reports, for the process it is given, the number of memory
+regions, the total virtual address space, and the minor and major page
+faults, and its figures match those the kernel publishes in \texttt{/proc}.
+The experiments show the behaviour behind those figures: a mapping costs
+virtual space but no memory until it is touched; touching anonymous memory
+causes one minor fault per page; reading a file that is not cached causes
+major faults; and a cached file is mapped with far fewer faults than pages.
+
+The tool has three limits. The tracepoints are x86-specific, so the
+``faults seen'' figures need other hooks on other architectures. The
+tracepoints count fault exceptions, not completed faults, so a fault that
+ends in \texttt{SIGSEGV} would be seen but not counted as minor or major.
+Finally, the module looks the tracepoints up by name, which ties it to
+kernels that use these names.

@@ -1,0 +1,13 @@
+This project builds \texttt{pfcount}, a tool that takes a process ID and
+reports four figures for that process: the number of its memory regions, its
+total virtual address space, and its minor and major page faults. It also
+reports the resident set size, which shows demand paging at work. The tool is
+a loadable kernel module for the \texttt{\KernelRelease} kernel built in
+Mini-Project~1, with a short command-line front end.
+
+Section~2 summarises the ideas the tool measures. Section~3 describes how the
+module obtains each figure. Section~4 checks the figures against
+\texttt{/proc} and against three small programs whose behaviour is known in
+advance. Every transcript in this report was captured by
+\texttt{scripts/run\_all.sh}, which also tests each claim the report makes;
+all \ChecksPassed{} checks passed (Appendix~B).

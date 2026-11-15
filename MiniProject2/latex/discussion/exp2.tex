@@ -1,0 +1,12 @@
+\texttt{1\_touch} maps \TouchPages{} anonymous pages and writes one byte to
+each in three stages. Each first write finds no page table entry inside a
+writable VMA, so the kernel allocates a zero-filled page and maps it. No I/O
+is involved, so every one of these faults is minor: touching
+\TouchPages{} pages caused \TouchMinor{} minor faults and no major faults, and
+the tracepoints saw the same \TouchSeen{}. Transparent huge pages are turned
+off for the buffer (\texttt{MADV\_NOHUGEPAGE}); otherwise one fault could map
+512 pages at once.
+
+The totals since the process started are higher (\TouchStartupMinor{} minor
+faults before the first touch) because loading the program and the C library
+faults in its code, data and stack first.

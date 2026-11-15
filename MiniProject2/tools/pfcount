@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# pfcount [-r] [-w] <pid> -- page fault summary for one process.
+#
+#   -r   also list every memory region (VMA)
+#   -w   redraw every second until the process exits
+#
+# A front end to the pfcount kernel module: it writes the pid to
+# /proc/pfcount and prints what the module reports. Asking again for the pid
+# already monitored keeps counting; a different pid starts from zero.
+
+set -u
+usage() { echo "usage: pfcount [-r] [-w] <pid>" >&2; exit 2; }
+
+regions=0 watch=0
+while getopts rw opt; do
+    case $opt in
+        r) regions=1 ;;
+        w) watch=1 ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND - 1))
+[ $# -eq 1 ] || usage
+pid=$1
+
+if [ ! -e /proc/pfcount ]; then
+    echo "pfcount: module not loaded (sudo insmod pfcount.ko)" >&2
+    exit 1
+fi
+if [ ! -w /proc/pfcount ]; then
+    echo "pfcount: must run as root" >&2
+    exit 1
+fi
+echo "$pid" > /proc/pfcount || exit 1
+
+show() {
+    cat /proc/pfcount
+    if [ "$regions" = 1 ]; then
+        echo "  regions:"
+        cat /proc/pfcount_regions
+    fi
+}
+
+if [ "$watch" = 1 ]; then
+    while kill -0 "$pid" 2>/dev/null; do
+        clear
+        show
+        sleep 1
+    done
+fi
+show

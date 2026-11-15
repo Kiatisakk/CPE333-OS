@@ -1,0 +1,66 @@
+# ./1_touch 1024 &
+[touch] mapped 1024 pages, touched none
+# pfcount -r 8542
+pid 8542 (1_touch), 1 thread
+  memory regions       : 23
+  total virtual space  : 6780 kB (1695 pages)
+  resident (RSS)       : 1676 kB (419 pages)
+  minor faults         : 160      since process start
+  major faults         : 0        since process start
+  since monitoring started:
+    faults seen        : 0        (0 user mode, 0 kernel mode)
+    minor / major      : 0 / 0
+  regions:
+5fa6d0987000-5fa6d0988000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+5fa6d0988000-5fa6d0989000 r-xp        4 kB  /home/builder/mp2/bin/1_touch
+5fa6d0989000-5fa6d098a000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+5fa6d098a000-5fa6d098b000 r--p        4 kB  /home/builder/mp2/bin/1_touch
+5fa6d098b000-5fa6d098c000 rw-p        4 kB  /home/builder/mp2/bin/1_touch
+5fa6e532d000-5fa6e534e000 rw-p      132 kB  [heap]
+7221d1000000-7221d1400000 rw-p     4096 kB
+7221d1400000-7221d1428000 r--p      160 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1428000-7221d15b1000 r-xp     1572 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d15b1000-7221d1600000 r--p      316 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1600000-7221d1604000 r--p       16 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1604000-7221d1606000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1606000-7221d1613000 rw-p       52 kB
+7221d1713000-7221d1716000 rw-p       12 kB
+7221d171d000-7221d171f000 rw-p        8 kB
+7221d171f000-7221d1720000 r--p        4 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1720000-7221d174b000 r-xp      172 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d174b000-7221d1755000 r--p       40 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1755000-7221d1757000 r--p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1757000-7221d1759000 rw-p        8 kB  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7ffff1612000-7ffff1633000 rw-p      132 kB  [stack]
+7ffff1666000-7ffff166a000 r--p       16 kB  [vvar]
+7ffff166a000-7ffff166c000 r-xp        8 kB  [vdso]
+# cat /proc/8542/maps
+5fa6d0987000-5fa6d0988000 r--p 00000000 08:02 142783                     /home/builder/mp2/bin/1_touch
+5fa6d0988000-5fa6d0989000 r-xp 00001000 08:02 142783                     /home/builder/mp2/bin/1_touch
+5fa6d0989000-5fa6d098a000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
+5fa6d098a000-5fa6d098b000 r--p 00002000 08:02 142783                     /home/builder/mp2/bin/1_touch
+5fa6d098b000-5fa6d098c000 rw-p 00003000 08:02 142783                     /home/builder/mp2/bin/1_touch
+5fa6e532d000-5fa6e534e000 rw-p 00000000 00:00 0                          [heap]
+7221d1000000-7221d1400000 rw-p 00000000 00:00 0 
+7221d1400000-7221d1428000 r--p 00000000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1428000-7221d15b1000 r-xp 00028000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d15b1000-7221d1600000 r--p 001b1000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1600000-7221d1604000 r--p 001ff000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1604000-7221d1606000 rw-p 00203000 08:02 2529454                    /usr/lib/x86_64-linux-gnu/libc.so.6
+7221d1606000-7221d1613000 rw-p 00000000 00:00 0 
+7221d1713000-7221d1716000 rw-p 00000000 00:00 0 
+7221d171d000-7221d171f000 rw-p 00000000 00:00 0 
+7221d171f000-7221d1720000 r--p 00000000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1720000-7221d174b000 r-xp 00001000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d174b000-7221d1755000 r--p 0002c000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1755000-7221d1757000 r--p 00036000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7221d1757000-7221d1759000 rw-p 00038000 08:02 2529451                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7ffff1612000-7ffff1633000 rw-p 00000000 00:00 0                          [stack]
+7ffff1666000-7ffff166a000 r--p 00000000 00:00 0                          [vvar]
+7ffff166a000-7ffff166c000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
+# diff <(cut -d' ' -f1 /proc/8542/maps) <(cut -d' ' -f1 /proc/pfcount_regions)
+24d23
+< ffffffffff600000-ffffffffff601000
+# grep VmSize /proc/8542/status
+VmSize:	    6780 kB

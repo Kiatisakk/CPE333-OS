@@ -1,0 +1,18 @@
+Neither page fault tracepoint is exported to modules, so the module cannot
+call \path{register_trace_page_fault_user()}. Instead,
+\path{for_each_kernel_tracepoint()} visits every tracepoint built into
+the kernel, \texttt{find\_tracepoint()} keeps the two whose names match, and
+\texttt{tracepoint\_probe\_register()} attaches a probe to each. Attaching the
+first probe also runs the tracepoints' registration hook,
+\texttt{trace\_pagefault\_reg()}, which turns on the static key that the fault
+handler tests; until then the handler skips the tracing code altogether.
+
+A probe runs on every page fault in the system with preemption disabled, so
+it does one comparison: the thread group of the faulting task against the
+monitored one. It compares \texttt{struct pid} pointers rather than numbers,
+so a reused process ID cannot be mistaken for the monitored process, and it
+counts the faults of every thread of the process. To change the target, the
+module first clears it and calls \texttt{synchronize\_rcu()}, which waits for
+any probe still running; only then does it reset the counters. On unloading,
+\texttt{tracepoint\_synchronize\_unregister()} ensures no probe is still
+executing module code that is about to be freed.
