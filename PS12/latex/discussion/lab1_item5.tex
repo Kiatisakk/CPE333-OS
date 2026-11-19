@@ -1,0 +1,21 @@
+% Discussion for lab1_item5 -- never overwritten by make_latex.py.
+
+Across genuinely separate drives or filesystems, symbolic links and Windows
+directory junctions can cross boundaries, whereas hard links cannot.
+
+A hard link maps a filename directly to an inode or NTFS MFT record number,
+which is only unique within a single filesystem volume. Because the Windows
+test machine has only one physical volume (\texttt{C:}), drive~\texttt{D:} was
+created temporarily with \texttt{subst D:} pointing to a folder on~\texttt{C:}.
+Under \texttt{subst}, both \texttt{D:} and \texttt{C:} resolve to the same
+underlying NTFS volume, which is why \texttt{mklink /H D:\textbackslash hard\_to\_c.txt}
+succeeded here; on two distinct physical volumes (or separate partitions),
+\texttt{mklink /H} fails because NTFS cannot share an MFT entry across volumes.
+Directory junctions (\texttt{mklink /J}) work across local NTFS volumes, while
+unprivileged \texttt{mklink} fails with the same privilege error seen earlier.
+
+The Linux transcript demonstrates the true cross-filesystem boundary directly:
+\texttt{/tmp} and \texttt{/dev/shm} are separate mounted filesystems with
+distinct device IDs, so \texttt{ln} fails with \texttt{Invalid cross-device
+link} (\texttt{EXDEV}), whereas \texttt{ln -s} stores a pathname string,
+succeeds across filesystems, and reads the target file normally.

@@ -1,0 +1,27 @@
+% Discussion for lab2_fifo -- never overwritten by make_latex.py.
+
+A named pipe (FIFO, created with \texttt{mkfifo}) is a special file that
+exposes an in-kernel, unidirectional, first-in-first-out byte stream through a
+path in the filesystem namespace, allowing unrelated processes to communicate
+without a common parent. In \texttt{ls -la pipeFile}, the leading mode
+character \texttt{p} identifies the file type as a named pipe and the size is
+\texttt{0}~bytes because data written to a FIFO is buffered transiently in
+kernel memory and never stored on disk.
+
+The observed behaviour follows directly from POSIX FIFO blocking semantics:
+\begin{itemize}
+  \item \textbf{Synchronised open:} opening \texttt{pipeFile} for reading
+    (\texttt{cat pipeFile} in terminal~2) blocks inside \texttt{open()} until
+    another process opens the same FIFO for writing (\texttt{cat > pipeFile} in
+    terminal~1). The timestamps confirm that terminal~2 remains blocked for
+    two seconds and receives no data until terminal~1 opens the write end.
+  \item \textbf{Ordered streaming:} each line written to the FIFO
+    (\texttt{hello linux} and subsequent lines) enters the kernel pipe buffer
+    and is delivered immediately to the reader in strict FIFO order.
+  \item \textbf{End-of-file propagation:} pressing \texttt{\^{}D} closes
+    terminal~1's standard input, causing \texttt{cat > pipeFile} to exit and
+    close the last write descriptor on \texttt{pipeFile}. Once the kernel
+    buffer drains with no writers remaining, \texttt{read()} in terminal~2
+    returns~\texttt{0} (EOF), so \texttt{cat pipeFile} exits cleanly with
+    status~\texttt{0}.
+\end{itemize}

@@ -1,0 +1,98 @@
+--- win_item1_2: hard and symbolic links, deleting source ---
+C:\> echo hello windows lab 12 > source.txt
+C:\> mklink sym_link.txt source.txt
+You do not have sufficient privilege to perform this operation.
+C:\> mklink /H hard_link.txt source.txt
+Hardlink created for hard_link.txt <<===>> source.txt
+C:\> dir /a-d /b source.txt hard_link.txt
+source.txt
+hard_link.txt
+C:\> del source.txt
+C:\> dir /a-d /b source.txt hard_link.txt
+hard_link.txt
+C:\> type hard_link.txt
+hello windows lab 12 
+
+--- win_item3: level 1 and level 2 hard link chain ---
+C:\> echo win chain data > src3.txt
+C:\> mklink /H l1_hard.txt src3.txt
+Hardlink created for l1_hard.txt <<===>> src3.txt
+C:\> mklink /H l2_hard.txt l1_hard.txt
+Hardlink created for l2_hard.txt <<===>> l1_hard.txt
+C:\> del src3.txt
+C:\> type l1_hard.txt
+win chain data 
+C:\> type l2_hard.txt
+win chain data 
+C:\> del l1_hard.txt
+C:\> type l2_hard.txt
+win chain data 
+
+--- win_item4: directory links, junction loop, and dir /s ---
+C:\> mklink /D dir_sym parent
+You do not have sufficient privilege to perform this operation.
+C:\> mklink /H dir_hard parent
+Access is denied.
+C:\> mklink /J dir_junc parent
+Junction created for dir_junc <<===>> parent
+C:\> dir /b dir_junc
+child
+p.txt
+C:\> mklink /J parent\child\loop parent
+Junction created for parent\child\loop <<===>> parent
+C:\> dir /s parent (truncated; loop recurses until path-length limit)
+ Volume in drive C is OS
+ Volume Serial Number is B402-2638
+ Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent
+11/20/2026  12:41 AM    <DIR>          .
+11/20/2026  12:41 AM    <DIR>          ..
+11/20/2026  12:41 AM    <DIR>          child
+11/20/2026  12:41 AM                14 p.txt
+               1 File(s)             14 bytes
+ Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child
+11/20/2026  12:41 AM    <DIR>          .
+11/20/2026  12:41 AM    <DIR>          ..
+11/20/2026  12:41 AM                13 c.txt
+11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
+               1 File(s)             13 bytes
+ Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop
+11/20/2026  12:41 AM    <DIR>          .
+11/20/2026  12:41 AM    <DIR>          ..
+11/20/2026  12:41 AM    <DIR>          child
+11/20/2026  12:41 AM                14 p.txt
+               1 File(s)             14 bytes
+ Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop\child
+11/20/2026  12:41 AM    <DIR>          .
+11/20/2026  12:41 AM    <DIR>          ..
+11/20/2026  12:41 AM                13 c.txt
+11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
+               1 File(s)             13 bytes
+ Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop\child\loop
+11/20/2026  12:41 AM    <DIR>          .
+11/20/2026  12:41 AM    <DIR>          ..
+11/20/2026  12:41 AM    <DIR>          child
+11/20/2026  12:41 AM                14 p.txt
+               1 File(s)             14 bytes
+... [truncated; total lines produced by dir /s parent: 1030] ...
+11/20/2026  12:41 AM                13 c.txt
+11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
+               1 File(s)             13 bytes
+     Total Files Listed:
+             128 File(s)          1,728 bytes
+             384 Dir(s)  95,428,100,096 bytes free
+
+--- win_item5: drive D: (subst) to drive C: ---
+C:\> subst D: "C:\Users\kiati\AppData\Local\Temp\ps12\driveD"
+C:\> subst
+D:\: => C:\Users\kiati\AppData\Local\Temp\ps12\driveD
+C:\> mklink D:\sym_to_c.txt "C:\Users\kiati\AppData\Local\Temp\ps12\c_src.txt"
+You do not have sufficient privilege to perform this operation.
+C:\> mklink /H D:\hard_to_c.txt "C:\Users\kiati\AppData\Local\Temp\ps12\c_src.txt"
+Hardlink created for D:\hard_to_c.txt <<===>> C:\Users\kiati\AppData\Local\Temp\ps12\c_src.txt
+C:\> type D:\hard_to_c.txt
+c-drive source 
+C:\> mklink /J D:\junc_to_c "C:\Users\kiati\AppData\Local\Temp\ps12\c_dir"
+Junction created for D:\junc_to_c <<===>> C:\Users\kiati\AppData\Local\Temp\ps12\c_dir
+C:\> dir /b D:\junc_to_c
+inside.txt
+C:\> subst D: /d

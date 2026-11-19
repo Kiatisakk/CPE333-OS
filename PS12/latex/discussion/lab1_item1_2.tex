@@ -1,0 +1,23 @@
+% Discussion for lab1_item1_2 -- never overwritten by make_latex.py.
+
+After the source file is deleted, the hard link remains readable and intact,
+whereas the symbolic link becomes a dangling link whose read fails.
+
+In a general-graph directory structure, a hard link (\texttt{ln} on Linux,
+\texttt{mklink /H} on Windows) adds a second directory entry pointing directly
+to the same underlying file object (inode on Linux, MFT entry on NTFS).
+On Linux, \texttt{ls -li} confirms that \texttt{source.txt} and
+\texttt{hard\_link.txt} share one inode and raise the link count from~1 to~2.
+Deleting \texttt{source.txt} only unlinks one name and decrements the link count
+to~1; the data blocks remain allocated until the count reaches~0, so both
+\texttt{cat hard\_link.txt} and Windows \texttt{type hard\_link.txt} still
+return the original content.
+
+A symbolic link (\texttt{ln -s} on Linux, \texttt{mklink} on Windows) is a
+separate file with its own inode storing only the target pathname
+(\texttt{-> source.txt}). When \texttt{source.txt} is removed, the directory
+entry still displays the stored path, but resolving it fails with
+\texttt{No such file or directory}. On this non-elevated Windows shell with
+Developer Mode disabled, \texttt{mklink} without \texttt{/H} or \texttt{/J}
+requires \texttt{SeCreateSymbolicLinkPrivilege} and fails with a privilege
+error, whereas \texttt{mklink /H} requires no elevation.

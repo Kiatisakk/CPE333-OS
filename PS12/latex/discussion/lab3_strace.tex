@@ -1,0 +1,31 @@
+% Discussion for lab3_strace -- never overwritten by make_latex.py.
+
+\texttt{strace} logs every system call a process makes to the Linux kernel.
+After loading shared libraries, GNU \texttt{cat} (\texttt{gnucat}, GNU
+coreutils~9.7) opens \texttt{foo} via \texttt{openat(AT\_FDCWD, "foo",
+O\_RDONLY) = \straceReadFd} and copies it to standard output in four key calls:
+\begin{enumerate}
+  \item \texttt{read(\straceReadFd, "hello\textbackslash n", \straceBufSize) = \straceBytes}:
+    requests up to \straceBufSize{}~bytes (\straceBufKiB{}\,KiB) from
+    fd~\straceReadFd{}; the kernel returns all \straceBytes{}~bytes of
+    \texttt{foo} (\texttt{hello} plus \texttt{\textbackslash n}).
+  \item \texttt{write(\straceWriteFd, "hello\textbackslash n", \straceBytes) = \straceBytes}:
+    writes those \straceBytes{}~bytes to fd~\straceWriteFd{} (\texttt{stdout})
+    and returns~\straceBytes{}.
+  \item \texttt{read(\straceReadFd, "", \straceBufSize) = \straceEofRet}:
+    reads again until end-of-file; returning~\straceEofRet{} signals EOF.
+  \item \texttt{close(\straceReadFd) = \straceCloseRet}: releases
+    fd~\straceReadFd{} in the process's file-descriptor table.
+\end{enumerate}
+
+Thus \texttt{\{3, 1, 6, 32768\}} denote the opened file descriptor
+(\texttt{\straceReadFd}), standard output (\texttt{\straceWriteFd}), the byte
+size of \texttt{foo} (\texttt{\straceBytes}, matching \texttt{wc -c foo}), and
+the requested \texttt{read()} buffer size (GNU \texttt{cat}~9.7 requests
+\straceBufSize{}~bytes, i.e.\ \straceBufKiB{}\,KiB, in the same role as the
+older 32\,KiB / \texttt{32768} buffer on the slide). Ubuntu's default
+\texttt{/usr/bin/cat} (\texttt{uutils} coreutils~0.8.0) likewise opens
+\texttt{foo} on fd~\straceReadFd{} but transfers the \straceBytes{}~bytes
+in-kernel via \texttt{pipe()} and \texttt{splice()} in \uutilsSpliceMiB{}\,MiB
+(\uutilsSpliceSize{}-byte) chunks before closing the descriptors.
+
