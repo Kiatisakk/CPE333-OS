@@ -1,28 +1,18 @@
 % Discussion for lab1_item4 -- never overwritten by make_latex.py.
 
-Yes, a directory can be linked using a symbolic link on Linux (\texttt{ln -s})
-or a directory junction on Windows (\texttt{mklink /J}); hard links to
-directories are forbidden on both operating systems (\texttt{ln} reports
-\texttt{hard link not allowed for directory} and \texttt{mklink /H} fails with
-\texttt{Access is denied}), and unprivileged \texttt{mklink /D} fails for lack
-of symlink privilege.
+Yes, a folder can be linked, but only by a symbolic link (\texttt{ln -s}) or a
+junction (\texttt{mklink /J}). Both systems refuse a hard link to a directory,
+which keeps the directory hierarchy itself free of cycles; unprivileged
+\texttt{mklink /D} fails for lack of the symbolic-link privilege.
 
-Prohibiting directory hard links keeps the core directory hierarchy acyclic so
-reference-counted garbage collection cannot leak isolated cycles. Allowing
-symbolic links or junctions turns the directory namespace into a general graph
-in which cycles such as \texttt{parent/child/loop -> ..} can be created.
-
-Recursive traversal tools handle the cycle differently:
+A link back to the parent (\texttt{parent/child/loop -> ..}) creates a cycle,
+and the two listings treat it differently:
 \begin{itemize}
-  \item On Linux, \texttt{ls -R parent} does not follow symbolic links by
-    default, so it lists \texttt{loop} as an entry and terminates without
-    recursing. When link-following is enabled, both \texttt{ls -RL}
-    (\texttt{not listing already-listed directory}) and \texttt{find -L}
-    (\texttt{File system loop detected}) track visited \texttt{(device, inode)}
-    pairs and abort the cycle.
-  \item On Windows, \texttt{dir /s parent} traverses directory junctions without
-    cycle detection, descending repeatedly into
-    \texttt{parent\textbackslash child\textbackslash loop\textbackslash child\textbackslash loop\textbackslash\ldots}
-    until the Windows path-length limit stops the recursion after
-    \winDirLines{} lines of output.
+  \item \texttt{ls -R} does not follow symbolic links, so it lists
+    \texttt{loop} as a name and stops. When told to follow them,
+    \texttt{ls -RL} and \texttt{find -L} detect the directory they have already
+    visited and skip it.
+  \item \texttt{dir /s} follows the junction with no such check, descending
+    through \texttt{loop\textbackslash child\textbackslash loop\ldots} again and
+    again, and produces \winDirLines{} lines before it stops.
 \end{itemize}

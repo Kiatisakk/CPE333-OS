@@ -1,19 +1,10 @@
 % Discussion for lab1_item3 -- never overwritten by make_latex.py.
 
-Deleting level~1 breaks a level-2 symbolic link, and deleting the source breaks
-both symbolic links; by contrast, a level-2 hard link survives the deletion of
-both the source and level~1.
+With symbolic links, deleting either level~1 or the source breaks level~2. With
+hard links, level~2 survives both deletions.
 
-Symbolic links resolve by following pathnames hop by hop
-(\texttt{l2\_sym.txt -> l1\_sym.txt -> src\_s.txt}). Removing the intermediate
-link \texttt{l1\_sym.txt} severs the chain so reading \texttt{l2\_sym.txt}
-fails immediately, even though \texttt{src\_s.txt} still exists; restoring
-\texttt{l1\_sym.txt} and removing \texttt{src\_s.txt} leaves both links
-dangling.
-
-Hard links do not form a chain of indirection: \texttt{ln l1\_hard.txt
-l2\_hard.txt} (and \texttt{mklink /H l2\_hard.txt l1\_hard.txt} on Windows)
-binds \texttt{l2\_hard.txt} directly to the same inode/MFT entry as
-\texttt{src\_h.txt}, bringing the Linux link count to~3. Removing the source
-reduces the count to~2 and removing level~1 reduces it to~1, leaving
-\texttt{l2\_hard.txt} fully readable on both Linux and Windows.
+A symbolic link is resolved name by name (\texttt{l2\_sym.txt -> l1\_sym.txt ->
+src\_s.txt}), so losing any name in the chain breaks it, even when the file at
+the end still exists. A hard link made from level~1 is not a link to level~1:
+it is a third name for the same inode (link count~3), and each deletion only
+lowers the count.

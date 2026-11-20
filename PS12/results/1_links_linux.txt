@@ -1,17 +1,17 @@
 --- lab1_item1_2: hard and symbolic links, deleting source ---
 $ echo 'hello os lab 12' > source.txt
 $ ls -li source.txt
-18 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 00:42 source.txt
+80 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 17:04 source.txt
 $ ln source.txt hard_link.txt
 $ ln -s source.txt sym_link.txt
 $ ls -li source.txt hard_link.txt sym_link.txt
-18 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 00:42 hard_link.txt
-18 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 00:42 source.txt
-19 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 00:42 sym_link.txt -> source.txt
+80 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 17:04 hard_link.txt
+80 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 17:04 source.txt
+81 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 17:04 sym_link.txt -> source.txt
 $ rm source.txt
 $ ls -li hard_link.txt sym_link.txt
-18 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 00:42 hard_link.txt
-19 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 00:42 sym_link.txt -> source.txt
+80 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 17:04 hard_link.txt
+81 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 17:04 sym_link.txt -> source.txt
 $ cat hard_link.txt
 hello os lab 12
 $ cat sym_link.txt
@@ -22,9 +22,9 @@ cat: sym_link.txt: No such file or directory
 $ echo 'chain data' > src_s.txt
 $ ln -s src_s.txt l1_sym.txt && ln -s l1_sym.txt l2_sym.txt
 $ ls -li src_s.txt l1_sym.txt l2_sym.txt
-22 lrwxrwxrwx 1 kiatisakk kiatisakk  9 Nov 20 00:42 l1_sym.txt -> src_s.txt
-23 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 00:42 l2_sym.txt -> l1_sym.txt
-21 -rw-r--r-- 1 kiatisakk kiatisakk 11 Nov 20 00:42 src_s.txt
+84 lrwxrwxrwx 1 kiatisakk kiatisakk  9 Nov 20 17:04 l1_sym.txt -> src_s.txt
+85 lrwxrwxrwx 1 kiatisakk kiatisakk 10 Nov 20 17:04 l2_sym.txt -> l1_sym.txt
+83 -rw-r--r-- 1 kiatisakk kiatisakk 11 Nov 20 17:04 src_s.txt
 $ cat l2_sym.txt
 chain data
 $ rm l1_sym.txt   # delete level 1
@@ -40,18 +40,18 @@ cat: l2_sym.txt: No such file or directory
 $ echo 'hard chain data' > src_h.txt
 $ ln src_h.txt l1_hard.txt && ln l1_hard.txt l2_hard.txt
 $ ls -li src_h.txt l1_hard.txt l2_hard.txt
-25 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 00:42 l1_hard.txt
-25 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 00:42 l2_hard.txt
-25 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 00:42 src_h.txt
+87 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 17:04 l1_hard.txt
+87 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 17:04 l2_hard.txt
+87 -rw-r--r-- 3 kiatisakk kiatisakk 16 Nov 20 17:04 src_h.txt
 $ rm src_h.txt   # delete source
 $ ls -li l1_hard.txt l2_hard.txt
-25 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 00:42 l1_hard.txt
-25 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 00:42 l2_hard.txt
+87 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 17:04 l1_hard.txt
+87 -rw-r--r-- 2 kiatisakk kiatisakk 16 Nov 20 17:04 l2_hard.txt
 $ cat l2_hard.txt
 hard chain data
 $ rm l1_hard.txt   # delete level 1
 $ ls -li l2_hard.txt
-25 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 00:42 l2_hard.txt
+87 -rw-r--r-- 1 kiatisakk kiatisakk 16 Nov 20 17:04 l2_hard.txt
 $ cat l2_hard.txt
 hard chain data
 
@@ -59,12 +59,12 @@ hard chain data
 $ ln parent parent_hard
 ln: parent: hard link not allowed for directory
 $ ln -s parent parent_sym && ls -ld parent_sym && ls parent_sym
-lrwxrwxrwx 1 kiatisakk kiatisakk 6 Nov 20 00:42 parent_sym -> parent
+lrwxrwxrwx 1 kiatisakk kiatisakk 6 Nov 20 17:04 parent_sym -> parent
 child
 p.txt
 $ ln -s .. parent/child/loop
 $ ls -l parent/child/loop
-lrwxrwxrwx 1 kiatisakk kiatisakk 2 Nov 20 00:42 parent/child/loop -> ..
+lrwxrwxrwx 1 kiatisakk kiatisakk 2 Nov 20 17:04 parent/child/loop -> ..
 $ ls -R parent
 parent:
 child
@@ -94,11 +94,11 @@ $ df -T /tmp /dev/shm | awk 'NR==1 || NR>1 {print $1, $2, $7}'
 Filesystem Type Mounted
 tmpfs tmpfs /tmp
 none tmpfs /dev/shm
-$ stat -c '%d %n' /tmp/ps12.SGNcfC/lab1/xsrc.txt /dev/shm/ps12_xdev.umxNbG
-72 /tmp/ps12.SGNcfC/lab1/xsrc.txt
-65 /dev/shm/ps12_xdev.umxNbG
-$ ln /tmp/ps12.SGNcfC/lab1/xsrc.txt /dev/shm/ps12_xdev.umxNbG/xhard.txt
-ln: failed to create hard link '/tmp/ps12.SGNcfC/lab1/xsrc.txt' => '/dev/shm/ps12_xdev.umxNbG/xhard.txt': Invalid cross-device link
-$ ln -s /tmp/ps12.SGNcfC/lab1/xsrc.txt /dev/shm/ps12_xdev.umxNbG/xsym.txt && ls -l /dev/shm/ps12_xdev.umxNbG/xsym.txt && cat /dev/shm/ps12_xdev.umxNbG/xsym.txt
-lrwxrwxrwx 1 kiatisakk kiatisakk 30 Nov 20 00:42 /dev/shm/ps12_xdev.umxNbG/xsym.txt -> /tmp/ps12.SGNcfC/lab1/xsrc.txt
+$ stat -c '%d %n' /tmp/ps12.6sm97V/lab1/xsrc.txt /dev/shm/ps12_xdev.tUqkuH
+71 /tmp/ps12.6sm97V/lab1/xsrc.txt
+65 /dev/shm/ps12_xdev.tUqkuH
+$ ln /tmp/ps12.6sm97V/lab1/xsrc.txt /dev/shm/ps12_xdev.tUqkuH/xhard.txt
+ln: failed to create hard link '/tmp/ps12.6sm97V/lab1/xsrc.txt' => '/dev/shm/ps12_xdev.tUqkuH/xhard.txt': Invalid cross-device link
+$ ln -s /tmp/ps12.6sm97V/lab1/xsrc.txt /dev/shm/ps12_xdev.tUqkuH/xsym.txt && ls -l /dev/shm/ps12_xdev.tUqkuH/xsym.txt && cat /dev/shm/ps12_xdev.tUqkuH/xsym.txt
+lrwxrwxrwx 1 kiatisakk kiatisakk 30 Nov 20 17:04 /dev/shm/ps12_xdev.tUqkuH/xsym.txt -> /tmp/ps12.6sm97V/lab1/xsrc.txt
 cross-fs content

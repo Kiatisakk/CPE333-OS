@@ -1,16 +1,16 @@
 --- lab2_fifo: mkfifo, ls -la, and two-terminal pipe transfer ---
 $ mkfifo pipeFile
 $ ls -la pipeFile
-prw-r--r-- 1 kiatisakk kiatisakk 0 Nov 20 00:42 pipeFile
+prw-r--r-- 1 kiatisakk kiatisakk 0 Nov 20 17:04 pipeFile
 
 # Terminal 2 runs 'cat pipeFile' first (blocks until a writer opens pipeFile)
-[00:42:27] terminal 2$ cat pipeFile
-[00:42:29] terminal 1$ cat > pipeFile
-[00:42:29] terminal 1 (send): hello linux
-[00:42:29] terminal 2 (recv): hello linux
-[00:42:30] terminal 1 (send): named pipe line 2
-[00:42:30] terminal 2 (recv): named pipe line 2
-[00:42:30] terminal 1 (send): named pipe line 3
-[00:42:30] terminal 1: ^D (EOF, writer closes pipeFile)
-[00:42:30] terminal 2 (recv): named pipe line 3
-[00:42:30] terminal 2: EOF received, cat pipeFile exited (status 0)
+[17:04:50] terminal 2$ cat pipeFile
+[17:04:52] terminal 1$ cat > pipeFile
+[17:04:52] terminal 1 (send): hello linux
+[17:04:52] terminal 2 (recv): hello linux
+[17:04:53] terminal 1 (send): named pipe line 2
+[17:04:53] terminal 2 (recv): named pipe line 2
+[17:04:54] terminal 1 (send): named pipe line 3
+[17:04:54] terminal 2 (recv): named pipe line 3
+[17:04:55] terminal 1: ^D (EOF, writer closes pipeFile)
+[17:04:55] terminal 2: EOF received, cat pipeFile exited (status 0)

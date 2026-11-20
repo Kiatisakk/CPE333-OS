@@ -263,14 +263,26 @@ fifo_received=""
 
     t_writer_open=$(date +%s)
     printf '[%s] terminal 1$ cat > pipeFile\n' "$(date +%H:%M:%S)" >> "$EVENTS"
+    # Terminal 1 types like a person watching terminal 2: send a line, wait
+    # until it shows up there, then type the next. Without the wait the two
+    # loggers race and the transcript can print a send before the previous recv.
+    wait_recv() {   # wait_recv N -- until the reader has N lines (max ~5 s)
+        local i
+        for i in $(seq 100); do
+            [ "$(wc -l < "$READER_RAW")" -ge "$1" ] && return 0
+            sleep 0.05
+        done
+        return 1
+    }
     {
-        printf '[%s] terminal 1 (send): hello linux\n' "$(date +%H:%M:%S)" >> "$EVENTS"
-        printf 'hello linux\n'
-        sleep 1
-        printf '[%s] terminal 1 (send): named pipe line 2\n' "$(date +%H:%M:%S)" >> "$EVENTS"
-        printf 'named pipe line 2\n'
-        printf '[%s] terminal 1 (send): named pipe line 3\n' "$(date +%H:%M:%S)" >> "$EVENTS"
-        printf 'named pipe line 3\n'
+        n=0
+        for msg in 'hello linux' 'named pipe line 2' 'named pipe line 3'; do
+            printf '[%s] terminal 1 (send): %s\n' "$(date +%H:%M:%S)" "$msg" >> "$EVENTS"
+            printf '%s\n' "$msg"
+            n=$((n + 1))
+            wait_recv "$n"
+            sleep 1
+        done
         printf '[%s] terminal 1: ^D (EOF, writer closes pipeFile)\n' "$(date +%H:%M:%S)" >> "$EVENTS"
     } | cat > pipeFile
 
@@ -374,6 +386,13 @@ check "Lab 2: reader blocked until writer opened (start=$t_reader_start, writer=
 expected_fifo=$(printf 'hello linux\nnamed pipe line 2\nnamed pipe line 3')
 [ "$fifo_received" = "$expected_fifo" ]
 check "Lab 2: reader received all written lines in exact order" $?
+
+# The prose says each line appears in terminal 2 as soon as it is typed, so
+# the transcript must read send, recv, send, recv, ... with no send between.
+send_recv=$(grep -oE 'terminal [12] \((send|recv)\)' "$PS12_DIR/results/2_fifo.txt" \
+            | sed 's/.*(\(.*\))/\1/' | paste -sd' ')
+[ "$send_recv" = "send recv send recv send recv" ]
+check "Lab 2: transcript alternates send/recv for every line ($send_recv)" $?
 
 [ "$fifo_reader_rc" -eq 0 ] && [ "$t_reader_end" -ge "$t_reader_first" ]
 check "Lab 2: reader exited cleanly (status 0) on writer EOF" $?

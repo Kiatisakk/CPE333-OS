@@ -40,46 +40,16 @@ child
 p.txt
 C:\> mklink /J parent\child\loop parent
 Junction created for parent\child\loop <<===>> parent
-C:\> dir /s parent (truncated; loop recurses until path-length limit)
- Volume in drive C is OS
- Volume Serial Number is B402-2638
+C:\> dir /s parent   (only the "Directory of" lines shown)
  Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent
-11/20/2026  12:41 AM    <DIR>          .
-11/20/2026  12:41 AM    <DIR>          ..
-11/20/2026  12:41 AM    <DIR>          child
-11/20/2026  12:41 AM                14 p.txt
-               1 File(s)             14 bytes
  Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child
-11/20/2026  12:41 AM    <DIR>          .
-11/20/2026  12:41 AM    <DIR>          ..
-11/20/2026  12:41 AM                13 c.txt
-11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
-               1 File(s)             13 bytes
  Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop
-11/20/2026  12:41 AM    <DIR>          .
-11/20/2026  12:41 AM    <DIR>          ..
-11/20/2026  12:41 AM    <DIR>          child
-11/20/2026  12:41 AM                14 p.txt
-               1 File(s)             14 bytes
  Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop\child
-11/20/2026  12:41 AM    <DIR>          .
-11/20/2026  12:41 AM    <DIR>          ..
-11/20/2026  12:41 AM                13 c.txt
-11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
-               1 File(s)             13 bytes
  Directory of C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent\child\loop\child\loop
-11/20/2026  12:41 AM    <DIR>          .
-11/20/2026  12:41 AM    <DIR>          ..
-11/20/2026  12:41 AM    <DIR>          child
-11/20/2026  12:41 AM                14 p.txt
-               1 File(s)             14 bytes
-... [truncated; total lines produced by dir /s parent: 1030] ...
-11/20/2026  12:41 AM                13 c.txt
-11/20/2026  12:41 AM    <JUNCTION>     loop [C:\Users\kiati\AppData\Local\Temp\ps12\dirtest\parent]
-               1 File(s)             13 bytes
+... [128 directories listed; total lines produced by dir /s parent: 1030] ...
      Total Files Listed:
              128 File(s)          1,728 bytes
-             384 Dir(s)  95,428,100,096 bytes free
+             384 Dir(s)  93,904,539,648 bytes free
 
 --- win_item5: drive D: (subst) to drive C: ---
 C:\> subst D: "C:\Users\kiati\AppData\Local\Temp\ps12\driveD"

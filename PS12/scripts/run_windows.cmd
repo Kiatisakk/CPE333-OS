@@ -95,17 +95,22 @@ echo C:\^> dir /b dir_junc
 dir /b dir_junc
 echo C:\^> mklink /J parent\child\loop parent
 mklink /J parent\child\loop parent
-echo C:\^> dir /s parent (truncated; loop recurses until path-length limit)
+echo C:\^> dir /s parent   (only the "Directory of" lines shown)
 dir /s parent > "%WORK%\dir_s.tmp" 2>&1
 for /f %%N in ('type "%WORK%\dir_s.tmp" ^| %SystemRoot%\System32\find.exe /c /v ""') do set "TOTAL_LINES=%%N"
+for /f %%N in ('%SystemRoot%\System32\find.exe /c "Directory of" ^< "%WORK%\dir_s.tmp"') do set "TOTAL_DIRS=%%N"
+set "COUNT=0"
+for /f "usebackq delims=" %%L in (`%SystemRoot%\System32\findstr.exe /c:"Directory of" "%WORK%\dir_s.tmp"`) do (
+    set /a COUNT+=1
+    if !COUNT! leq 5 echo %%L
+)
+echo ... [!TOTAL_DIRS! directories listed; total lines produced by dir /s parent: !TOTAL_LINES!] ...
 set "NONEMPTY=0"
 for /f "usebackq delims=" %%L in ("%WORK%\dir_s.tmp") do set /a NONEMPTY+=1
-set /a TAIL_START=!NONEMPTY!-5
+set /a TAIL_START=!NONEMPTY!-2
 set "COUNT=0"
 for /f "usebackq delims=" %%L in ("%WORK%\dir_s.tmp") do (
     set /a COUNT+=1
-    if !COUNT! leq 32 echo %%L
-    if !COUNT! equ 33 echo ... [truncated; total lines produced by dir /s parent: !TOTAL_LINES!] ...
     if !COUNT! geq !TAIL_START! echo %%L
 )
 rmdir parent\child\loop

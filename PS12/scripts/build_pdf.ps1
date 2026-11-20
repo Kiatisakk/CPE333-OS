@@ -1,8 +1,5 @@
 # Build latex/main.pdf with pdfLaTeX.
 #
-# PS12 asks for no screenshots, so unlike PS3 there is nothing to warn about
-# missing here.
-#
 # Uses pdflatex directly rather than latexmk: latexmk is a Perl script and a
 # stock MiKTeX install has no Perl script engine. Two passes are needed so that
 # cross-references resolve.
