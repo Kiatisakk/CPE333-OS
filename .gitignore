@@ -24,3 +24,12 @@ __pycache__/
 *.nav
 *.snm
 *.vrb
+
+# Large local course materials, raw build logs, and draft PDFs
+CPE333_PEP_Midterm/
+lecture/
+MiniProject1/results/
+PS06/latex/PS06_concise.pdf
+PS06/latex/PS06_final.pdf
+PS06/latex/main_updated.pdf
+PS12/latex/main.pdf
