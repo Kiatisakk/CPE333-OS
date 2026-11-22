@@ -1,0 +1,23 @@
+﻿
+$ uname -r
+6.18.33.2-microsoft-standard-WSL2
+[exit 0, 0 s]
+
+$ lsb_release -ds
+Ubuntu 24.04.5 LTS
+[exit 0, 0 s]
+
+$ nproc
+8
+[exit 0, 0 s]
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           8.7Gi       603Mi       7.7Gi       3.5Mi       548Mi       8.1Gi
+Swap:          3.0Gi          0B       3.0Gi
+[exit 0, 0 s]
+
+$ df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  3.9G  952G   1% /
+[exit 0, 0 s]

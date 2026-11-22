@@ -1,0 +1,64 @@
+﻿  CC      drivers/pci/msi/irqdomain.o
+  CC [M]  fs/nfs/blocklayout/rpc_pipefs.o
+  CC      lib/list_sort.o
+  CC [M]  drivers/gpio/gpio-max730x.o
+  CC      lib/uuid.o
+  CC      lib/iov_iter.o
+  AR      drivers/pci/msi/built-in.a
+  LD [M]  fs/nfs/blocklayout/blocklayoutdriver.o
+  CC [M]  fs/nfs/client.o
+  CC      drivers/pci/pcie/portdrv.o
+  CC [M]  drivers/gpio/gpio-max732x.o
+  CC [M]  sound/pci/ac97/ac97_pcm.o
+  CC [M]  fs/nfsd/nfssvc.o
+  CC      lib/clz_ctz.o
+  CC      drivers/pci/pcie/rcec.o
+  CC [M]  drivers/gpio/gpio-mb86s7x.o
+  CC      lib/bsearch.o
+  CC [M]  sound/pci/ac97/ac97_proc.o
+  CC [M]  fs/nfs/dir.o
+  CC      drivers/pci/pcie/aspm.o
+  CC [M]  fs/nfsd/nfsctl.o
+  CC [M]  drivers/gpio/gpio-mc33880.o
+  LD [M]  sound/pci/ac97/snd-ac97-codec.o
+  CC [M]  sound/pci/ali5451/ali5451.o
+  CC      lib/find_bit.o
+  CC      lib/llist.o
+  CC [M]  drivers/gpio/gpio-menz127.o
+  CC      lib/lwq.o
+  CC      drivers/pci/pcie/aer.o
+  CC [M]  fs/nfsd/nfsfh.o
+  LD [M]  sound/pci/ali5451/snd-ali5451.o
+  CC [M]  sound/pci/asihpi/asihpi.o
+  CC      lib/memweight.o
+  CC [M]  drivers/gpio/gpio-ml-ioh.o
+  CC [M]  fs/nfs/file.o
+  CC      lib/kfifo.o
+  CC [M]  sound/pci/asihpi/hpioctl.o
+  CC      drivers/pci/pcie/err.o
+  CC [M]  fs/nfsd/vfs.o
+  CC [M]  drivers/gpio/gpio-pca953x.o
+  CC      lib/percpu-refcount.o
+  CC      drivers/pci/pcie/pme.o
+  CC [M]  fs/nfs/getroot.o
+  CC [M]  drivers/gpio/gpio-pca9570.o
+  CC [M]  sound/pci/asihpi/hpimsginit.o
+  CC      lib/rhashtable.o
+  CC [M]  fs/nfsd/export.o
+  CC      drivers/pci/pcie/dpc.o
+  CC [M]  drivers/gpio/gpio-pcf857x.o
+  CC [M]  sound/pci/asihpi/hpicmn.o
+  CC [M]  fs/nfs/inode.o
+  CC      drivers/pci/pcie/ptm.o
+  CC      lib/base64.o
+  CC [M]  fs/nfsd/auth.o
+  CC      lib/once.o
+  CC [M]  sound/pci/asihpi/hpifunc.o
+  CC [M]  drivers/gpio/gpio-pcie-idio-24.o
+  CC      drivers/pci/pcie/edr.o
+  CC [M]  fs/nfsd/lockd.o
+  CC      lib/refcount.o
+  CC [M]  drivers/gpio/gpio-pci-idio-16.o
+  CC [M]  sound/pci/asihpi/hpidebug.o
+
+--- build stopped by hand at 2026-09-17 16:59:05 after about 2h37m: moved to WSL, see report ---

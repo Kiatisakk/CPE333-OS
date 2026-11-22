@@ -1,0 +1,67 @@
+﻿# excerpt: results/wsl/07_build.txt lines 1-3
+
+$ fakeroot debian/rules clean && fakeroot debian/rules binary
+for cert in canonical-uefi-2012-all.pem canonical-uefi-2017-all.pem canonical-uefi-2018-all.pem canonical-uefi-2019-all.pem canonical-uefi-2021v1-all.pem canonical-uefi-2021v2-all.pem canonical-uefi-2021v3-all.pem canonical-uefi-uc2019-all.pem;					\
+
+# excerpt: results/wsl/07_build.txt lines 65290-65317
+dh_installdocs -plinux-image-unsigned-6.8.0-999-generic
+dh_compress -plinux-image-unsigned-6.8.0-999-generic
+# Compress kernel modules, on mantic+
+find debian/linux-image-unsigned-6.8.0-999-generic -name '*.ko' -print0 | xargs -0 -n1 -P 8 -r zstd -19 --quiet --rm
+dh_fixperms -plinux-image-unsigned-6.8.0-999-generic -X/boot/
+dh_shlibdeps -plinux-image-unsigned-6.8.0-999-generic -- -l/usr/x86_64-linux-gnu/lib
+dh_installdeb -plinux-image-unsigned-6.8.0-999-generic
+dh_installdebconf -plinux-image-unsigned-6.8.0-999-generic
+flock -w 60 /home/builder/kernel/linux-6.8.0/debian/.LOCK dh_gencontrol -plinux-image-unsigned-6.8.0-999-generic -- -Vlinux:rprovides='spl-modules,  spl-dkms,  zfs-modules,  zfs-dkms,  v4l2loopback-modules,  v4l2loopback-dkms, ' 
+dpkg-gencontrol: warning: Depends field of package linux-image-unsigned-6.8.0-999-generic: substitution variable ${shlibs:Depends} used, but is not defined
+dh_md5sums -plinux-image-unsigned-6.8.0-999-generic
+dh_builddeb -plinux-image-unsigned-6.8.0-999-generic -- -Znone
+dpkg-deb: building package 'linux-image-unsigned-6.8.0-999-generic' in '../linux-image-unsigned-6.8.0-999-generic_6.8.0-999.139_amd64.deb'.
+dh_installchangelogs -plinux-modules-6.8.0-999-generic
+dh_installdocs -plinux-modules-6.8.0-999-generic
+dh_compress -plinux-modules-6.8.0-999-generic
+# Compress kernel modules, on mantic+
+find debian/linux-modules-6.8.0-999-generic -name '*.ko' -print0 | xargs -0 -n1 -P 8 -r zstd -19 --quiet --rm
+dh_fixperms -plinux-modules-6.8.0-999-generic -X/boot/
+dh_shlibdeps -plinux-modules-6.8.0-999-generic -- -l/usr/x86_64-linux-gnu/lib
+dh_installdeb -plinux-modules-6.8.0-999-generic
+dh_installdebconf -plinux-modules-6.8.0-999-generic
+flock -w 60 /home/builder/kernel/linux-6.8.0/debian/.LOCK dh_gencontrol -plinux-modules-6.8.0-999-generic -- -Vlinux:rprovides='spl-modules,  spl-dkms,  zfs-modules,  zfs-dkms,  v4l2loopback-modules,  v4l2loopback-dkms, ' 
+dpkg-gencontrol: warning: Depends field of package linux-modules-6.8.0-999-generic: substitution variable ${shlibs:Depends} used, but is not defined
+dpkg-gencontrol: warning: Built-Using field of package linux-modules-6.8.0-999-generic: substitution variable ${linux:BuiltUsing} used, but is not defined
+dh_md5sums -plinux-modules-6.8.0-999-generic
+dh_builddeb -plinux-modules-6.8.0-999-generic -- -Znone
+dpkg-deb: building package 'linux-modules-6.8.0-999-generic' in '../linux-modules-6.8.0-999-generic_6.8.0-999.139_amd64.deb'.
+
+# excerpt: results/wsl/07_build.txt lines 65507-65537
+dpkg-deb: building package 'linux-headers-6.8.0-999' in '../linux-headers-6.8.0-999_6.8.0-999.139_all.deb'.
+dpkg-deb: building package 'linux-tools-common' in '../linux-tools-common_6.8.0-999.139_all.deb'.
+dpkg-deb: building package 'linux-cloud-tools-common' in '../linux-cloud-tools-common_6.8.0-999.139_all.deb'.
+dpkg-deb: building package 'linux-tools-host' in '../linux-tools-host_6.8.0-999.139_all.deb'.
+dpkg-deb: building package 'linux-source-6.8.0' in '../linux-source-6.8.0_6.8.0-999.139_all.deb'.
+dpkg-deb: building package 'linux-doc' in '../linux-doc_6.8.0-999.139_all.deb'.
+[exit 0, 22358 s]
+
+$ ls -1 ../*.deb
+../linux-bpf-dev_6.8.0-999.139_amd64.deb
+../linux-buildinfo-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-cloud-tools-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-cloud-tools-6.8.0-999_6.8.0-999.139_amd64.deb
+../linux-cloud-tools-common_6.8.0-999.139_all.deb
+../linux-doc_6.8.0-999.139_all.deb
+../linux-headers-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-headers-6.8.0-999_6.8.0-999.139_all.deb
+../linux-image-unsigned-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-lib-rust-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-libc-dev_6.8.0-999.139_amd64.deb
+../linux-modules-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-modules-extra-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-modules-ipu6-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-modules-iwlwifi-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-modules-usbio-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-source-6.8.0_6.8.0-999.139_all.deb
+../linux-tools-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+../linux-tools-6.8.0-999_6.8.0-999.139_amd64.deb
+../linux-tools-common_6.8.0-999.139_all.deb
+../linux-tools-host_6.8.0-999.139_all.deb
+[exit 0, 0 s]

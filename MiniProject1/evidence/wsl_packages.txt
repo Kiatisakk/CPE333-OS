@@ -1,0 +1,98 @@
+﻿# excerpt: results/wsl/03_packages.txt lines 1-30
+
+$ sudo apt update
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Get:3 http://security.ubuntu.com/ubuntu noble-security/universe Sources [297 kB]
+Hit:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Get:6 http://archive.ubuntu.com/ubuntu noble/main Sources [1384 kB]
+Get:7 http://security.ubuntu.com/ubuntu noble-security/restricted Sources [70.3 kB]
+Get:8 http://security.ubuntu.com/ubuntu noble-security/main Sources [280 kB]
+Get:9 http://security.ubuntu.com/ubuntu noble-security/multiverse Sources [23.3 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble/universe Sources [19.8 MB]
+Get:11 http://archive.ubuntu.com/ubuntu noble/multiverse Sources [299 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble/restricted Sources [18.7 kB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/restricted Sources [75.1 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/multiverse Sources [29.5 kB]
+Get:15 http://archive.ubuntu.com/ubuntu noble-updates/universe Sources [441 kB]
+Get:16 http://archive.ubuntu.com/ubuntu noble-updates/main Sources [522 kB]
+Get:17 http://archive.ubuntu.com/ubuntu noble-backports/multiverse Sources [768 B]
+Get:18 http://archive.ubuntu.com/ubuntu noble-backports/main Sources [5812 B]
+Get:19 http://archive.ubuntu.com/ubuntu noble-backports/universe Sources [13.7 kB]
+Fetched 23.3 MB in 23s (1027 kB/s)
+Reading package lists...
+Building dependency tree...
+Reading state information...
+22 packages can be upgraded. Run 'apt list --upgradable' to see them.
+[exit 0, 26 s]
+
+# excerpt: results/wsl/03_packages.txt lines 32-68
+$ sudo apt build-dep -y linux linux-image-unsigned-6.8.0-139-generic
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Picking 'linux' as source package instead of 'linux-image-unsigned-6.8.0-139-generic'
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  asciidoc asciidoc-base asciidoc-common autoconf automake autopoint
+  autotools-dev bindgen-0.65 build-essential ca-certificates-java clang-17
+  clang-18 cpio debhelper debugedit default-jdk-headless default-jre-headless
+  dh-autoreconf dh-strip-nondeterminism dkms docbook-xml docbook-xsl
+  docutils-common dwz g++ g++-13 g++-13-x86-64-linux-gnu g++-x86-64-linux-gnu
+  gettext intltool-debian java-common libarchive-zip-perl libaudit-dev
+  libcap-dev libcap-ng-dev libclang-common-17-dev libclang-common-18-dev
+  libclang-cpp17t64 libclang-cpp18 libclang1-17t64 libclang1-18
+  libdebhelper-perl libdw-dev libexpat1-dev libfile-stripnondeterminism-perl
+  libgc1 libiberty-dev libjs-jquery libjs-sphinxdoc libjs-underscore
+  libllvm17t64 libllvm18 liblzma-dev libnewt-dev libnl-3-200 libnl-3-dev
+  libnl-genl-3-200 libnl-genl-3-dev libnspr4 libnss3 libnuma-dev libnuma1
+  libobjc-13-dev libobjc4 libpci-dev libpci3 libpcsclite1 libpkgconf3
+  libpng-dev libpython3-dev libpython3.12-dev libslang2-dev libstd-rust-1.75
+  libstd-rust-dev libstdc++-13-dev libsub-override-perl libtool
+  libtraceevent-dev libtraceevent1 libtracefs-dev libtracefs1 libudev-dev
+  libunwind-dev libxml2-utils libxslt1.1 llvm-17-linker-tools
+  llvm-18-linker-tools makedumpfile openjdk-21-jdk-headless
+  openjdk-21-jre-headless pahole pkg-config pkgconf pkgconf-bin po-debconf
+  python3-dev python3-docutils python3-roman python3.12-dev rust-src rustc
+  rustfmt sgml-data sharutils uuid-dev xmlto xsltproc zstd
+The following packages will be upgraded:
+  libpython3.12-minimal libpython3.12-stdlib libpython3.12t64 python3.12
+  python3.12-minimal
+5 upgraded, 108 newly installed, 0 to remove and 17 not upgraded.
+Need to get 361 MB of archives.
+After this operation, 1358 MB of additional disk space will be used.
+
+# excerpt: results/wsl/03_packages.txt lines 793-793
+[exit 0, 187 s]
+
+# excerpt: results/wsl/03_packages.txt lines 795-814
+$ sudo apt install -y fakeroot llvm libncurses-dev dwarves
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  icu-devtools libfakeroot libffi-dev libicu-dev libncurses6 libpfm4
+  libxml2-dev libz3-4 libz3-dev llvm-18 llvm-18-dev llvm-18-runtime
+  llvm-18-tools llvm-runtime
+Suggested packages:
+  icu-doc ncurses-doc llvm-18-doc
+The following NEW packages will be installed:
+  dwarves fakeroot icu-devtools libfakeroot libffi-dev libicu-dev
+  libncurses-dev libncurses6 libpfm4 libxml2-dev libz3-4 libz3-dev llvm
+  llvm-18 llvm-18-dev llvm-18-runtime llvm-18-tools llvm-runtime
+0 upgraded, 18 newly installed, 0 to remove and 17 not upgraded.
+Need to get 91.3 MB of archives.
+After this operation, 538 MB of additional disk space will be used.
+
+# excerpt: results/wsl/03_packages.txt lines 912-912
+[exit 0, 54 s]

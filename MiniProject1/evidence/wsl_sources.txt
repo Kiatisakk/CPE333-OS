@@ -1,0 +1,13 @@
+﻿
+$ grep -n "^Types:" /etc/apt/sources.list.d/ubuntu.sources
+32:Types: deb
+40:Types: deb
+[exit 0, 0 s]
+
+$ sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+[exit 0, 0 s]
+
+$ grep -n "^Types:" /etc/apt/sources.list.d/ubuntu.sources
+32:Types: deb deb-src
+40:Types: deb deb-src
+[exit 0, 0 s]

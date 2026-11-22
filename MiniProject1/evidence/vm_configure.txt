@@ -1,0 +1,57 @@
+﻿
+$ dpkg -l | grep -- '-999' | awk '{print $1, $2}'
+ii linux-headers-6.8.0-999
+ii linux-headers-6.8.0-999-generic
+iU linux-image-unsigned-6.8.0-999-generic
+ii linux-modules-6.8.0-999-generic
+[exit 0, 0 s]
+
+$ ls -1 /boot | grep -- -999
+config-6.8.0-999-generic
+System.map-6.8.0-999-generic
+vmlinuz-6.8.0-999-generic
+[exit 0, 0 s]
+
+$ sudo dpkg --configure -a
+Setting up linux-image-unsigned-6.8.0-999-generic (6.8.0-999.139) ...
+I: /boot/vmlinuz is now a symlink to vmlinuz-6.8.0-999-generic
+I: /boot/initrd.img is now a symlink to initrd.img-6.8.0-999-generic
+Processing triggers for linux-image-unsigned-6.8.0-999-generic (6.8.0-999.139) ...
+/etc/kernel/postinst.d/dkms:
+ * dkms: running auto installation service for kernel 6.8.0-999-generic
+ * dkms: autoinstall for kernel 6.8.0-999-generic
+   ...done.
+/etc/kernel/postinst.d/initramfs-tools:
+update-initramfs: Generating /boot/initrd.img-6.8.0-999-generic
+/etc/kernel/postinst.d/zz-update-grub:
+Sourcing file `/etc/default/grub'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-6.8.0-999-generic
+Found initrd image: /boot/initrd.img-6.8.0-999-generic
+Found linux image: /boot/vmlinuz-6.8.0-139-generic
+Found initrd image: /boot/initrd.img-6.8.0-139-generic
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+Adding boot menu entry for UEFI Firmware Settings ...
+done
+[exit 0, 41 s]
+
+$ dpkg -l | grep -- '-999' | awk '{print $1, $2}'
+ii linux-headers-6.8.0-999
+ii linux-headers-6.8.0-999-generic
+ii linux-image-unsigned-6.8.0-999-generic
+ii linux-modules-6.8.0-999-generic
+[exit 0, 0 s]
+
+$ ls -1 /boot | grep -- -999
+config-6.8.0-999-generic
+initrd.img-6.8.0-999-generic
+System.map-6.8.0-999-generic
+vmlinuz-6.8.0-999-generic
+[exit 0, 0 s]
+
+$ sudo grep -E "^\s*menuentry .*6\.8\.0-999" /boot/grub/grub.cfg | cut -c1-90
+	menuentry 'Ubuntu, with Linux 6.8.0-999-generic' --class ubuntu --class gnu-linux --class
+	menuentry 'Ubuntu, with Linux 6.8.0-999-generic (recovery mode)' --class ubuntu --class g
+[exit 0, 0 s]

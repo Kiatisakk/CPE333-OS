@@ -1,0 +1,15 @@
+﻿
+$ cat debian/debian.env
+DEBIAN=debian.master
+[exit 0, 0 s]
+
+$ head -1 debian.master/changelog
+linux (6.8.0-139.139) noble; urgency=medium
+[exit 0, 0 s]
+
+$ sed -i '1s/-[0-9][0-9]*\./-999./' debian.master/changelog
+[exit 0, 0 s]
+
+$ head -1 debian.master/changelog
+linux (6.8.0-999.139) noble; urgency=medium
+[exit 0, 0 s]

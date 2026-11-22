@@ -1,0 +1,23 @@
+﻿
+$ uname -r
+6.8.0-139-generic
+[exit 0, 0 s]
+
+$ lsb_release -ds
+Ubuntu 24.04.5 LTS
+[exit 0, 0 s]
+
+$ nproc
+6
+[exit 0, 0 s]
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       456Mi       7.2Gi       1.0Mi       338Mi       7.3Gi
+Swap:             0B          0B          0B
+[exit 0, 1 s]
+
+$ df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        44G  2.8G   40G   7% /
+[exit 0, 0 s]

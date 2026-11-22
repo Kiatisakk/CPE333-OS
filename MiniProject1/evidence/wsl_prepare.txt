@@ -1,0 +1,64 @@
+﻿
+$ pwd
+/home/builder/kernel/linux-6.8.0
+[exit 0, 0 s]
+
+$ chmod a+x debian/scripts/* && chmod a+x debian/scripts/misc/* && fakeroot debian/rules clean
+for cert in canonical-uefi-2012-all.pem canonical-uefi-2017-all.pem canonical-uefi-2018-all.pem canonical-uefi-2019-all.pem canonical-uefi-2021v1-all.pem canonical-uefi-2021v2-all.pem canonical-uefi-2021v3-all.pem canonical-uefi-uc2019-all.pem;					\
+do									\
+	for dir in debian.master debian;					\
+	do								\
+		if [ -f "$dir/revoked-certs/$cert" ]; then		\
+			cat "$dir/revoked-certs/$cert";		\
+			break;						\
+		fi;							\
+	done;								\
+done >"debian/canonical-revoked-certs.pem"
+for cert in canonical-livepatch-2025-all.pem canonical-livepatch-all.pem ubuntu-drivers-2025-all.pem ubuntu-drivers-all.pem;					\
+do									\
+	for dir in debian.master debian;					\
+	do								\
+		if [ -f "$dir/certs/$cert" ]; then			\
+			cat "$dir/certs/$cert";			\
+			break;						\
+		fi;							\
+	done;								\
+done >"debian/canonical-certs.pem"
+for i in debian.master/control.stub.in debian/control.d/linux-libc-dev.stub debian/control.d/linux-tools-common.stub debian/control.d/linux-cloud-tools-common.stub debian/control.d/linux-tools-host.stub debian/control.d/linux-source.stub debian/control.d/linux-doc.stub debian/control.d/linux-bpf-dev.stub; do                                           \
+  cat $i;                                                              \
+  echo "";                                                              \
+done | sed -e 's/PKGVER/6.8.0/g'                                   \
+        -e 's/ABINUM/139/g'                                       \
+	-e 's/SRCPKGNAME/linux/g'                             \
+	-e 's/=HUMAN=/64 bit x86/g'                                  \
+	-e 's/=SERIES=/noble/g'                                     \
+	-e 's|\(^Maintainer:.*\)|\1\nXSC-Ubuntu-Compatible-Signing: ubuntu/4 pro/3 livepatch:2025 kmod:2025|g' \
+	-e 's/\(^Build-Depends:$\)/\1\n\ gcc-13, gcc-13-aarch64-linux-gnu [arm64] <cross>, gcc-13-arm-linux-gnueabihf [armhf] <cross>, gcc-13-powerpc64le-linux-gnu [ppc64el] <cross>, gcc-13-riscv64-linux-gnu [riscv64] <cross>, gcc-13-s390x-linux-gnu [s390x] <cross>, gcc-13-x86-64-linux-gnu [amd64] <cross>,/g'         \
+  > debian.master/control.stub;
+flavours="debian.master/control.d/vars.generic debian.master/control.d/vars.generic-64k debian.master/control.d/vars.generic-lpae";\
+for i in $flavours; do							\
+  /bin/bash -e debian/scripts/control-create $i "true" |	\
+	sed -e 's/PKGVER/6.8.0/g'                                  \
+	-e 's/ABINUM/139/g'                                       \
+	-e 's/SRCPKGNAME/linux/g'                             \
+	-e 's/=HUMAN=/64 bit x86/g'                                  \
+	-e 's/=SERIES=/noble/g'                                     \
+	>> debian.master/control.stub;                                      \
+done
+cp debian.master/control.stub debian/control
+dh_testdir
+dh_testroot
+dh_clean
+# normal build junk
+rm -rf debian.master/abi
+rm -rf /home/builder/kernel/linux-6.8.0/debian/build /home/builder/kernel/linux-6.8.0/debian/stamps
+rm -rf debian/linux-*/
+cp debian.master/changelog debian/changelog
+# Install the copyright information.
+cp debian.master/copyright debian/copyright
+# If we have a reconstruct script use it.
+[ -f debian.master/reconstruct ] && bash debian.master/reconstruct || true
+# Remove generated intermediate files
+rm -f debian/control.stub debian.master/control.stub
+rm -f debian/scripts/fix-filenames
+[exit 0, 8 s]

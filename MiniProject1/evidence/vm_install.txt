@@ -1,0 +1,50 @@
+﻿
+$ ls -1 *.deb
+linux-headers-6.8.0-999_6.8.0-999.139_all.deb
+linux-headers-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+linux-image-unsigned-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+linux-modules-6.8.0-999-generic_6.8.0-999.139_amd64.deb
+[exit 0, 0 s]
+
+$ sudo dpkg -i linux-headers-6.8.0-999_*_all.deb
+Selecting previously unselected package linux-headers-6.8.0-999.
+(Reading database ... 121242 files and directories currently installed.)
+Preparing to unpack linux-headers-6.8.0-999_6.8.0-999.139_all.deb ...
+Unpacking linux-headers-6.8.0-999 (6.8.0-999.139) ...
+Setting up linux-headers-6.8.0-999 (6.8.0-999.139) ...
+[exit 0, 133 s]
+
+$ sudo dpkg -i linux-headers-6.8.0-999-generic_*.deb
+Selecting previously unselected package linux-headers-6.8.0-999-generic.
+(Reading database ... 141269 files and directories currently installed.)
+Preparing to unpack linux-headers-6.8.0-999-generic_6.8.0-999.139_amd64.deb ...
+Unpacking linux-headers-6.8.0-999-generic (6.8.0-999.139) ...
+Setting up linux-headers-6.8.0-999-generic (6.8.0-999.139) ...
+/etc/kernel/header_postinst.d/dkms:
+ * dkms: running auto installation service for kernel 6.8.0-999-generic
+ * dkms: autoinstall for kernel 6.8.0-999-generic
+   ...done.
+[exit 0, 31 s]
+
+$ sudo dpkg -i linux-image-unsigned-6.8.0-999-generic_*.deb
+Selecting previously unselected package linux-image-unsigned-6.8.0-999-generic.
+(Reading database ... 151520 files and directories currently installed.)
+Preparing to unpack linux-image-unsigned-6.8.0-999-generic_6.8.0-999.139_amd64.deb ...
+Unpacking linux-image-unsigned-6.8.0-999-generic (6.8.0-999.139) ...
+dpkg: dependency problems prevent configuration of linux-image-unsigned-6.8.0-999-generic:
+ linux-image-unsigned-6.8.0-999-generic depends on linux-modules-6.8.0-999-generic; however:
+  Package linux-modules-6.8.0-999-generic is not installed.
+
+dpkg: error processing package linux-image-unsigned-6.8.0-999-generic (--install):
+ dependency problems - leaving unconfigured
+Errors were encountered while processing:
+ linux-image-unsigned-6.8.0-999-generic
+[exit 1, 3 s]
+
+$ sudo dpkg -i linux-modules-6.8.0-999-generic_*.deb
+Selecting previously unselected package linux-modules-6.8.0-999-generic.
+(Reading database ... 151524 files and directories currently installed.)
+Preparing to unpack linux-modules-6.8.0-999-generic_6.8.0-999.139_amd64.deb ...
+Unpacking linux-modules-6.8.0-999-generic (6.8.0-999.139) ...
+Setting up linux-modules-6.8.0-999-generic (6.8.0-999.139) ...
+[exit 0, 14 s]

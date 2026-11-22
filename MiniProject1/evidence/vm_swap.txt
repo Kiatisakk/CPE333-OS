@@ -1,0 +1,19 @@
+﻿
+$ swapon --show; free -h | grep Swap
+Swap:             0B          0B          0B
+[exit 0, 0 s]
+
+$ sudo fallocate -l 4G /swap.img && sudo chmod 600 /swap.img && sudo mkswap /swap.img && sudo swapon /swap.img
+Setting up swapspace version 1, size = 4 GiB (4294963200 bytes)
+no label, UUID=1210b5c2-823a-468e-9de4-c50cb33a24ce
+[exit 0, 0 s]
+
+$ grep -q "^/swap.img" /etc/fstab || echo "/swap.img none swap sw 0 0" | sudo tee -a /etc/fstab
+/swap.img none swap sw 0 0
+[exit 0, 0 s]
+
+$ swapon --show; free -h | grep Swap
+NAME      TYPE SIZE USED PRIO
+/swap.img file   4G   0B   -2
+Swap:          4.0Gi          0B       4.0Gi
+[exit 0, 0 s]

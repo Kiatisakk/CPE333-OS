@@ -1,0 +1,70 @@
+% ===================================================================
+%  Preamble -- HAND-EDITED.  The build script never changes this file.
+%  Style follows the PS02--PS04 reports in this repository.
+% ===================================================================
+
+% ---- encoding / fonts ---------------------------------------------
+% The report contains ASCII/Latin text only, so pdfLaTeX is sufficient.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+% To typeset Thai names, replace the three lines above with the fontspec
+% block below and build with: scripts\build_pdf.ps1 -Xe
+% \usepackage{fontspec}
+% \setmainfont{Leelawadee UI}
+% \setmonofont{Consolas}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+
+% ---- page breaking -------------------------------------------------
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\raggedbottom
+\newcommand{\headroom}{\Needspace*{6\baselineskip}}
+\captionsetup[lstlisting]{font=small,labelfont=bf}
+\emergencystretch=2em
+
+% ---- colours -------------------------------------------------------
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{codecomment}{RGB}{0,120,0}
+\definecolor{codekeyword}{RGB}{0,0,180}
+\definecolor{codestring}{RGB}{170,0,0}
+
+% ---- terminal transcripts ------------------------------------------
+% Fixed columns and kept spaces preserve shell output such as dpkg tables.
+\lstdefinestyle{term}{
+  basicstyle=\ttfamily\scriptsize,
+  numbers=none,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  columns=fixed,
+  keepspaces=true,
+  basewidth=0.5em,
+  captionpos=b,
+}
+\lstset{style=term}
+\lstset{aboveskip=0.7\baselineskip,belowskip=0.4\baselineskip}
+
+% ---- a visible marker for genuinely missing prose ------------------
+\newcommand{\todoprose}[1]{%
+  \par\medskip
+  \noindent\fcolorbox{red}{yellow!15}{%
+    \parbox{0.97\linewidth}{\textbf{TODO --- write this section.} #1}%
+  }%
+  \par\medskip
+}

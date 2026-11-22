@@ -1,0 +1,9 @@
+﻿Need to get 0 B of source archives.
+[exit 0, 69 s]
+
+$ ls -1
+linux-6.8.0
+linux_6.8.0-139.139.diff.gz
+linux_6.8.0-139.139.dsc
+linux_6.8.0.orig.tar.gz
+[exit 0, 0 s]

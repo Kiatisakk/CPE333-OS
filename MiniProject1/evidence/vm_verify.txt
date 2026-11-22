@@ -1,0 +1,22 @@
+﻿
+$ uname -r
+6.8.0-999-generic
+[exit 0, 0 s]
+
+$ head -1 /home/builder/kernel/linux-6.8.0/debian.master/changelog
+linux (6.8.0-999.139) noble; urgency=medium
+[exit 0, 0 s]
+
+$ dpkg -l | grep -- '-999'
+ii  linux-headers-6.8.0-999                6.8.0-999.139                                    all          Header files related to Linux kernel version 6.8.0
+ii  linux-headers-6.8.0-999-generic        6.8.0-999.139                                    amd64        Linux kernel headers for version 6.8.0 on 64 bit x86 SMP
+ii  linux-image-unsigned-6.8.0-999-generic 6.8.0-999.139                                    amd64        Linux kernel image for version 6.8.0 on 64 bit x86 SMP
+ii  linux-modules-6.8.0-999-generic        6.8.0-999.139                                    amd64        Linux kernel extra modules for version 6.8.0 on 64 bit x86 SMP
+[exit 0, 0 s]
+
+$ ls -1 /boot/vmlinuz*
+/boot/vmlinuz
+/boot/vmlinuz-6.8.0-139-generic
+/boot/vmlinuz-6.8.0-999-generic
+/boot/vmlinuz.old
+[exit 0, 0 s]
