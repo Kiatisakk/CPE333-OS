@@ -1,0 +1,13 @@
+% Discussion for item1_1 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+The results show that Linux and Microsoft Windows use the same basic virtual-
+memory model: each process receives an independent virtual address space, and
+the Memory Management Unit translates virtual addresses through page tables
+maintained by the operating system.
+
+Both systems use demand paging. A page is brought into physical memory only
+when it is required, which improves memory utilization and isolates normal user
+processes from one another. The main implementation difference is how each
+system names and exposes its backing storage and memory states, as summarized
+in the table below.

@@ -1,0 +1,26 @@
+% Discussion for item2_3 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Column meanings.}
+The \texttt{vmstat} command reports process, memory, swap, block I/O, system,
+and CPU activity. The traditional format has 17 standard columns; this procps
+build also appends \texttt{gu} as an extra guest-time percentage column:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{r} and \texttt{b}: runnable processes and processes blocked while waiting for I/O.
+    \item \texttt{swpd}, \texttt{free}, \texttt{buff}, and \texttt{cache}: used swap, free RAM, buffer memory, and cache memory.
+    \item \texttt{si} and \texttt{so}: swap-in and swap-out rates.
+    \item \texttt{bi} and \texttt{bo}: blocks received from and sent to block devices.
+    \item \texttt{in} and \texttt{cs}: interrupts and context switches per second.
+    \item \texttt{us}, \texttt{sy}, \texttt{id}, \texttt{wa}, and \texttt{st}: percentages of CPU time spent in user mode, system mode, idle, I/O wait, and stolen time.
+\end{itemize}
+
+\paragraph{Interpretation.}
+With no delay argument, \texttt{vmstat} prints one row. In that first row, the
+rate columns \texttt{si}, \texttt{so}, \texttt{bi}, \texttt{bo}, \texttt{in},
+\texttt{cs}, \texttt{us}, \texttt{sy}, \texttt{id}, \texttt{wa}, and
+\texttt{st} are averages since boot, not measurements of one instant. The
+\texttt{r}, \texttt{b}, \texttt{swpd}, \texttt{free}, \texttt{buff}, and
+\texttt{cache} columns describe the state when the command was run; \texttt{gu}
+is the corresponding guest-time percentage. Memory values are in KiB by
+default, while CPU columns are percentages.

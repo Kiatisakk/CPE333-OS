@@ -1,0 +1,14 @@
+% Discussion for the Discussion section -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+The Linux results consistently showed high available memory, a mostly idle CPU,
+and no swap-in or swap-out activity. The difference between \texttt{free} and
+\texttt{available} is important because Linux deliberately uses otherwise idle
+RAM for caches. Cached memory is not permanently unavailable; much of it can be
+reclaimed when applications need additional memory.
+
+The swap experiment also demonstrates that total virtual-memory backing can be
+changed while the system is running. Adding the temporary file increased total
+swap by 1~GiB, and disabling it restored the original configuration. Because no
+swap was used, the file could be disabled without first moving active swapped
+pages back into RAM.

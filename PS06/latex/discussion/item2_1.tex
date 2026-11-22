@@ -1,0 +1,24 @@
+% Discussion for item2_1 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Column meanings.}
+The \texttt{free} command reports physical memory and swap utilization. Its
+columns have the following meanings:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{total}: total usable physical memory or swap space.
+    \item \texttt{used}: memory currently unavailable for new applications;
+    in this version of \texttt{free}, it equals \texttt{total} minus
+    \texttt{available}.
+    \item \texttt{free}: completely unused memory.
+    \item \texttt{shared}: memory mainly used by \texttt{tmpfs} and shared-memory facilities.
+    \item \texttt{buff/cache}: kernel buffers and filesystem page cache that can be reclaimed when necessary.
+    \item \texttt{available}: estimated memory available for starting new applications without swapping.
+\end{itemize}
+
+\paragraph{Interpretation.}
+The RAM columns are different views of memory, not disjoint categories to add
+together. In particular, \texttt{used} includes memory outside the
+\texttt{available} estimate, and \texttt{shared} can overlap with cached memory.
+The captured figures confirm that \texttt{used} is the difference between
+\texttt{total} and \texttt{available}.

@@ -1,0 +1,10 @@
+\texttt{vmstat} reports processes, memory, swapping, block I/O, system events,
+and CPU activity. \texttt{r} counts runnable processes and \texttt{b} blocked
+processes. \texttt{swpd}, \texttt{free}, \texttt{buff}, and \texttt{cache} are
+memory amounts in KiB. \texttt{si}/\texttt{so} are swap rates;
+\texttt{bi}/\texttt{bo} are block-device input/output rates;
+\texttt{in}/\texttt{cs} are interrupts/context switches per second.
+\texttt{us}, \texttt{sy}, \texttt{id}, \texttt{wa}, \texttt{st}, and \texttt{gu}
+are CPU percentages for user, system, idle, I/O wait, stolen, and guest time.
+The first row's rate columns average activity since boot; its process and
+memory columns describe the state when the command ran.

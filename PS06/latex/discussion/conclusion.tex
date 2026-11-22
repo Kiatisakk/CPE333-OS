@@ -1,0 +1,21 @@
+% Discussion for the Conclusion section -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Linux.}
+Linux and Windows both implement isolated virtual address spaces and demand
+paging, but they expose memory state using different terminology and tools. In
+Linux, \texttt{free} and \texttt{vmstat} showed that the test machine had ample
+available RAM and no swap activity. Adding a temporary 1~GiB swap file raised
+total swap from 3.0~GiB to 4.0~GiB, while disabling it returned the system to
+3.0~GiB.
+
+\paragraph{Windows.}
+Windows Resource Monitor complements the Linux command-line tools by providing
+a graphical view of process working sets and physical-memory states. The
+captured values showed 3,228~MB available memory, so the machine still had
+reclaimable memory despite 82\% physical-memory usage.
+
+\paragraph{Overall result.}
+The experiments therefore demonstrate the same virtual-memory principles in
+both operating systems while showing why their monitoring tools report the
+state using different names and views.

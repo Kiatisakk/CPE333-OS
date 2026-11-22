@@ -1,0 +1,11 @@
+# LaTeX auxiliary files (same set as PS02/PS03/PS04)
+latex/*.aux
+latex/*.log
+latex/*.out
+latex/*.toc
+latex/*.lof
+latex/*.lot
+latex/*.fls
+latex/*.fdb_latexmk
+latex/*.synctex.gz
+scripts/__pycache__/

@@ -1,0 +1,31 @@
+% Discussion for item2_4 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Cumulative statistics.}
+The \texttt{-s} or \texttt{-{}-stats} option displays cumulative memory and system
+counters in a descriptive list. The output reported 9,123,456~KiB total memory,
+1,089,272~KiB used, 260,652~KiB active, 1,791,260~KiB inactive, 6,557,884~KiB free,
+55,044~KiB in buffers, and 1,609,940~KiB in cache. Total swap was
+3,145,728~KiB, with 0~KiB used and 3,145,728~KiB free. CPU counters included
+300,326 non-nice user ticks, 426 nice-user ticks, 409,463 system ticks,
+73,865,315 idle ticks, 14,136 I/O-wait ticks, 0 IRQ ticks, 177,606 soft-IRQ ticks,
+0 stolen ticks, and zero guest ticks. The system had paged in 11,987,079~KiB and
+paged out 436,411~KiB, with zero pages swapped in or out. It had recorded
+109,331,345 interrupts, 175,343,465 context switches, a boot-time value of
+1,789,748,573, and 371,003 forks.
+
+\paragraph{Repeated samples.}
+The positional arguments in \texttt{vmstat 2 5} set a delay of two seconds and
+a count of five reports. This is useful because it shows changes over time
+instead of providing only a single system-wide average. The first row represents
+an average since boot, whereas later rows describe each two-second interval.
+
+\paragraph{Observed result.}
+The five-sample output showed no blocked processes, no used swap, and no
+swap-in or swap-out activity. Free memory ranged from 6,575,368~KiB to
+6,581,908~KiB. Buffer memory stayed at 55,060~KiB and cache memory stayed at
+1,609,940~KiB. CPU idle time ranged from 97\% to 100\%. Block output was zero
+in nearly every interval, with a brief write burst of \texttt{bo=54} in interval
+3. Interrupts ranged from 270 to 2,848 per second, while context switches
+ranged from 239 to 4,739 per second. These values indicate a lightly loaded
+system with no paging pressure.

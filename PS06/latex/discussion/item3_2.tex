@@ -1,0 +1,22 @@
+% Explanation of the Windows Resource Monitor interface.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Process memory.}
+The Processes table shows memory activity for each running process. The Commit
+column represents virtual memory for which Windows has committed backing
+storage. Working Set is the portion currently resident in physical RAM.
+Shareable memory can potentially be shared with other processes, while Private
+memory belongs only to that process. Hard Faults/sec indicates how often pages
+must be retrieved from storage instead of RAM; a hard fault is not necessarily
+a hardware failure.
+
+\paragraph{Physical memory.}
+The Physical Memory bar separates installed RAM into Hardware Reserved, In Use,
+Modified, Standby, and Free. Hardware Reserved is unavailable to Windows; In Use
+contains resident pages used by processes and the operating system; Modified
+pages have changed and must be written before reuse; Standby pages hold cached
+data that can be reclaimed; and Free pages are immediately unused. Available is
+Standby plus Free, while Cached is Standby plus Modified. The graphs on the
+right show the last 60 seconds of used physical memory, commit charge, and hard
+faults per second. Commit charge tracks committed virtual memory and therefore
+does not equal RAM currently in use.

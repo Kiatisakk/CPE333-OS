@@ -1,0 +1,20 @@
+% Discussion for item1_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Initial configuration.}
+The initial swap configuration contained a 3.0~GiB partition at
+\texttt{/dev/sdc}. The \texttt{USED} column was 0~B, which indicates that no
+pages were stored in swap at the time of the experiment.
+
+\paragraph{Increasing swap.}
+A temporary 1~GiB file was created and configured as swap. Permission mode 600
+was applied so that only the root user could read or write the file.
+
+After the file was enabled, \texttt{swapon}~\texttt{-{}-show} displayed both the original
+3~GiB partition and the new 1~GiB file. Total swap therefore increased from
+3.0~GiB to 4.0~GiB. The swap usage remained 0~B.
+
+\paragraph{Decreasing swap.}
+The temporary swap file was then disabled. The system again displayed only the
+original \texttt{/dev/sdc} swap partition, and total swap returned to 3.0~GiB.
+The file was deleted only after \texttt{swapoff} completed successfully.

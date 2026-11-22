@@ -1,0 +1,181 @@
+
+FREE - BASIC
+$ free
+               total        used        free      shared  buff/cache   available
+Mem:         9123456      998188     6644492       25764     1667800     8125268
+Swap:        3145728           0     3145728
+
+FREE - HELP
+$ free --help
+
+Usage:
+ free [options]
+
+Options:
+ -b, --bytes         show output in bytes
+     --kilo          show output in kilobytes
+     --mega          show output in megabytes
+     --giga          show output in gigabytes
+     --tera          show output in terabytes
+     --peta          show output in petabytes
+ -k, --kibi          show output in kibibytes
+ -m, --mebi          show output in mebibytes
+ -g, --gibi          show output in gibibytes
+     --tebi          show output in tebibytes
+     --pebi          show output in pebibytes
+ -h, --human         show human-readable output
+     --si            use powers of 1000 not 1024
+ -l, --lohi          show detailed low and high memory statistics
+ -L, --line          show output on a single line
+ -t, --total         show total for RAM + swap
+ -v, --committed     show committed memory and commit limit
+ -s N, --seconds N   repeat printing every N seconds
+ -c N, --count N     repeat printing N times, then exit
+ -w, --wide          wide output
+
+     --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see free(1).
+
+FREE - HUMAN READABLE
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           8.7Gi       974Mi       6.3Gi        25Mi       1.6Gi       7.7Gi
+Swap:          3.0Gi          0B       3.0Gi
+
+FREE - FIVE SAMPLES, TWO SECONDS APART
+$ free -s 2 -c 5
+               total        used        free      shared  buff/cache   available
+Mem:         9123456      998188     6644492       25764     1667800     8125268
+Swap:        3145728           0     3145728
+
+               total        used        free      shared  buff/cache   available
+Mem:         9123456     1000256     6642376       25756     1667876     8123200
+Swap:        3145728           0     3145728
+
+               total        used        free      shared  buff/cache   available
+Mem:         9123456      996972     6645656       25756     1667888     8126484
+Swap:        3145728           0     3145728
+
+               total        used        free      shared  buff/cache   available
+Mem:         9123456      998380     6644240       25756     1667888     8125076
+Swap:        3145728           0     3145728
+
+               total        used        free      shared  buff/cache   available
+Mem:         9123456      998380     6644240       25756     1667888     8125076
+Swap:        3145728           0     3145728
+
+VMSTAT - BASIC
+$ vmstat
+procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu
+ 0  0      0 6644012  53512 1614376    0    0   120     4 1167    2  0  1 99  0  0  0
+
+VMSTAT - HELP
+$ vmstat --help
+
+Usage:
+ vmstat [options] [delay [count]]
+
+Options:
+ -a, --active           active/inactive memory
+ -f, --forks            number of forks since boot
+ -m, --slabs            slabinfo
+ -n, --one-header       do not redisplay header
+ -s, --stats            event counter statistics
+ -d, --disk             disk statistics
+ -D, --disk-sum         summarize disk statistics
+ -p, --partition <dev>  partition specific statistics
+ -S, --unit <char>      define display unit
+ -w, --wide             wide output
+ -t, --timestamp        show timestamp
+ -y, --no-first         skips first line of output
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see vmstat(8).
+
+VMSTAT - STATISTICS
+$ vmstat -s
+      9123456 K total memory
+       998608 K used memory
+       246672 K active memory
+      1786500 K inactive memory
+      6644012 K free memory
+        53512 K buffer memory
+      1614376 K swap cache
+      3145728 K total swap
+            0 K used swap
+      3145728 K free swap
+       295485 non-nice user cpu ticks
+          420 nice user cpu ticks
+       401671 system cpu ticks
+     73092009 idle cpu ticks
+        13409 IO-wait cpu ticks
+            0 IRQ cpu ticks
+       175271 softirq cpu ticks
+            0 stolen cpu ticks
+            0 non-nice guest cpu ticks
+            0 nice guest cpu ticks
+     11146987 K paged in
+       408943 K paged out
+            0 pages swapped in
+            0 pages swapped out
+    108050758 interrupts
+    173301654 CPU context switches
+   1789748573 boot time
+       365818 forks
+
+VMSTAT - FIVE SAMPLES, TWO SECONDS APART
+$ vmstat 2 5
+procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu
+ 0  0      0 6644012  53512 1614376    0    0   120     4 1167    2  0  1 99  0  0  0
+ 0  0      0 6643988  53512 1614380    0    0     0     0 1241 2075  0  1 99  0  0  0
+ 0  0      0 6643988  53520 1614380    0    0     0    14 1638 2449  1  2 98  0  0  0
+ 0  0      0 6643988  53520 1614380    0    0     0     0  201  288  0  0 100  0  0  0
+ 0  0      0 6639704  53520 1614380    0    0     0     0 1230 1879  0  1 99  0  0  0
+
+SWAP - BEFORE
+$ swapon --show
+NAME     TYPE      SIZE USED PRIO
+/dev/sdc partition   3G   0B   -2
+
+SWAP - BEFORE (FREE)
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           8.7Gi       979Mi       6.3Gi        25Mi       1.6Gi       7.7Gi
+Swap:          3.0Gi          0B       3.0Gi
+
+SWAP - CREATE AND ENABLE 1 GIB FILE
+$ sudo fallocate -l 1G /swapfile_ps6
+$ sudo chmod 600 /swapfile_ps6
+$ sudo mkswap /swapfile_ps6
+Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+no label, UUID=68ca62eb-08e5-4ec5-9993-45e18cf9a378
+$ sudo swapon /swapfile_ps6
+
+SWAP - AFTER INCREASE
+$ swapon --show
+NAME          TYPE       SIZE USED PRIO
+/dev/sdc      partition    3G   0B   -2
+/swapfile_ps6 file      1024M   0B   -3
+
+SWAP - AFTER INCREASE (FREE)
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           8.7Gi       978Mi       6.3Gi        25Mi       1.6Gi       7.7Gi
+Swap:          4.0Gi          0B       4.0Gi
+
+SWAP - AFTER DECREASE
+$ sudo swapoff /swapfile_ps6
+$ swapon --show
+NAME     TYPE      SIZE USED PRIO
+/dev/sdc partition   3G   0B   -2
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           8.7Gi       978Mi       6.3Gi        25Mi       1.6Gi       7.7Gi
+Swap:          3.0Gi          0B       3.0Gi
+$ sudo rm /swapfile_ps6

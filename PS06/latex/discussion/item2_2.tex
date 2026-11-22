@@ -1,0 +1,22 @@
+% Discussion for item2_2 -- prose goes here.
+% scripts/make_latex.py will NEVER overwrite this file.
+
+\paragraph{Readable output.}
+The \texttt{-h} or \texttt{-{}-human} option displays memory using readable binary
+units such as MiB and GiB. The human-readable output showed 8.7~GiB total RAM,
+1.1~GiB used, 6.2~GiB free, 25~MiB shared, 1.6~GiB in buffers and cache, and
+7.6~GiB available. It also reported 3.0~GiB total swap, with 0~B used and
+3.0~GiB free.
+
+\paragraph{Repeated samples.}
+The \texttt{-s 2} option repeats the report every two seconds, while
+\texttt{-c 5} stops after five reports. Combining them provides a short memory
+time series without requiring the command to be stopped manually.
+
+\paragraph{Observed result.}
+Across the five samples, total RAM remained 9,123,456~KiB and total swap remained
+3,145,728~KiB. Used RAM ranged from 1,101,148~KiB to 1,103,596~KiB, while free
+RAM ranged from 6,544,768~KiB to 6,547,216~KiB. Shared memory stayed near
+25,716~KiB, buffer and cache memory changed only slightly from 1,663,776~KiB to
+1,663,780~KiB, and available memory ranged from 8,019,860~KiB to
+8,022,308~KiB. Swap usage stayed at 0~KiB in every sample.

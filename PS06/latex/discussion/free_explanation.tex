@@ -1,0 +1,8 @@
+The \texttt{free} command reports physical memory and swap use. Its columns
+mean: \texttt{total}, usable RAM or swap; \texttt{used}, RAM unavailable to new
+applications; \texttt{free}, unused memory; \texttt{shared}, mainly tmpfs and
+shared memory; \texttt{buff/cache}, buffers and reclaimable cache; and
+\texttt{available}, estimated RAM for new applications without swapping.
+The RAM columns overlap and should not be added together. Here,
+\texttt{used} equals \texttt{total} minus \texttt{available}:
+$9{,}123{,}456 - 8{,}009{,}596 = 1{,}113{,}860\text{ KiB}$.
