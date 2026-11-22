@@ -138,6 +138,22 @@ def block_lines(rel, label):
     return last - first + 1
 
 
+def screenshot_fig(filename, caption, covers=None, width=r"0.92\linewidth"):
+    rel = "results/screenshots/" + filename
+    path = os.path.join(ROOT, rel)
+    if not os.path.exists(path):
+        raise SystemExit("make_latex.py: missing screenshot %s" % rel)
+    if covers:
+        QUOTED.add(covers)
+    return "\n".join([
+        r"\Needspace*{18\baselineskip}",
+        r"\begin{center}",
+        r"\includegraphics[width=%s]{../%s}" % (width, rel),
+        r"\captionof{figure}{%s}" % caption,
+        r"\end{center}",
+    ])
+
+
 def strace_table(vals):
     """Derived summary of the four key syscalls and numbers from 3_strace.txt."""
     fd = vals["straceReadFd"]
@@ -244,60 +260,65 @@ def build_body(vals):
 
     sub("Creating Hard and Symbolic Links and Deleting the Source",
         "lab1_item1_2", [
-            block_listing(R_LIN, "lab1_item1_2",
-                          r"Linux: hard and symbolic links before and after \texttt{rm source.txt}"), "",
-            block_listing(R_WIN, "win_item1_2",
-                          r"Windows: \texttt{mklink} (unprivileged) and \texttt{mklink /H} before and after \texttt{del source.txt}"), "",
+            screenshot_fig("lab1_item1_2_linux.png",
+                           r"Linux terminal screenshot: creating hard/symbolic links and deleting \texttt{source.txt}",
+                           covers=(R_LIN, "lab1_item1_2")), "",
+            screenshot_fig("lab1_item1_2_windows.png",
+                           r"Windows Command Prompt screenshot: \texttt{mklink} and \texttt{mklink /H} before and after \texttt{del source.txt}",
+                           covers=(R_WIN, "win_item1_2")), "",
         ])
 
     sub("Multi-Level Links (Level 1 and Level 2)",
         "lab1_item3", [
-            block_listing(R_LIN, "lab1_item3",
-                          r"Linux: level-1 and level-2 symbolic and hard link chains",
-                          style="termsmall", reserve=False), "",
-            block_listing(R_WIN, "win_item3",
-                          r"Windows: level-1 and level-2 hard link chain via \texttt{mklink /H}"), "",
-        ], reserve_block=(R_LIN, "lab1_item3", "termsmall"))
+            screenshot_fig("lab1_item3_linux.png",
+                           r"Linux terminal screenshot: level-1 and level-2 symbolic and hard link chains",
+                           covers=(R_LIN, "lab1_item3")), "",
+            screenshot_fig("lab1_item3_windows.png",
+                           r"Windows Command Prompt screenshot: level-1 and level-2 symbolic and hard link chains",
+                           covers=(R_WIN, "win_item3")), "",
+        ])
 
     sub("Links to Directories and Recursive Loop Traversal",
         "lab1_item4", [
-            block_listing(R_LIN, "lab1_item4",
-                          r"Linux: directory links, parent loop, \texttt{ls -R}, \texttt{ls -RL}, and \texttt{find -L}",
-                          reserve=False), "",
-            block_listing(R_WIN, "win_item4",
-                          r"Windows: \texttt{mklink /D}, \texttt{/H}, \texttt{/J}, junction loop, and truncated \texttt{dir /s}",
-                          style="termsmall"), "",
-        ], reserve_block=(R_LIN, "lab1_item4", "term"))
+            screenshot_fig("lab1_item4_linux.png",
+                           r"Linux terminal screenshot: directory links, loop symlink, \texttt{ls -R}, \texttt{ls -RL}, and \texttt{find -L}",
+                           covers=(R_LIN, "lab1_item4")), "",
+            screenshot_fig("lab1_item4_windows.png",
+                           r"Windows Command Prompt screenshot: \texttt{mklink /D}, \texttt{/H}, \texttt{/J}, junction loop, and \texttt{dir /s}",
+                           covers=(R_WIN, "win_item4")), "",
+        ])
 
     sub("Cross-Drive and Cross-Filesystem Links (Drive D: to Drive C:)",
         "lab1_item5", [
-            block_listing(R_WIN, "win_item5",
-                          r"Windows: \texttt{subst D:} to a folder on \texttt{C:} and \texttt{mklink} tests",
-                          reserve=False), "",
-            block_listing(R_LIN, "lab1_item5",
-                          r"Linux: cross-filesystem \texttt{ln} (EXDEV) vs.\ \texttt{ln -s} between \texttt{/tmp} and \texttt{/dev/shm}"), "",
-        ], reserve_block=(R_WIN, "win_item5", "term"))
+            screenshot_fig("lab1_item5_windows.png",
+                           r"Windows Command Prompt screenshot: \texttt{subst D:} to a folder on \texttt{C:} and \texttt{mklink} tests",
+                           covers=(R_WIN, "win_item5")), "",
+            screenshot_fig("lab1_item5_linux.png",
+                           r"Linux terminal screenshot: cross-filesystem \texttt{ln} (EXDEV) vs.\ \texttt{ln -s} between \texttt{/tmp} and \texttt{/dev/shm}",
+                           covers=(R_LIN, "lab1_item5")), "",
+        ])
 
     # ------------------------------------------------------------ Lab 2 ---
-    sec("Lab 2: Linux's File Type --- Named Pipe (FIFO)",
-        reserve_block=(R_FIFO, "lab2_fifo", "term"))
+    sec("Lab 2: Linux's File Type --- Named Pipe (FIFO)", newpage=True)
     out.extend([
-        block_listing(R_FIFO, "lab2_fifo",
-                      r"Linux: creating \texttt{pipeFile} with \texttt{mkfifo} and transferring lines between two terminals",
-                      reserve=False), "",
+        screenshot_fig("lab2_fifo_linux.png",
+                       r"Linux terminal screenshot: \texttt{mkfifo pipeFile}, \texttt{ls -la}, and two-terminal FIFO transfer",
+                       covers=(R_FIFO, "lab2_fifo")), "",
+        screenshot_fig("lab2_fifo_diagram.png",
+                       r"Named pipe (FIFO) architecture and 3-phase blocking/streaming/EOF execution flow",
+                       width=r"0.96\linewidth"), "",
         r"\input{discussion/lab2_fifo}", "",
     ])
 
     # ------------------------------------------------------------ Lab 3 ---
-    sec(r"Lab 3: Reading and Writing Files (\texttt{strace})",
-        newpage=True, reserve_block=(R_STRACE, "lab3_strace_gnucat", "termsmall"))
+    sec(r"Lab 3: Reading and Writing Files (\texttt{strace})", newpage=True)
     out.extend([
-        block_listing(R_STRACE, "lab3_strace_gnucat",
-                      r"Linux: \texttt{echo hello > foo} and full \texttt{strace gnucat foo} (GNU coreutils 9.7)",
-                      style="termsmall", reserve=False), "",
-        block_listing(R_STRACE, "lab3_strace_uutils",
-                      r"Linux: \texttt{strace cat foo} excerpt on Ubuntu's default \texttt{uutils} \texttt{cat} 0.8.0",
-                      style="termsmall"), "",
+        screenshot_fig("lab3_strace_gnucat_linux.png",
+                       r"Linux terminal screenshot: \texttt{strace gnucat foo} showing \texttt{openat}, \texttt{read}, \texttt{write}, \texttt{read} (EOF), and \texttt{close}",
+                       covers=(R_STRACE, "lab3_strace_gnucat")), "",
+        screenshot_fig("lab3_strace_uutils_linux.png",
+                       r"Linux terminal screenshot: \texttt{strace cat foo} on Ubuntu default \texttt{uutils} \texttt{cat} using \texttt{splice()}",
+                       covers=(R_STRACE, "lab3_strace_uutils")), "",
         strace_table(vals), "",
         r"\input{discussion/lab3_strace}", "",
     ])

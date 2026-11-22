@@ -1,9 +1,9 @@
 % Discussion for lab1_item4 -- never overwritten by make_latex.py.
 
-Yes, a folder can be linked, but only by a symbolic link (\texttt{ln -s}) or a
-junction (\texttt{mklink /J}). Both systems refuse a hard link to a directory,
-which keeps the directory hierarchy itself free of cycles; unprivileged
-\texttt{mklink /D} fails for lack of the symbolic-link privilege.
+Yes, a folder can be linked, but only by a symbolic link (\texttt{ln -s},
+\texttt{mklink /D}) or a junction (\texttt{mklink /J}). Both systems refuse a
+hard link to a directory, which keeps the directory hierarchy itself free of
+cycles.
 
 A link back to the parent (\texttt{parent/child/loop -> ..}) creates a cycle,
 and the two listings treat it differently:

@@ -1,0 +1,696 @@
+{
+  "members": [
+    {
+      "id": "67070501075",
+      "name": "Siriwan Yindeephot",
+      "role": "Peterson: fairness and performance",
+      "pages": "1–2, 6–7",
+      "time": "2–3 min",
+      "duty": "เปิดเรื่องและเกณฑ์วิเคราะห์ แล้วอธิบาย progress, fairness และ performance ของ Peterson"
+    },
+    {
+      "id": "67070501018",
+      "name": "Tithinan Sobking",
+      "role": "Peterson: idea and correctness",
+      "pages": "3–5",
+      "time": "2–3 min",
+      "duty": "อธิบาย flag/turn และ pseudocode แล้วไล่เหตุการณ์เพื่ออธิบาย mutual exclusion"
+    },
+    {
+      "id": "67070501005",
+      "name": "Kiatisak Markmeeshap",
+      "role": "LL/SC: idea and correctness",
+      "pages": "8–10",
+      "time": "2–3 min",
+      "duty": "อธิบาย reservation, LL/SC และ pseudocode แล้วไล่เหตุการณ์สองเธรด"
+    },
+    {
+      "id": "67070501021",
+      "name": "Thanaboon Tikaew",
+      "role": "MCS: idea and correctness",
+      "pages": "13–15",
+      "time": "2–3 min",
+      "duty": "อธิบาย node, tail, pseudocode และการส่ง lock ตามคิว"
+    },
+    {
+      "id": "67070501040",
+      "name": "Worawut Sereethai",
+      "role": "LL/SC: fairness and performance",
+      "pages": "11–12",
+      "time": "2–3 min",
+      "duty": "อธิบาย retry, progress, starvation และกรณีที่ทำให้เสียเวลา spin"
+    },
+    {
+      "id": "67070501059",
+      "name": "Chanon Lhumsa-ard",
+      "role": "MCS: fairness and performance",
+      "pages": "16–19",
+      "time": "2–3 min",
+      "duty": "อธิบาย FIFO, progress และกรณี preemption แล้วสรุปเปรียบเทียบทั้งสามแบบ"
+    }
+  ],
+  "sources": {
+    "assignment": "PS08/UTF-8_PS8_2025.pptx, slides 1 and 3–6",
+    "lecture": "PS08/UTF-8_Lecture8_LocksMechanism.pptx, slides 4, 15, 23–31",
+    "ostep": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-locks.pdf",
+    "peterson": "https://zoo.cs.yale.edu/classes/cs323/doc/Peterson.pdf",
+    "arm": "https://documentation-service.arm.com/static/68c223238a337a2bc6645c0a",
+    "mcs": "https://www.cs.rochester.edu/u/scott/papers/1991_TOCS_synch.pdf",
+    "mcs_code": "https://www.cs.rochester.edu/research/synchronization/pseudocode/ss.html",
+    "scheduler": "https://www.cs.rochester.edu/u/scott/papers/1997_TOCS_synch.pdf"
+  },
+  "slides": [
+    {
+      "title": "Problem Session 08: Lock Mechanisms",
+      "owner": 0,
+      "layout": "cover",
+      "subtitle": "Peterson's Algorithm · LL/SC · MCS Lock",
+      "description": "CPE 333 Operating Systems, 1/2026\nGroup OS InW",
+      "notes": "สวัสดีครับ/ค่ะ กลุ่ม OS InW จะอธิบาย lock สามกลไก คือ Peterson, LL/SC และ MCS โดยดูจากโค้ดว่าป้องกันการเข้าพร้อมกันอย่างไร ใครต้องรอ และมีกรณีไหนที่การรอเพิ่มต้นทุนให้โปรแกรม วันนี้ใช้การวิเคราะห์อัลกอริทึมและลำดับเหตุการณ์เป็นหลัก\n\nใช้เกณฑ์สี่ข้อจาก lecture Mutual exclusion ดูว่าเข้าได้พร้อมกันหรือไม่ Absence of deadlock ดูว่ามีคนเดินต่อได้หรือไม่ Fairness ดูว่าใครอาจถูกแซงซ้ำ ส่วน performance ดูต้นทุนจากคำสั่ง การ retry และการรอ ต้องระบุสมมติฐานว่า memory ordering ถูกต้อง เธรดที่จำเป็นได้รัน และเจ้าของออกจาก critical section แล้วปล่อย lock ต่อไป Tithinan และ Siriwan จะอธิบาย Peterson ร่วมกัน",
+      "sources": [
+        "assignment",
+        "lecture"
+      ]
+    },
+    {
+      "title": "Group: OS InW",
+      "owner": 0,
+      "layout": "roles",
+      "takeaway": "Two presenters per algorithm: mechanism/correctness, then fairness/performance.",
+      "notes": "แบ่งสมาชิกสองคนต่ออัลกอริทึม คนแรกเล่าไอเดีย โค้ด และเหตุผลของ mutual exclusion คนที่สองอธิบาย progress, fairness และกรณี performance ที่ทำให้รอหรือเสียเวลา Tithinan คู่กับ Siriwan สำหรับ Peterson, Kiatisak คู่กับ Worawut สำหรับ LL/SC และ Thanaboon คู่กับ Chanon สำหรับ MCS",
+      "sources": [
+        "assignment"
+      ]
+    },
+    {
+      "title": "Peterson's Algorithm",
+      "owner": 1,
+      "layout": "section",
+      "subtitle": "Two threads coordinate with flags and turn.",
+      "notes": "ส่วนนี้เป็น Peterson สำหรับสองเธรด จุดสำคัญคือใช้ flag ประกาศความต้องการเข้า และใช้ turn ตัดสินเมื่อทั้งสองต้องการเข้าพร้อมกัน จะไล่จากโค้ดไปถึงเหตุการณ์ที่ทำให้คนหนึ่งต้องรอ",
+      "sources": [
+        "peterson",
+        "ostep"
+      ],
+      "pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "title": "Peterson: Idea and Pseudocode",
+      "owner": 1,
+      "layout": "code",
+      "bullets": [
+        "flag[i] announces that thread i wants entry.",
+        "turn gives priority to the other thread.",
+        "Wait only when the other wants entry and has priority.",
+        "Assume sequentially consistent atomic reads/writes."
+      ],
+      "code": "Initially: flag[0] = flag[1] = false\n\nlock(i):\n    j = 1 - i\n    flag[i] = true\n    turn = j\n    while flag[j] and turn == j:\n        spin\n\nunlock(i):\n    flag[i] = false",
+      "takeaway": "The two conditions together decide whether a contender must wait.",
+      "notes": "flag ของแต่ละคนหมายถึงอยากเข้า ส่วน turn เท่ากับอีกคนคือยอมให้อีกคนก่อน ถ้าอีกคนไม่อยากเข้า เราเข้าได้เลย ถ้าทั้งสองอยากเข้า turn จะตัดสิน โค้ดนี้เป็น pseudocode ภายใต้ sequential consistency ในการเขียนโปรแกรมจริงต้องใช้ atomics และ ordering ที่เหมาะสม การใส่ volatile อย่างเดียวไม่รับประกันสมมติฐานนี้",
+      "sources": [
+        "peterson",
+        "ostep"
+      ]
+    },
+    {
+      "title": "Peterson: Mutual Exclusion",
+      "owner": 1,
+      "layout": "table",
+      "headers": [
+        "Step",
+        "Thread 0",
+        "Thread 1"
+      ],
+      "widths": [
+        1.0,
+        5.565,
+        5.565
+      ],
+      "rows": [
+        [
+          "1",
+          "flag[0] = true",
+          ""
+        ],
+        [
+          "2",
+          "",
+          "flag[1] = true"
+        ],
+        [
+          "3",
+          "turn = 1",
+          ""
+        ],
+        [
+          "4",
+          "",
+          "turn = 0 (last write)"
+        ],
+        [
+          "5",
+          "turn != 1: enter",
+          "flag[0] and turn == 0: wait"
+        ],
+        [
+          "6",
+          "unlock: flag[0] = false",
+          "The wait condition becomes false."
+        ]
+      ],
+      "takeaway": "While both intent flags stay true, the last writer of turn must wait.",
+      "notes": "ตารางเป็นตัวอย่างที่เธรด 1 เขียน turn ทีหลัง จึงยอมให้เธรด 0 เธรด 0 เข้าได้และเธรด 1 รอ เหตุผลทั่วไปคือสมมติว่าทั้งสองอยู่ใน critical section แล้วเลือกคนที่เขียน turn ทีหลัง ภายใต้ sequential consistency อีกคนตั้ง flag ไปแล้ว และ turn ยังให้สิทธิ์อีกคน คนที่เขียนทีหลังจึงต้องรอ ขัดกับสมมติฐานว่าเข้าได้ทั้งคู่ คำว่าเขียนทีหลังต้องรอใช้ในช่วงที่ทั้งสอง flag ยังเป็นจริง ต่อไป Siriwan จะวิเคราะห์ progress, fairness และ performance ของ Peterson",
+      "sources": [
+        "peterson"
+      ]
+    },
+    {
+      "title": "Peterson: Progress and Fairness",
+      "owner": 0,
+      "layout": "columns",
+      "columns": [
+        {
+          "title": "Progress and waiting order",
+          "bullets": [
+            "One shared turn value breaks a simultaneous-entry tie.",
+            "The holder clears its flag on exit, allowing the waiter to proceed.",
+            "After the intent/turn doorway, the peer can overtake at most once."
+          ]
+        },
+        {
+          "title": "Assumptions and limitations",
+          "bullets": [
+            "The basic algorithm supports only two threads.",
+            "The proof needs sequential consistency and eventual execution.",
+            "Bounded overtaking does not bound elapsed waiting time."
+          ]
+        }
+      ],
+      "takeaway": "Bounded waiting is an algorithm guarantee under the stated assumptions.",
+      "notes": "ถ้าทั้งสองแข่งกัน turn ทำให้มีคนหนึ่งผ่านได้ เมื่อเจ้าของเคลียร์ flag คนรอก็ผ่านได้อีก ในแง่ fairness หลังประกาศความต้องการและเขียน turn แล้ว อีกคนแซงได้ไม่เกินหนึ่งครั้ง แต่ไม่ได้หมายความว่าจะได้ CPU ภายในกี่มิลลิวินาที เพราะ scheduler ยังมีผล ข้อจำกัดอีกสองอย่างคือใช้ได้สองเธรด และต้องรักษา memory ordering ตามสมมติฐาน",
+      "sources": [
+        "peterson",
+        "ostep"
+      ]
+    },
+    {
+      "title": "Peterson: Performance Cases",
+      "owner": 0,
+      "layout": "cases",
+      "headers": [
+        "Case",
+        "What the code does",
+        "Performance consequence"
+      ],
+      "widths": [
+        2.6,
+        4.55,
+        4.98
+      ],
+      "rows": [
+        [
+          "No contention",
+          "Write flag/turn, then test the peer.",
+          "No waiting loop; ordered accesses still add cost."
+        ],
+        [
+          "Two active contenders",
+          "Read shared flag/turn until priority allows entry.",
+          "Spinning and shared-state updates add overhead."
+        ],
+        [
+          "Longer critical section",
+          "The peer's flag stays true for longer.",
+          "The waiting thread spends more CPU time spinning."
+        ],
+        [
+          "Preempted holder",
+          "A waiter runs while the holder cannot finish.",
+          "Progress waits for the scheduler to run the holder."
+        ]
+      ],
+      "takeaway": "Software coordination still consumes CPU time while a thread waits.",
+      "notes": "ตอนไม่มี contention จะผ่านเงื่อนไขได้เลย แต่ยังมีต้นทุนของ flag, turn และ ordering ตอนสองคนแย่งกัน คนหนึ่งต้องอ่านค่าซ้ำ ถ้า critical section ยาวก็รอนานขึ้น และถ้าเจ้าของถูก preempt คนรออาจใช้ CPU ไปกับการ spin ทั้งที่เจ้าของยังทำงานต่อไม่ได้ ต่อไป Kiatisak และ Worawut จะอธิบายการใช้ LL/SC เพื่อแย่ง ownership แบบ atomic",
+      "sources": [
+        "peterson",
+        "ostep"
+      ]
+    },
+    {
+      "title": "Load-Linked / Store-Conditional",
+      "owner": 2,
+      "layout": "section",
+      "subtitle": "A reservation makes the conditional update atomic.",
+      "notes": "LL/SC เป็นคู่คำสั่งของฮาร์ดแวร์บางสถาปัตยกรรม จะอธิบายเป็น pseudocode เพื่อให้เห็นว่าการอ่านค่า lock กับการได้เป็นเจ้าของเป็นคนละขั้นตอน จุดตัดสินคือ Store-Conditional ที่สำเร็จ",
+      "sources": [
+        "ostep",
+        "arm"
+      ],
+      "pair": [
+        2,
+        4
+      ]
+    },
+    {
+      "title": "LL/SC: Idea and Pseudocode",
+      "owner": 2,
+      "layout": "code",
+      "bullets": [
+        "flag = 0 means free; flag = 1 means held.",
+        "LL reads the flag and establishes a reservation.",
+        "SC stores only while that reservation remains valid.",
+        "Only successful SC grants entry to the critical section."
+      ],
+      "code": "Initially: flag = 0\n\nlock():\n    repeat:\n        while LL_acquire(flag) != 0:\n            spin\n    until SC(flag, 1) succeeds\n\nunlock():\n    store_release(flag, 0)",
+      "takeaway": "Acquire/release ordering also protects the data inside the critical section.",
+      "notes": "LL อ่าน flag และสร้าง reservation ถ้ายังเป็น 1 ก็วนรอ พออ่านได้ 0 จึงลอง SC เพื่อเขียน 1 ถ้าสำเร็จจึงเข้าได้ ถ้าล้มเหลวต้องกลับไป LL ใหม่ LL ไม่ได้จอง lock ให้เราโดยทันที ชื่อ LL_acquire และ store_release แสดง ordering ของข้อมูลที่ lock ป้องกัน โค้ดนี้นิยาม SC เป็นสำเร็จหรือล้มเหลว ไม่ใช้ค่า status ดิบของ STXR ซึ่งศูนย์หมายถึงสำเร็จ",
+      "sources": [
+        "ostep",
+        "arm"
+      ]
+    },
+    {
+      "title": "LL/SC: Mutual Exclusion",
+      "owner": 2,
+      "layout": "table",
+      "headers": [
+        "Step",
+        "Thread A",
+        "Thread B",
+        "Effect"
+      ],
+      "widths": [
+        0.8,
+        3.0,
+        3.0,
+        5.33
+      ],
+      "rows": [
+        [
+          "1",
+          "LL reads 0",
+          "",
+          "A establishes a reservation."
+        ],
+        [
+          "2",
+          "",
+          "LL reads 0",
+          "B also establishes a reservation."
+        ],
+        [
+          "3",
+          "SC successfully writes 1",
+          "",
+          "A enters; B's reservation becomes invalid."
+        ],
+        [
+          "4",
+          "",
+          "SC fails",
+          "B stays outside and returns to LL."
+        ],
+        [
+          "5",
+          "unlock stores 0",
+          "",
+          "A leaves the critical section."
+        ],
+        [
+          "6",
+          "",
+          "Fresh LL, then SC",
+          "B may acquire with a new reservation."
+        ]
+      ],
+      "takeaway": "At most one of the old competing reservations can successfully claim the lock.",
+      "notes": "แม้ A และ B อ่าน 0 ได้ทั้งคู่ แต่ถ้า A ทำ SC สำเร็จก่อน B จะเสีย reservation และ SC ล้มเหลว B จึงยังเข้าไม่ได้ หลัง A ปลด lock B ต้องใช้ LL ใหม่ก่อนลอง SC อีกครั้ง เหตุผลคือในกลุ่ม reservation เดิมที่อ่าน 0 มาก่อนการเขียนสำเร็จ จะมีคน claim ได้ไม่เกินหนึ่งคน ไม่ได้หมายความว่าทุกการแข่งขันต้องมีหนึ่งคนสำเร็จทันที เพราะ SC อาจล้มเหลวจากเหตุอื่นได้ด้วย ต่อไป Worawut จะวิเคราะห์การ retry, fairness และต้นทุนของการรอ",
+      "sources": [
+        "ostep",
+        "arm"
+      ]
+    },
+    {
+      "title": "LL/SC: Progress and Fairness",
+      "owner": 4,
+      "layout": "columns",
+      "columns": [
+        {
+          "title": "Progress",
+          "bullets": [
+            "Failed SC returns to a fresh LL attempt.",
+            "The holder must run and release the lock.",
+            "The valid exclusive loop needs an opportunity to complete."
+          ]
+        },
+        {
+          "title": "Fairness and limitations",
+          "bullets": [
+            "No queue or bounded-waiting guarantee; starvation is possible.",
+            "Reservation loss can cause SC failure without a competing update.",
+            "LL/SC support and exclusive-loop rules depend on the architecture."
+          ]
+        }
+      ],
+      "takeaway": "Retry supports progress, but does not guarantee a turn for each waiter.",
+      "notes": "ถ้า SC ล้มเหลวเราจะลองใหม่ แต่คำว่าลองใหม่ไม่รับประกันว่าคนเดิมจะได้เข้า ต้องมีโอกาสให้ exclusive loop สำเร็จ และเจ้าของต้องได้รันเพื่อปล่อย lock ไม่มีคิวกำหนดลำดับ จึงมีคนแพ้ซ้ำจน starvation ได้ SC อาจล้มเหลวแม้ไม่มีใครเปลี่ยน flag เพราะ reservation หายได้ ต้องทำช่วง LL ถึง SC ให้สอดคล้องกับกฎของสถาปัตยกรรม เครื่อง x86 ไม่รองรับคำสั่ง LL/SC โดยตรง แต่เรายังวิเคราะห์อัลกอริทึมนี้จากความหมายคำสั่งได้",
+      "sources": [
+        "ostep",
+        "arm"
+      ]
+    },
+    {
+      "title": "LL/SC: Performance Cases",
+      "owner": 4,
+      "layout": "cases",
+      "headers": [
+        "Case",
+        "What the code does",
+        "Performance consequence"
+      ],
+      "widths": [
+        2.6,
+        4.55,
+        4.98
+      ],
+      "rows": [
+        [
+          "No contention",
+          "LL sees 0; the first SC can succeed.",
+          "A short acquisition path without spinning."
+        ],
+        [
+          "Many active contenders",
+          "Read the shared flag, then race with SC when free.",
+          "Failed attempts retry; updates invalidate reservations."
+        ],
+        [
+          "Longer critical section",
+          "Keep reading while the flag remains 1.",
+          "CPU time spent spinning grows with the wait."
+        ],
+        [
+          "Preempted holder",
+          "Waiters run while the owner cannot unlock.",
+          "Scheduling delays extend the wait."
+        ]
+      ],
+      "takeaway": "The cost comes from waiting and retries, beyond the successful LL/SC pair.",
+      "notes": "ตอนว่างเส้นทางสั้นคือ LL แล้ว SC สำเร็จ แต่เมื่อหลายเธรดแย่งกัน จะมีการ retry และ update ที่ทำให้ reservation ของคนอื่นใช้ไม่ได้ ระหว่าง flag เป็น 1 คนรออ่านอย่างเดียว จึงไม่ควรพูดว่าทุกรอบ spin ต้องเขียนหรือเป็น remote access ถ้าเจ้าของไม่ได้รัน เวลา spin ก็ยาวขึ้น ส่วนต่อไป Thanaboon และ Chanon จะเล่าว่า MCS เปลี่ยนการรอจาก flag กลางไปเป็น node ของแต่ละคนอย่างไร",
+      "sources": [
+        "ostep",
+        "arm",
+        "mcs"
+      ]
+    },
+    {
+      "title": "MCS Queue Lock",
+      "owner": 3,
+      "layout": "section",
+      "subtitle": "Waiters form a queue and spin on their own nodes.",
+      "notes": "MCS เป็น lock เพิ่มเติมที่เลือกมาศึกษา จุดเด่นคือคนรอต่อคิว และแต่ละคนวนอ่าน flag ใน node ของตัวเอง แทนการแย่ง flag เดียวกันทั้งหมด จะดูว่าคิวช่วยเรื่องลำดับและการสื่อสารระหว่าง core อย่างไร",
+      "sources": [
+        "mcs",
+        "mcs_code"
+      ],
+      "pair": [
+        3,
+        5
+      ]
+    },
+    {
+      "title": "MCS: Queue and Local Spinning",
+      "owner": 3,
+      "layout": "queue_code",
+      "nodes": [
+        [
+          "T0",
+          "In critical section"
+        ],
+        [
+          "T1",
+          "Spin on T1.locked"
+        ],
+        [
+          "T2",
+          "Spin on T2.locked"
+        ]
+      ],
+      "code": "Initially: tail = null\nlock(me):\n    me.next = null\n    me.locked = true\n    prev = exchange(tail, me)\n    if prev != null:\n        prev.next = me\n        while me.locked:\n            spin",
+      "bullets": [
+        "One node per acquisition, valid until unlock finishes.",
+        "Atomic exchange fixes queue order.",
+        "Release clears the successor's locked field.",
+        "With no successor, CAS resets tail to null."
+      ],
+      "takeaway": "A predecessor signals one successor; each waiter polls its own field.",
+      "notes": "ภาพคือ T0 เป็นเจ้าของ T1 และ T2 รออยู่ด้านหลัง tail ชี้คนท้ายคิว exchange ทำให้แต่ละคนได้ predecessor ที่แน่นอน แล้วเชื่อม next ถ้ามี predecessor เราวนอ่าน locked ใน node ของเราเอง ตอนปล่อยเจ้าของเคลียร์ locked ของ successor คนเดียว ถ้าไม่มีคนต่อจะใช้ CAS คืน tail เป็น null โค้ดนี้เป็นขั้นตอนเชิงแนวคิด การใช้จริงต้องมี memory ordering สำหรับการ publish node และการ handoff ถ้า me.next ยังเป็น null ตอนปล่อย ให้ลอง CAS(tail, me, null) ก่อน และคืนได้เมื่อ CAS สำเร็จเท่านั้น ถ้าล้มเหลวต้องรอ successor เชื่อม next แล้วจึงเคลียร์ locked ของ successor Node ต้องยังใช้ได้จน unlock เสร็จ",
+      "sources": [
+        "mcs",
+        "mcs_code"
+      ]
+    },
+    {
+      "title": "MCS: Mutual Exclusion and Handoff",
+      "owner": 3,
+      "layout": "table",
+      "headers": [
+        "Step",
+        "Action",
+        "Logical queue",
+        "Who may enter?"
+      ],
+      "widths": [
+        0.8,
+        5.05,
+        3.1,
+        3.18
+      ],
+      "rows": [
+        [
+          "1",
+          "A exchanges tail and finds null.",
+          "A",
+          "A enters."
+        ],
+        [
+          "2",
+          "B exchanges tail and links behind A.",
+          "A → B",
+          "B waits on B.locked."
+        ],
+        [
+          "3",
+          "C exchanges tail and links behind B.",
+          "A → B → C",
+          "C waits on C.locked."
+        ],
+        [
+          "4",
+          "A releases by clearing B.locked.",
+          "B → C",
+          "B enters; C still waits."
+        ],
+        [
+          "5",
+          "B releases by clearing C.locked.",
+          "C",
+          "C enters next."
+        ]
+      ],
+      "takeaway": "Only the queue head enters; release grants ownership to one successor.",
+      "notes": "exchange เป็น atomic จึงกำหนดตำแหน่งในคิวได้แน่นอน A ที่เจอคิวว่างเข้าได้ B และ C รอคนก่อนหน้าของตน เมื่อ A ออกจาก critical section แล้วจึงเคลียร์ B.locked ไม่ได้เคลียร์ของทุกคน B เข้าได้แต่ C ยังรอจน B ปล่อย การเคลียร์ flag นี้คือสัญญาณ ownership ภายในคิว ไม่ใช่การ wake เธรดที่หลับผ่าน OS ต่อไป Chanon จะวิเคราะห์ลำดับคิวและกรณีที่ทำให้ performance แย่ลง",
+      "sources": [
+        "mcs",
+        "mcs_code"
+      ]
+    },
+    {
+      "title": "MCS: Progress and Fairness",
+      "owner": 5,
+      "layout": "columns",
+      "columns": [
+        {
+          "title": "Progress and FIFO order",
+          "bullets": [
+            "The CAS-release version serves successful tail-exchange order.",
+            "A later enqueued waiter cannot overtake its predecessor.",
+            "Progress requires predecessors to run and release."
+          ]
+        },
+        {
+          "title": "Assumptions and limitations",
+          "bullets": [
+            "Keep the node valid until unlock finishes; order publication and handoff.",
+            "A preempted successor can delay everyone behind it.",
+            "FIFO admission does not imply equal counts or a time bound."
+          ]
+        }
+      ],
+      "takeaway": "Queue order controls admission; the scheduler still controls execution.",
+      "notes": "FIFO หมายถึงลำดับที่ exchange สำเร็จเพื่อเข้าคิว ไม่ใช่เวลาที่เริ่มเรียกฟังก์ชัน ใครเข้าคิวทีหลังแซง predecessor ไม่ได้ แต่ต้องให้คนข้างหน้าได้รันและปล่อย lock ถ้า successor ถูก preempt คนหลังทั้งหมดก็รอได้ Node ต้องมีอายุและ ordering ถูกต้อง ที่นี่วิเคราะห์ MCS รุ่น release ด้วย CAS รุ่นใน paper ที่ไม่มี CAS มีรายละเอียด fairness ต่างออกไป",
+      "sources": [
+        "mcs",
+        "mcs_code",
+        "scheduler"
+      ]
+    },
+    {
+      "title": "MCS: Performance Cases",
+      "owner": 5,
+      "layout": "cases",
+      "headers": [
+        "Case",
+        "What the code does",
+        "Performance consequence"
+      ],
+      "widths": [
+        2.6,
+        4.55,
+        4.98
+      ],
+      "rows": [
+        [
+          "No contention",
+          "Initialize a node, exchange tail, CAS on release.",
+          "Queue management adds work even without waiting."
+        ],
+        [
+          "Many active contenders",
+          "Spin on separate nodes; predecessor signals successor.",
+          "Appropriate placement reduces coherence contention."
+        ],
+        [
+          "Preempted holder",
+          "Waiters keep polling their own fields.",
+          "Local spinning still consumes CPU time."
+        ],
+        [
+          "Preempted successor",
+          "Release selects a queued thread that is not running.",
+          "Later waiters cannot bypass it; progress stalls."
+        ]
+      ],
+      "takeaway": "MCS reduces waiting communication, but still depends on scheduled threads.",
+      "notes": "ตอนไม่มีคนรอ MCS ยังมีงานจัด node และ tail ตอนคนรอเยอะข้อดีคือการอ่าน node คนละอัน ซึ่งลดการแย่ง cache line หากจัดวาง node เหมาะสม แต่ไม่ได้ทำให้คนรอหยุดใช้ CPU กรณีที่ successor ถูก preempt แม้คนเดิมปล่อยแล้ว คนอื่นก็แซงหัวคิวไม่ได้ งานหยุดรอ scheduler ได้เช่นกัน ตอนท้ายจะเปรียบเทียบข้อดีและข้อจำกัดของทั้งสามอัลกอริทึม",
+      "sources": [
+        "mcs",
+        "mcs_code",
+        "scheduler"
+      ]
+    },
+    {
+      "title": "References",
+      "owner": 5,
+      "layout": "references",
+      "refs": [
+        [
+          "CPE 333",
+          "PS08 assignment slides and Lecture 8: Locks Mechanism",
+          "assignment"
+        ],
+        [
+          "Arpaci-Dusseau & Arpaci-Dusseau",
+          "Operating Systems: Three Easy Pieces, chapter 28: Locks",
+          "ostep"
+        ],
+        [
+          "G. L. Peterson, 1981",
+          "Myths About the Mutual Exclusion Problem",
+          "peterson"
+        ],
+        [
+          "Arm, 2025",
+          "Implementation Software Synchronization Primitives in A64",
+          "arm"
+        ],
+        [
+          "Mellor-Crummey & Scott, 1991",
+          "Algorithms for Scalable Synchronization on Shared-Memory Multiprocessors",
+          "mcs"
+        ],
+        [
+          "Kontothanassis, Wisniewski & Scott, 1997",
+          "Scheduler-Conscious Synchronization",
+          "scheduler"
+        ]
+      ],
+      "notes": "แหล่งหลักคือโจทย์และ lecture ของรายวิชา ตำรา OSTEP บท Locks บทความต้นฉบับของ Peterson และ MCS คู่มือ Arm และบทความเรื่อง scheduler ลิงก์เต็มอยู่ใน speaker notes ของแต่ละหน้า หน้าถัดไปจะสรุปข้อดีและข้อจำกัดของทั้งสามแบบ",
+      "sources": [
+        "assignment",
+        "lecture",
+        "ostep",
+        "peterson",
+        "arm",
+        "mcs",
+        "mcs_code",
+        "scheduler"
+      ]
+    },
+    {
+      "title": "Comparison: Advantages and Limitations",
+      "owner": 5,
+      "layout": "comparison",
+      "headers": [
+        "Algorithm",
+        "Mechanism",
+        "Correctness /\nProgress",
+        "Fairness",
+        "Low\nContention",
+        "High\nContention",
+        "Worst Case /\nLimitations"
+      ],
+      "widths": [
+        1.17,
+        1.65,
+        1.95,
+        1.45,
+        1.8,
+        2.05,
+        2.06
+      ],
+      "rows": [
+        [
+          "Peterson",
+          "2 threads; two flags + turn.\nSoftware coordination.",
+          "Exclusive under sequential consistency.\nHolder must run to release.",
+          "Bounded waiting: at most one overtake after doorway.",
+          "Few flag/turn accesses; no atomic read-modify-write.\nOnly 2 threads.",
+          "Poll shared flags/turn.\nLonger critical sections increase busy waiting.",
+          "Preempted holder cannot release; other thread spins.\nPoor ordering breaks safety."
+        ],
+        [
+          "LL/SC",
+          "Hardware support; LL reserves, SC conditionally writes.",
+          "Only successful SC claims the lock.\nRetries need a chance to finish.",
+          "No FIFO or bounded wait; starvation is possible.",
+          "Short LL/SC path when SC succeeds.\nSpurious failure can add retries.",
+          "Race after unlock; failed SCs retry.\nShared flag and reservations remain contended.",
+          "Reservation loss causes retries; preempted holder prolongs spinning."
+        ],
+        [
+          "MCS\n(CAS release)",
+          "Node queue; atomic tail exchange; poll own flag.",
+          "One owner; predecessor hands off.\nNodes and ordering must stay valid.",
+          "FIFO by successful tail exchange.\nNo time bound.",
+          "Node setup + tail exchange; CAS on release.\nQueue overhead remains.",
+          "Separate-node polling reduces coherence traffic with suitable placement.",
+          "Preempted successor blocks later waiters.\nNeeds a live node per acquisition."
+        ]
+      ],
+      "takeaway": "All three locks spin; waiting time includes scheduler delays. No lock is best for every workload.",
+      "notes": "หน้านี้เปรียบเทียบ 7 คอลัมน์ โดยไล่จากกลไก เงื่อนไข correctness และ progress ความเป็นธรรม ต้นทุนเมื่อคนรอน้อย เมื่อคนรอมาก และกรณีที่ทำให้แย่ Peterson ใช้ flag และ turn ประสานงานระหว่างสองเธรด ไม่มี atomic read-modify-write แต่ต้องมี sequential consistency หรือ memory ordering ที่รักษาการพิสูจน์ไว้ เมื่อทั้งคู่ต้องการเข้า คนที่ผ่าน doorway แล้วจะถูกอีกคนแซงได้ไม่เกินหนึ่งครั้ง ไม่ได้หมายถึงรอได้ไม่เกินเวลาคงที่ LL/SC ใช้ reservation และ SC ที่สำเร็จเพื่อให้สิทธิ์เข้า critical section เส้นทางสั้นเมื่อสำเร็จ แต่ SC อาจล้มเหลวจากการเสีย reservation แม้ไม่มีคนเขียนแทรก ต้อง retry ด้วย LL ใหม่ และไม่มีคิวรับประกันลำดับ MCS รุ่น CAS release จัด FIFO ตามลำดับ tail exchange ที่สำเร็จ คนรออ่าน flag ของตัวเอง จึงลด coherence traffic เมื่อวาง node เหมาะสม แต่ต้องจัด node ให้มีอายุจน unlock เสร็จ และยังมีต้นทุนจัดคิวแม้ไม่มีคนรอ หาก holder ถูก preempt ทั้งสามแบบยัง spin และต้องรอให้ holder ได้รันเพื่อปล่อย lock สำหรับ MCS แม้ holder ปล่อยแล้ว แต่ successor ไม่ได้รัน คนข้างหลังก็แซงไม่ได้ ทุกแบบจึงต้องดูทั้งการสื่อสารระหว่าง core ระยะเวลา critical section และ scheduler Guarantees ถือภายใต้สมมติฐานที่อธิบายก่อนหน้า ตารางนี้เป็นการวิเคราะห์พฤติกรรม ไม่มีตัวใดเร็วที่สุดในทุก workload ขอบคุณครับ/ค่ะ",
+      "sources": [
+        "peterson",
+        "ostep",
+        "arm",
+        "mcs",
+        "mcs_code",
+        "scheduler"
+      ]
+    }
+  ]
+}

@@ -11,6 +11,6 @@ shows one inode for both names and a link count of~2. Deleting
 until the count reaches~0.
 
 A symbolic link (\texttt{ln -s}, \texttt{mklink}) is a separate file that stores
-only the target's path, so it fails once that path no longer exists. On Windows,
-\texttt{mklink} without \texttt{/H} or \texttt{/J} needs the symbolic-link
-privilege, which this unelevated shell lacks.
+only the target's path, so it fails once that path no longer exists (returning
+\texttt{No such file or directory} on Linux and
+\texttt{The system cannot find the file specified} on Windows).
